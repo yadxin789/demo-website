@@ -73,6 +73,55 @@ return [
             'replace_placeholders' => true,
         ],
 
+        /*
+        |----------------------------------------------------------------------
+        | 五产品日志通道（各写各的，便于单独排障与交付时按产品取证）
+        |----------------------------------------------------------------------
+        | 用法： Log::channel('erp')->info(...)
+        |      或 SetProductContext 中间件把默认通道切到当前产品
+        | 五个目录在 storage/logs/{x}/ 下，互不覆盖
+        |
+        */
+        'erp' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/erp/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'pm' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/pm/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'shop' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/shop/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'mes' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/mes/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'hr' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/hr/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

@@ -13,7 +13,13 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'database'),
+    /*
+    | 必须是 sync（同步执行）。
+    | 演示站没有常驻 queue:work 进程，也没有 jobs 表；
+    | 任何 dispatch 都应当当场执行完，而不是静静躺在表里永远不跑。
+    | 定时任务已整体移除（HC-25），排队需求在演示版里不存在。
+    */
+    'default' => env('QUEUE_CONNECTION', 'sync'),
 
     /*
     |--------------------------------------------------------------------------

@@ -18,7 +18,15 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    /*
+    | 必须是 file。
+    | SQLite 是单写者，database 驱动会让五个库各建一张 sessions 表，
+    | 每个请求都要写库 —— 五个产品并行访问时必然互相撞锁。
+    |
+    | 不按产品分目录：五个 guard 的 session key 天然不同（login_{guard}_{hash}），
+    | 同一目录下互不覆盖；分目录反而要五套 cookie，得不偿失。
+    */
+    'driver' => env('SESSION_DRIVER', 'file'),
 
     /*
     |--------------------------------------------------------------------------

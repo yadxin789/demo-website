@@ -16,7 +16,12 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    /*
+    | 默认连接只是"未显式指定连接"时的兜底，业务代码一律不得依赖它（HC-15）。
+    | 允许连接 = 五个产品 + portal，除此之外不存在。
+    | 故意不设 DB_CONNECTION 环境变量：任何"以为是默认库"的误写都应尽早暴露。
+    */
+    'default' => env('DB_CONNECTION', 'erp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -40,6 +45,86 @@ return [
             'busy_timeout' => null,
             'journal_mode' => null,
             'synchronous' => null,
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | 五个产品连接（HC-15：模型必须显式 $connection，禁止跨库 join）
+        |----------------------------------------------------------------------
+        | SQLite 是单写者，参数必须埋在配置里而不是交给默认值：
+        |   journal_mode = WAL          允许读写并行，避免"database is locked"
+        |   busy_timeout = 5000         写锁等待 5 秒再报错
+        |   synchronous  = NORMAL       兼顾安全与速度（FULL 太慢，OFF 会丢数据）
+        |   foreign_key_constraints     每个库各自开外键，不依赖全局开关
+        |
+        | 相对路径由 database_path() 解析，.env 里只写文件名（换机器不用改路径）
+        |
+        */
+        'erp' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('ERP_DB_DATABASE', 'erp.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        'pm' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('PM_DB_DATABASE', 'pm.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        'shop' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('SHOP_DB_DATABASE', 'shop.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        'mes' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('MES_DB_DATABASE', 'mes.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        'hr' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('HR_DB_DATABASE', 'hr.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        // 门户线索库：只存 leads，不读任何产品库（HC-14）
+        'portal' => [
+            'driver' => 'sqlite',
+            'database' => database_path(env('PORTAL_DB_DATABASE', 'portal.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+            'busy_timeout' => 5000,
+            'journal_mode' => 'WAL',
+            'synchronous' => 'NORMAL',
             'transaction_mode' => 'DEFERRED',
         ],
 
