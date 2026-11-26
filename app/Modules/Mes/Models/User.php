@@ -22,6 +22,11 @@ class User extends Authenticatable
     protected $connection = 'mes';
     protected $table = 'users';
 
+    /** spatie 角色/权限按 guard 隔离，MES 用自己的 guard（HC-11） */
+    protected $guard_name = 'mes';
+
+    protected $fillable = ['name', 'email', 'employee_no', 'team', 'password', 'status'];
+
     protected $guarded = ['id'];
     protected $hidden = ['password', 'remember_token'];
 

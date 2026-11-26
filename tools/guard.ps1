@@ -266,7 +266,17 @@ if ($g10.Count -gt 0) {
 # ---------------------------------------------------------------------------
 $g11 = New-Object System.Collections.Generic.List[string]
 $hits = FindHits 'app' 'Schedule::|->withSchedule\(|->command\(' '*.php'
-foreach ($h in $hits) { $g11.Add($h) }
+foreach ($h in $hits) {
+    # ApsSchedule / aps_schedules 是 MES 的"排产结果"表，不是定时任务，必须放行
+    if ($h -match '^(.*):(\d+)$') {
+        $relPath = $matches[1]
+        $lineNo = [int]$matches[2]
+        $absPath = Join-Path $script:Root $relPath
+        $text = (Get-Content -LiteralPath $absPath -ErrorAction SilentlyContinue | Select-Object -Skip ($lineNo - 1) -First 1)
+        if ("$text" -match 'ApsSchedule|aps_schedule') { continue }
+    }
+    $g11.Add($h)
+}
 if (Test-Path (Join-Path $script:Root 'routes\console.php')) {
     $console = Join-Path $script:Root 'routes\console.php'
     foreach ($l in (Get-Content -LiteralPath $console -ErrorAction SilentlyContinue)) {
@@ -344,6 +354,15 @@ $g16 = New-Object System.Collections.Generic.List[string]
 foreach ($p in @('mes', 'hr')) {
     $base = Join-Path $script:Root "app\Modules\$($p.Substring(0,1).ToUpper())$($p.Substring(1))"
     if (-not (Test-Path -LiteralPath $base)) { continue }
+
+    # 只约束"尚未开发"的预留位：config/products.php 里 enabled=true 的产品已经是正式模块，
+    # 它的实现代码不应再被当成越界（否则每完成一个产品都要改一次门禁）
+    $productsRaw = Get-Content -LiteralPath (Join-Path $script:Root 'config\products.php') -Raw
+    $segMatch = [regex]::Match($productsRaw, "(?s)'" + $p + "'\s*=>\s*\[(.*?)\n        \],")
+    if ($segMatch.Success -and ($segMatch.Groups[1].Value -match "enabled'\s*=>\s*true")) {
+        continue
+    }
+
     foreach ($f in (Get-ChildItem -LiteralPath $base -Recurse -File -Filter '*.php' -ErrorAction SilentlyContinue)) {
         $rel = $f.FullName.Replace($base + '\', '')
         $allowed = ($rel -match '^Models\\BaseModel\.php$') -or

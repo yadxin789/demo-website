@@ -1,0 +1,242 @@
+/* ==========================================================================
+   MES · 精工精密制造（苏州）主题
+   深蓝 + 橙：车间环境对比度高，投到产线大屏上也清楚（规划书 M1-08）
+   只服务 /mes/*，不得被其它产品引用（HC-21/22）
+   ========================================================================== */
+
+:root {
+    --mes-navy: #16233f;
+    --mes-navy-2: #1e3055;
+    --mes-orange: #f08c00;
+    --mes-orange-2: #e67700;
+    --mes-line: #dfe4ee;
+    --mes-text: #22303f;
+    --mes-muted: #6b7a90;
+    --mes-bg: #f4f6fa;
+    --mes-ok: #2f9e44;
+    --mes-warn: #f59f00;
+    --mes-bad: #d6336c;
+}
+
+* { box-sizing: border-box; }
+
+body.mes-body {
+    margin: 0;
+    background: var(--mes-bg);
+    color: var(--mes-text);
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 14px;
+}
+
+/* ---------- 登录页 ---------- */
+.mes-login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(900px 500px at 15% 10%, rgba(240, 140, 0, .18), transparent 60%),
+        linear-gradient(155deg, #101b31 0%, #1e3055 60%, #24406f 100%);
+    padding: 32px 16px;
+}
+
+.mes-login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(6, 17, 34, .35);
+    padding: 34px 32px 28px;
+}
+
+.mes-login-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.mes-login-brand .mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--mes-navy-2), var(--mes-orange));
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: .5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mes-login-brand h1 {
+    font-size: 19px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.mes-login-sub {
+    color: var(--mes-muted);
+    font-size: 13px;
+    margin: 4px 0 22px;
+}
+
+.mes-login-card .form-label { font-size: 13px; color: var(--mes-muted); }
+.mes-login-card .form-control { height: 42px; }
+.mes-login-btn {
+    height: 44px;
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    background: var(--mes-orange);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: .4px;
+}
+.mes-login-btn:hover { background: var(--mes-orange-2); }
+
+.mes-login-tip {
+    margin-top: 18px;
+    padding: 10px 12px;
+    background: #f8f9fb;
+    border: 1px dashed var(--mes-line);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--mes-muted);
+    line-height: 1.7;
+}
+.mes-login-tip b { color: var(--mes-text); }
+
+.mes-login-foot {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: #93a1b5;
+}
+
+/* ---------- 侧栏布局 ---------- */
+.mes-shell { display: flex; min-height: 100vh; }
+
+.mes-side {
+    width: 232px;
+    flex: 0 0 232px;
+    background: linear-gradient(180deg, var(--mes-navy) 0%, var(--mes-navy-2) 100%);
+    color: #cfd8e6;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.mes-side-brand {
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.mes-side-brand .mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--mes-orange);
+    color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+}
+.mes-side-brand .txt { line-height: 1.2; }
+.mes-side-brand .txt b { display: block; color: #fff; font-size: 14px; font-weight: 600; }
+.mes-side-brand .txt span { font-size: 11px; color: #93a5bf; }
+
+.mes-nav { padding: 10px 10px 20px; overflow-y: auto; flex: 1; }
+.mes-nav .grp {
+    font-size: 11px;
+    color: #7f92ad;
+    letter-spacing: 1px;
+    padding: 14px 10px 6px;
+    text-transform: uppercase;
+}
+.mes-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 7px;
+    color: #cfd8e6;
+    text-decoration: none;
+    font-size: 13.5px;
+}
+.mes-nav a i { width: 16px; text-align: center; color: #8ca2c0; font-size: 13px; }
+.mes-nav a:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+.mes-nav a.on { background: rgba(240, 140, 0, .16); color: #fff; box-shadow: inset 3px 0 0 var(--mes-orange); }
+.mes-nav a.on i { color: var(--mes-orange); }
+
+.mes-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.mes-topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--mes-line);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.mes-topbar .ttl { font-size: 16px; font-weight: 600; }
+.mes-topbar .sub { font-size: 12px; color: var(--mes-muted); }
+.mes-topbar .who { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--mes-muted); }
+.mes-topbar .who b { color: var(--mes-text); }
+
+.mes-content { padding: 20px; }
+
+/* ---------- 通用卡片 / KPI ---------- */
+.mes-card {
+    background: #fff;
+    border: 1px solid var(--mes-line);
+    border-radius: 10px;
+    padding: 16px 18px;
+}
+.mes-card h3 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+
+.mes-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.mes-kpi {
+    background: #fff;
+    border: 1px solid var(--mes-line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-top: 3px solid var(--mes-navy-2);
+}
+.mes-kpi.orange { border-top-color: var(--mes-orange); }
+.mes-kpi.ok { border-top-color: var(--mes-ok); }
+.mes-kpi.bad { border-top-color: var(--mes-bad); }
+.mes-kpi .lb { font-size: 12px; color: var(--mes-muted); }
+.mes-kpi .vl { font-size: 24px; font-weight: 700; line-height: 1.5; }
+.mes-kpi .ft { font-size: 12px; color: var(--mes-muted); }
+
+/* ---------- 表格 ---------- */
+.mes-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.mes-table th, .mes-table td { padding: 9px 10px; border-bottom: 1px solid var(--mes-line); text-align: left; vertical-align: middle; }
+.mes-table th { color: var(--mes-muted); font-weight: 500; background: #fafbfd; }
+.mes-table tbody tr:hover { background: #fbfcfe; }
+.mes-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.mes-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; line-height: 1.6; }
+.b-draft { background: #eceff4; color: #5b6a7f; }
+.b-released { background: #e6f0ff; color: #1c5fd0; }
+.b-progress { background: #fff4e0; color: #b36b00; }
+.b-done { background: #e6f7ec; color: #227a39; }
+.b-bad { background: #ffe9ef; color: #a61e4d; }
+
+.mes-progress { height: 6px; background: #edf0f6; border-radius: 3px; overflow: hidden; min-width: 80px; }
+.mes-progress > span { display: block; height: 100%; background: var(--mes-orange); }
+
+.mes-empty { padding: 36px 10px; text-align: center; color: var(--mes-muted); font-size: 13px; }
+
+@media (max-width: 900px) {
+    .mes-shell { flex-direction: column; }
+    .mes-side { width: 100%; flex: none; height: auto; position: static; }
+    .mes-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .mes-nav .grp { grid-column: 1 / -1; }
+}
