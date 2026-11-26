@@ -28,7 +28,7 @@
             </p>
             <div class="p-stats">
                 <div><b>{{ count($products) }}</b><span>在线产品</span></div>
-                <div><b>5</b><span>预留席位</span></div>
+                <div><b>{{ 5 - count($products) }}</b><span>预留席位</span></div>
                 <div><b>123456</b><span>统一演示密码</span></div>
             </div>
         </section>
