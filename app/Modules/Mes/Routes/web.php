@@ -15,6 +15,9 @@ declare(strict_types=1);
 
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
+use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
+use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
+use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,13 +50,28 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                 ->whereNumber('workOrder')
                 ->name('work-orders.show');
 
-            // 主数据（M1 替换）
+            // 主数据（M1：物料已真实落地，其余逐步替换）
             Route::prefix('master')->name('master.')->group(function () {
-                Route::get('materials', [PlaceholderController::class, 'show'])->name('materials.index');
+                Route::get('materials', [MaterialController::class, 'index'])->name('materials.index');
+                Route::post('materials', [MaterialController::class, 'store'])->name('materials.store');
+                Route::put('materials/{material}', [MaterialController::class, 'update'])
+                    ->whereNumber('material')
+                    ->name('materials.update');
+
                 Route::get('boms', [PlaceholderController::class, 'show'])->name('boms.index');
                 Route::get('routings', [PlaceholderController::class, 'show'])->name('routings.index');
-                Route::get('work-centers', [PlaceholderController::class, 'show'])->name('work-centers.index');
-                Route::get('shifts', [PlaceholderController::class, 'show'])->name('shifts.index');
+
+                Route::get('work-centers', [WorkCenterController::class, 'index'])->name('work-centers.index');
+                Route::post('work-centers', [WorkCenterController::class, 'store'])->name('work-centers.store');
+                Route::put('work-centers/{workCenter}', [WorkCenterController::class, 'update'])
+                    ->whereNumber('workCenter')
+                    ->name('work-centers.update');
+
+                Route::get('shifts', [ShiftController::class, 'index'])->name('shifts.index');
+                Route::post('shifts', [ShiftController::class, 'store'])->name('shifts.store');
+                Route::put('shifts/{shift}', [ShiftController::class, 'update'])
+                    ->whereNumber('shift')
+                    ->name('shifts.update');
             });
 
             // 质量（M4 替换）
