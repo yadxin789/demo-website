@@ -1,30 +1,64 @@
-@extends('shop::layouts.app')
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 | {{ config('shop.name') }}</title>
+    <link rel="stylesheet" href="{{ asset(config('shop.assets.bootstrap.css')) }}">
+    <link rel="stylesheet" href="{{ asset(config('shop.assets.fontawesome.css')) }}">
+    <link rel="stylesheet" href="{{ asset('assets/shop/css/shop.css') }}">
+</head>
+<body>
+    <main class="d-flex align-items-center justify-content-center" style="min-block-size:100vh;" role="main">
+        <section class="card" style="inline-size:100%;max-inline-size:24rem;" aria-labelledby="login-heading">
+            <div class="text-center mb-3">
+                <i class="fa-solid fa-store fa-2x text-primary"></i>
+                <h1 id="login-heading" class="h4 mt-2 mb-0">{{ config('shop.name') }}</h1>
+                <p class="text-muted small">请登录后进入系统</p>
+            </div>
 
-@section('title', '登录 · 百货零售 ERP')
+            @if (session('status'))
+                <div class="alert alert-success" role="status">{{ session('status') }}</div>
+            @endif
 
-@section('content')
-    <div class="login-card">
-        <div class="login-head">
-            <div class="login-icon"> ERP</div>
-            <h1>百货零售 ERP</h1>
-            <p>请登录后进入系统</p>
-        </div>
+            <form method="post" action="{{ route('shop.login') }}" aria-label="登录表单">
+                @csrf
 
-        <form method="POST" action="{{ route('shop.root') }}">
-            @csrf
-            <label class="field">
-                <span>用户名 / 邮箱</span>
-                <input type="text" name="email" value="{{ config('products.products.shop.demo_account.email') }}" autocomplete="username">
-            </label>
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名 / 邮箱</label>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           class="form-control @error('username') is-invalid @enderror"
+                           value="{{ old('username') }}"
+                           placeholder="请输入用户名或邮箱"
+                           autocomplete="username"
+                           autocapitalize="none"
+                           spellcheck="false"
+                           required autofocus>
+                    @error('username')
+                        <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <label class="field">
-                <span>密码</span>
-                <input type="password" name="password" value="123456" autocomplete="current-password">
-            </label>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           class="form-control @error('password') is-invalid @enderror"
+                           autocomplete="current-password"
+                           required>
+                    @error('password')
+                        <div class="invalid-feedback" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <button type="submit" class="btn-primary">登录</button>
-        </form>
-
-        <p class="login-note">演示账号已预填，直接点登录即可。</p>
-    </div>
-@endsection
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i>登录
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

@@ -125,7 +125,7 @@ return [
             ],
             'shots' => [],
             'demo_account' => [
-                'email' => 'admin@shop.demo',
+                'email' => 'admin',
                 'password' => '123456',
                 'note' => '演示环境统一密码 123456',
             ],

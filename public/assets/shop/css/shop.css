@@ -1,0 +1,1094 @@
+/* ==========================================================================
+   百货零售 ERP — 设计令牌与基础样式（离线，本地托管）
+   层级：reset, base, theme, components, utilities
+   规范对齐 .agents/skills/modern-web-guidance
+   ========================================================================== */
+
+@layer reset, base, theme, components, utilities;
+
+/* --------------------------------------------------------------------------
+   1. Reset（仅定向元素，禁止 * 全局重置）
+   -------------------------------------------------------------------------- */
+@layer reset {
+    html {
+        box-sizing: border-box;
+        -webkit-text-size-adjust: 100%;
+    }
+    body,
+    h1, h2, h3, h4, h5, h6,
+    p, figure, blockquote, dl, dd {
+        margin: 0;
+    }
+    button, input, select, textarea {
+        font: inherit;
+        color: inherit;
+    }
+    img, svg {
+        max-inline-size: 100%;
+        block-size: auto;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. Theme — 设计令牌（基础色 / 语义色 / UI 组件色）
+   -------------------------------------------------------------------------- */
+@layer theme {
+    :root {
+        /* 基础色板 */
+        --color-primary: #0b57d0;
+        --color-primary-strong: #0842a0;
+        --color-primary-soft: #e8f0fe;
+        --color-success: #1e7e34;
+        --color-success-soft: #e6f4ea;
+        --color-danger: #c5221f;
+        --color-danger-soft: #fce8e6;
+        --color-warning: #b06000;
+        --color-warning-soft: #fef7e0;
+        --color-info: #0277bd;
+
+        --color-gray-50: #f8f9fa;
+        --color-gray-100: #f1f3f5;
+        --color-gray-200: #e9ecef;
+        --color-gray-300: #dee2e6;
+        --color-gray-500: #868e96;
+        --color-gray-700: #495057;
+        --color-gray-900: #212529;
+
+        /* 语义色 */
+        --color-accent: var(--color-primary);
+        --color-text: var(--color-gray-900);
+        --color-text-muted: var(--color-gray-700);
+        --color-surface: #ffffff;
+        --color-surface-subtle: var(--color-gray-50);
+        /* 组件边界（输入框/卡片/按钮）需要 ≥3:1，不靠阴影表达边界 */
+        --color-border: #767f8b;
+        /* 表格与列表内部的分隔线属装饰性，可用浅色 */
+        --color-border-subtle: var(--color-gray-300);
+        --color-link: var(--color-primary);
+
+        /* UI 令牌 */
+        --ui-border: 1px solid var(--color-border);
+        --ui-radius: 0.5rem;
+        --ui-radius-sm: 0.375rem;
+        --ui-gap: 1rem;
+        --ui-sidebar-width: 15.5rem;
+        --ui-topbar-height: 3.5rem;
+
+        /* 字体与排版 */
+        --font-sans: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui,
+            -apple-system, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+        --size-sm: 0.875rem;
+        --size-base: 1rem;
+        --size-lg: 1.125rem;
+
+        /* 让浏览器原生控件/滚动条/画布跟随系统主题（须落在根元素上） */
+        color-scheme: light dark;
+
+        /* Bootstrap 变量跟随设计令牌（含表单、卡片、表格边框） */
+        --bs-border-color: var(--color-border);
+        --bs-link-color: var(--color-link);
+        --bs-link-hover-color: var(--color-primary-strong);
+        --bs-body-color: var(--color-text);
+        --bs-body-bg: var(--color-surface);
+        --bs-secondary-color: var(--color-text-muted);
+    }
+
+    /* 暗色模式（color-scheme 不支持时的兜底路径同样生效：这里用媒体查询切换令牌） */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --color-primary: #8ab4f8;
+            --color-primary-strong: #aecbfa;
+            --color-success: #81c995;
+            --color-danger: #f28b82;
+            --color-warning: #fdd663;
+            --color-info: #4fc3f7;
+            --color-text: #e9ecef;
+            --color-text-muted: #bdc5cf;
+            --color-surface: #1f2125;
+            --color-surface-subtle: #16181c;
+            --color-border: #9aa4b2;
+            --color-border-subtle: #3c4046;
+            --color-primary-soft: #1c2b45;
+            --color-success-soft: #14301c;
+            --color-danger-soft: #3a1c1a;
+            --color-warning-soft: #3a2c12;
+            --color-link: var(--color-primary);
+        }
+    }
+
+    /* 系统要求更高对比度时：加强次要文字与边界，而不是等用户开了才补救默认对比 */
+    @media (prefers-contrast: more) {
+        :root {
+            --color-text-muted: var(--color-text);
+            --color-border: #3d4653;
+            --color-border-subtle: #6b7280;
+        }
+    }
+    @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+        :root {
+            --color-border: #d7dde5;
+            --color-border-subtle: #8b95a3;
+        }
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. Base — 基础元素
+   -------------------------------------------------------------------------- */
+@layer base {
+    body {
+        font-family: var(--font-sans);
+        font-size: var(--size-base);
+        line-height: 1.5;
+        color: var(--color-text);
+        background: #f5f7fa;
+        text-align: start;
+    }
+
+    h1 { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+    h2 { font-size: var(--size-lg); }
+
+    /* 文本可读行宽 */
+    article, .prose { max-inline-size: 60ch; }
+
+    /* 焦点可见环 */
+    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: var(--ui-radius-sm);
+    }
+
+    /* 触控目标最小尺寸 */
+    :where(button, .btn, a.nav-link) {
+        min-block-size: 2.25rem;
+    }
+    @media (pointer: coarse) {
+        :where(button, .btn) { min-block-size: 3.25rem; }
+    }
+}
+
+/* --------------------------------------------------------------------------
+   4. Components — 通用组件
+   -------------------------------------------------------------------------- */
+@layer components {
+    .app-shell {
+        display: grid;
+        grid-template-columns: var(--ui-sidebar-width) 1fr;
+        min-block-size: 100vh;
+    }
+
+    .app-sidebar {
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        border-inline-end: 1px solid rgba(255, 255, 255, 0.08);
+        padding-block: var(--ui-gap);
+        color: #fff;
+    }
+
+    .app-topbar {
+        min-block-size: var(--ui-topbar-height);
+        background: var(--color-surface);
+        border-block-end: var(--ui-border);
+        display: flex;
+        align-items: center;
+        gap: var(--ui-gap);
+        padding-inline: var(--ui-gap);
+    }
+
+    .app-main {
+        padding: var(--ui-gap);
+        max-inline-size: 100%;
+    }
+
+    .card {
+        background: var(--color-surface);
+        border: var(--ui-border);
+        border-radius: var(--ui-radius);
+        padding: var(--ui-gap);
+    }
+
+    .table-wrapper {
+        overflow: auto;
+        max-block-size: min(500px, 80vh);
+        container-type: inline-size;
+    }
+
+    .skip-link {
+        position: absolute;
+        inset-inline-start: 0.5rem;
+        inset-block-start: -3rem;
+        z-index: 1000;
+        background: var(--color-primary);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: var(--ui-radius-sm);
+        text-decoration: none;
+    }
+    .skip-link:focus-visible { inset-block-start: 0.5rem; }
+
+    .visually-hidden {
+        position: absolute !important;
+        clip-path: inset(50%) !important;
+        overflow: hidden !important;
+        inline-size: 1px !important;
+        block-size: 1px !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    /* POS 收银台（独立全屏，无后台侧边栏） */
+    .pos-body { min-block-size: 100vh; }
+
+    .pos-shell {
+        display: flex;
+        flex-direction: column;
+        min-block-size: 100vh;
+    }
+
+    .pos-topbar {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--ui-gap);
+        flex-wrap: wrap;
+        min-block-size: var(--ui-topbar-height);
+        background: var(--color-surface);
+        border-block-end: var(--ui-border);
+        padding-inline: var(--ui-gap);
+        padding-block: 0.5rem;
+    }
+
+    .pos-topbar-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .pos-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1.2fr 1fr;
+        gap: var(--ui-gap);
+        flex: 1;
+        min-block-size: 0;
+        padding: var(--ui-gap);
+    }
+
+    .pos-panel {
+        display: flex;
+        flex-direction: column;
+        min-block-size: 0;
+        background: var(--color-surface);
+        border: var(--ui-border);
+        border-radius: var(--ui-radius);
+        overflow: hidden;
+    }
+
+    .pos-panel-search { padding: var(--ui-gap); }
+
+    .pos-panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--ui-gap);
+        padding: var(--ui-gap);
+        border-block-end: var(--ui-border);
+    }
+
+    .pos-catalog {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        flex: 1;
+        min-block-size: 0;
+        overflow: auto;
+        padding: var(--ui-gap);
+        align-content: start;
+    }
+
+    .pos-product {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        text-align: start;
+        border: var(--ui-border);
+        border-radius: var(--ui-radius-sm);
+        background: var(--color-surface);
+        padding: 0.75rem;
+        min-block-size: 3.25rem;
+    }
+    .pos-product:hover:not(:disabled) { background: var(--color-primary-soft); }
+    .pos-product:disabled { opacity: 0.55; cursor: not-allowed; }
+    .pos-product-code { font-size: var(--size-sm); color: var(--color-text-muted); }
+    .pos-product-name { font-weight: 600; overflow-wrap: anywhere; }
+    .pos-product-price { color: var(--color-primary-strong); font-weight: 600; }
+
+    .pos-cart {
+        flex: 1;
+        min-block-size: 0;
+        overflow: auto;
+        padding: var(--ui-gap);
+    }
+
+    .pos-summary {
+        display: grid;
+        gap: 0.6rem;
+        padding: var(--ui-gap);
+        margin: 0;
+    }
+    .pos-summary dd { margin: 0; font-weight: 600; }
+    .pos-summary-grand {
+        border-block-start: var(--ui-border);
+        padding-block-start: 0.6rem;
+        font-size: var(--size-lg);
+    }
+    .pos-summary-grand dd { color: var(--color-success); }
+
+    .pos-pay-methods {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        padding: var(--ui-gap);
+    }
+
+    @media (max-width: 1100px) {
+        .pos-grid { grid-template-columns: 1fr; }
+        .pos-panel { min-block-size: 20rem; }
+    }
+
+    /* 表格：组件外框用强边界，行内分隔保持浅色 */
+    .table {
+        --bs-table-border-color: var(--color-border-subtle);
+        --bs-table-bg: var(--color-surface);
+        --bs-table-color: var(--color-text);
+    }
+
+    /* 表单控件边界 ≥3:1，占位文字也用可读的次要色 */
+    .form-control,
+    .form-select {
+        border-color: var(--color-border);
+        background-color: var(--color-surface);
+        color: var(--color-text);
+    }
+    .form-control::placeholder { color: var(--color-text-muted); opacity: 1; }
+
+    .form-check-input { accent-color: var(--color-primary); }
+}
+
+/* --------------------------------------------------------------------------
+   4b. 强制配色（Windows 高对比）与高对比回退
+   阴影/渐变/背景图在强制配色下会被移除，因此边界一律落成实线；
+   颜色改用系统色关键字，保证与用户主题对比度始终可辨。
+   -------------------------------------------------------------------------- */
+@layer components {
+    @media (forced-colors: active) {
+        :root {
+            --color-text: CanvasText;
+            --color-text-muted: GrayText;
+            --color-surface: Canvas;
+            --color-surface-subtle: Canvas;
+            --color-border: CanvasText;
+            --color-border-subtle: CanvasText;
+            --color-link: LinkText;
+            --color-primary: LinkText;
+            --color-primary-strong: LinkText;
+            --color-success: CanvasText;
+            --color-danger: CanvasText;
+            --color-warning: CanvasText;
+            --bs-border-color: CanvasText;
+        }
+
+        /* 组件边界：卡片、面板、顶栏、侧栏、汇总区 */
+        .card,
+        .pos-panel,
+        .app-sidebar,
+        .app-topbar,
+        .pos-topbar,
+        .pos-summary-grand,
+        .table-wrapper,
+        .table {
+            border: 1px solid CanvasText;
+        }
+
+        .table > :not(caption) > * > * { border-color: CanvasText; }
+
+        /* 徽标/按钮原本靠背景色区分，强制配色下背景被移除，补实线边界 */
+        .badge,
+        .btn,
+        .btn-primary,
+        .btn-outline-primary,
+        .btn-outline-secondary,
+        .btn-outline-danger,
+        .skip-link {
+            border: 1px solid ButtonText;
+        }
+
+        .badge { border-color: CanvasText; }
+
+        /* 选中/焦点改用系统高亮色，避免依赖自定义蓝 */
+        :focus-visible { outline: 3px solid Highlight; }
+
+        /* 禁用态明确降到 GrayText，避免只剩低透明度 */
+        :disabled,
+        .pos-product:disabled {
+            color: GrayText;
+            border-color: GrayText;
+            opacity: 1;
+        }
+
+        .text-muted { color: GrayText; }
+        a { color: LinkText; }
+    }
+
+    /* 系统要求更高对比度：边界加粗，避免细线在低视力下消失 */
+    @media (prefers-contrast: more) {
+        .card,
+        .form-control,
+        .form-select,
+        .pos-panel,
+        .pos-product {
+            border-width: 2px;
+        }
+        .text-muted { text-decoration: underline; text-decoration-thickness: 1px; }
+    }
+}
+
+/* --------------------------------------------------------------------------
+   5. Utilities
+   -------------------------------------------------------------------------- */
+@layer utilities {
+    .text-muted { color: var(--color-text-muted); }
+    .text-danger { color: var(--color-danger); }
+    .text-success { color: var(--color-success); }
+    .d-flex { display: flex; }
+    .gap-1 { gap: 0.5rem; }
+    .gap-2 { gap: 1rem; }
+    .align-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .mt-2 { margin-block-start: 1rem; }
+    .mb-2 { margin-block-end: 1rem; }
+}
+
+@layer components {
+    /* 4c. POS 前台交互面板（客户选择 / 多笔支付 / 批次选择 / 交班） */
+    .pos-dialog {
+        position: fixed;
+        inset: 0;
+        z-index: 1055;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.45);
+    }
+
+    .pos-dialog.d-none { display: none; }
+
+    .pos-dialog-panel {
+        width: min(440px, 100%);
+        padding: 1rem;
+        background: var(--color-surface);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+    }
+
+    .pos-customer-results {
+        max-height: 12rem;
+        overflow: auto;
+        margin-top: 0.25rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 0.375rem;
+    }
+
+    .pos-customer-option {
+        display: block;
+        width: 100%;
+        padding: 0.3rem 0.5rem;
+        color: inherit;
+        text-align: left;
+        background: none;
+        border: 0;
+        border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .pos-customer-option:last-child { border-bottom: 0; }
+
+    .pos-customer-option:hover,
+    .pos-customer-option:focus-visible { background: var(--color-primary-soft); }
+
+    .pos-payment-row {
+        display: grid;
+        grid-template-columns: 1fr 6rem auto;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .pos-payment-row:last-child { border-bottom: 0; }
+
+    .pos-payment-ref {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+    }
+
+    .pos-payment-ref input { min-inline-size: 0; }
+
+    #pos-qr-canvas img, #pos-qr-canvas canvas { display: block; }
+
+    .pos-shift-denom {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.15rem 0;
+    }
+
+    @media (forced-colors: active) {
+        .pos-dialog-panel,
+        .pos-customer-results { border: 1px solid CanvasText; }
+
+        .pos-customer-option { border-bottom: 1px solid CanvasText; }
+
+        .pos-payment-row { border-bottom: 1px solid CanvasText; }
+    }
+}
+
+@layer components {
+    /* 4d. 顶栏用户中心与侧栏图标/徽章（对齐 pm-server-openEuler 的呈现风格） */
+    .app-sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-block: 0.4rem;
+        color: #fff;
+        border-radius: var(--ui-radius-sm);
+    }
+
+    .app-sidebar .nav-link:hover,
+    .app-sidebar .nav-link:focus-visible { background: rgba(255, 255, 255, 0.1); }
+
+    .app-sidebar .nav-link.active {
+        background: rgba(102, 126, 234, 0.3);
+        color: #fff;
+        font-weight: 600;
+        border-left: 3px solid #667eea;
+    }
+
+    /* 分组标题（基础资料 / 采购管理 等不可点击项）用弱化白 */
+    .app-sidebar span.nav-link { color: rgba(255, 255, 255, 0.75); }
+
+    .sidebar-menu-icon {
+        inline-size: 1.25rem;
+        text-align: center;
+        flex: none;
+    }
+
+    .menu-badge.is-zero {
+        background: var(--color-gray-500);
+        color: #fff;
+    }
+
+    .menu-badge {
+        margin-inline-start: auto;
+        min-inline-size: 1.25rem;
+        padding: 0 0.35rem;
+        border-radius: 999px;
+        background: var(--color-danger);
+        color: #fff;
+        font-size: 0.75rem;
+        line-height: 1.25rem;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .notification-menu .app-icon-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2.25rem;
+        block-size: 2.25rem;
+        padding: 0;
+        border: 0;
+        border-radius: var(--ui-radius-sm);
+        background: transparent;
+        color: var(--color-text);
+        font-size: 1rem;
+    }
+
+    .notification-menu .app-icon-button:hover,
+    .notification-menu .app-icon-button:focus-visible,
+    .notification-menu .app-icon-button[aria-expanded="true"] {
+        background: var(--color-surface-subtle);
+    }
+
+    .notification-badge {
+        position: absolute;
+        inset-block-start: 0.1rem;
+        inset-inline-end: 0.05rem;
+        min-inline-size: 1.15rem;
+        block-size: 1.15rem;
+        padding: 0 0.25rem;
+        border-radius: 999px;
+        background: var(--color-danger);
+        color: #fff;
+        font-size: 0.68rem;
+        line-height: 1.15rem;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .notification-dropdown {
+        inline-size: 22rem;
+        max-inline-size: calc(100vw - 1.5rem);
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+    }
+
+    .notification-panel-head,
+    .notification-panel-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .notification-panel-head {
+        border-block-end: 1px solid var(--color-border);
+        background: var(--color-surface-subtle);
+    }
+
+    .notification-panel-foot {
+        border-block-start: 1px solid var(--color-border);
+        font-size: 0.82rem;
+    }
+
+    .notification-preview {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.65rem 0.8rem;
+        border-block-end: 1px solid var(--color-border);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .notification-preview:hover,
+    .notification-preview:focus-visible {
+        background: var(--color-surface-subtle);
+    }
+
+    .notification-preview.is-unread {
+        background: var(--color-primary-soft);
+    }
+
+    .notification-preview-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-inline-size: 0;
+    }
+
+    .notification-preview-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    .notification-preview-text {
+        font-size: 0.78rem;
+        color: var(--color-text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .notification-preview-time {
+        font-size: 0.72rem;
+        color: var(--color-text-muted);
+    }
+
+    .notification-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2rem;
+        block-size: 2rem;
+        border-radius: 50%;
+        flex: none;
+        background: var(--color-primary-soft);
+        color: var(--color-primary);
+        font-size: 0.85rem;
+    }
+
+    .notification-icon.level-warning {
+        background: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .notification-icon.level-danger {
+        background: var(--color-danger-soft);
+        color: var(--color-danger);
+    }
+
+    .notification-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 1.5rem 1rem;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+    }
+
+    .notification-empty-page {
+        padding-block: 2.5rem;
+    }
+
+    .notification-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .notification-row.is-unread {
+        background: var(--color-primary-soft);
+    }
+
+    .notification-row-body {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+    }
+
+    .notification-row-title {
+        font-weight: 600;
+    }
+
+    .notification-row-text {
+        margin-block-start: 0.3rem;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        white-space: pre-line;
+    }
+
+    .notification-row-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-block-start: 0.35rem;
+        color: var(--color-text-muted);
+        font-size: 0.75rem;
+    }
+
+    .notification-row-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: none;
+        font-size: 0.8rem;
+    }
+
+    .notification-level {
+        border-radius: 999px;
+        padding: 0.05rem 0.45rem;
+        font-size: 0.7rem;
+        background: var(--color-primary-soft);
+        color: var(--color-primary);
+    }
+
+    .notification-level.level-warning {
+        background: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .notification-level.level-danger {
+        background: var(--color-danger-soft);
+        color: var(--color-danger);
+    }
+
+    .notification-unread-dot {
+        inline-size: 0.45rem;
+        block-size: 0.45rem;
+        border-radius: 50%;
+        background: var(--color-danger);
+    }
+
+    .default-avatar-option {
+        display: block;
+        inline-size: 100%;
+        padding: 0.35rem;
+        border: 0;
+        background: transparent;
+        color: inherit;
+    }
+
+    .default-avatar-option img {
+        inline-size: 4.5rem;
+        block-size: 4.5rem;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .default-avatar-option:hover img,
+    .default-avatar-option:focus-visible img {
+        border-color: var(--color-primary-soft);
+    }
+
+    .default-avatar-option.is-selected img {
+        border-color: var(--color-primary);
+    }
+
+    .user-menu .app-user-toggle {
+        padding: 0.25rem 0.5rem;
+        border: 0;
+        background: transparent;
+        border-radius: var(--ui-radius-sm);
+        color: var(--color-text);
+    }
+
+    .user-menu .app-user-toggle:hover,
+    .user-menu .app-user-toggle:focus-visible,
+    .user-menu .app-user-toggle[aria-expanded="true"] { background: var(--color-surface-subtle); }
+
+    .user-avatar {
+        inline-size: var(--avatar-size, 2.25rem);
+        block-size: var(--avatar-size, 2.25rem);
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex: none;
+    }
+
+    .user-avatar img {
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+    }
+
+    .user-avatar-initial { font-size: calc(var(--avatar-size, 2.25rem) * 0.42); line-height: 1; }
+
+    .user-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        line-height: 1.15;
+        color: var(--color-text);
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        line-height: 1.2;
+        color: var(--color-text-muted);
+    }
+
+    .user-menu .dropdown-menu {
+        min-inline-size: 10.5rem;
+        border: 1px solid var(--color-border);
+    }
+
+    .user-menu .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding-block: 0.45rem;
+    }
+
+    .dashboard-stat .card-body {
+        align-items: flex-start;
+    }
+
+    .dashboard-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inline-size: 2.25rem;
+        block-size: 2.25rem;
+        border-radius: 50%;
+        flex: none;
+        font-size: 0.9rem;
+    }
+
+    .dashboard-stat-icon.tone-primary {
+        background: var(--color-primary-soft);
+        color: var(--color-primary);
+    }
+
+    .dashboard-stat-icon.tone-success {
+        background: var(--color-success-soft);
+        color: var(--color-success);
+    }
+
+    .dashboard-stat-icon.tone-warning {
+        background: var(--color-warning-soft);
+        color: var(--color-warning);
+    }
+
+    .dashboard-stat-icon.tone-danger {
+        background: var(--color-danger-soft);
+        color: var(--color-danger);
+    }
+
+    .dashboard-chart {
+        position: relative;
+        block-size: 18rem;
+    }
+
+    .dashboard-chart canvas {
+        max-inline-size: 100%;
+    }
+
+    .dashboard-chart-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        block-size: 18rem;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+    }
+
+    .dashboard-chart-empty i {
+        font-size: 1.6rem;
+        opacity: 0.6;
+    }
+
+    .min-w-0 {
+        min-inline-size: 0;
+    }
+
+    @media (max-width: 575.98px) {
+        .dashboard-chart,
+        .dashboard-chart-empty {
+            block-size: 15rem;
+        }
+    }
+
+    @media (forced-colors: active) {
+        .user-avatar,
+        .menu-badge { border: 1px solid ButtonText; }
+
+        .app-sidebar .nav-link.active { border: 1px solid Highlight; }
+    }
+}
+
+/* 扫码摄像头弹层（scan.js 动态创建） */
+.erp-scan-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.erp-scan-dialog {
+    inline-size: min(32rem, 100%);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #111;
+}
+
+.erp-scan-video-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: #111;
+    aspect-ratio: 4 / 3;
+}
+
+.erp-scan-video-wrap video {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.erp-scan-frame {
+    position: absolute;
+    inset: 18% 12%;
+    border: 2px dashed rgba(255, 255, 255, 0.75);
+    border-radius: 0.5rem;
+    pointer-events: none;
+}
+
+body.erp-scan-open { overflow: hidden; }
+
+/* ==========================================================================
+   侧边栏配色覆盖（未分层规则，确保压过 Bootstrap 未分层的 .nav-link）
+   对齐 pm-server-openEuler：深蓝渐变底 + 白色菜单文字 + 蓝紫选中态
+   ========================================================================== */
+.app-sidebar {
+    color: #fff;
+}
+
+.app-sidebar .nav-link,
+.app-sidebar .nav-link:link,
+.app-sidebar .nav-link:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
+.app-sidebar .nav-link:hover,
+.app-sidebar .nav-link:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.app-sidebar .nav-link.active {
+    background: rgba(102, 126, 234, 0.3);
+    color: #fff;
+    font-weight: 600;
+    border-left: 3px solid #667eea;
+}
+
+/* 分组标题（基础资料 / 采购管理 等不可点击项）用弱化白 */
+.app-sidebar span.nav-link {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* 手风琴分组折叠 */
+.nav-group-toggle {
+    cursor: pointer;
+}
+
+.nav-group-toggle .menu-badge {
+    margin-inline-start: 0;
+}
+
+.sidebar-chevron {
+    margin-inline-start: auto;
+    inline-size: 1rem;
+    text-align: center;
+    font-size: 0.72rem;
+    transition: transform 0.2s ease;
+}
+
+.nav-group-toggle[aria-expanded="true"] .sidebar-chevron {
+    transform: rotate(180deg);
+}
+
+.nav-group-toggle[aria-expanded="true"] {
+    color: #fff;
+}
+
+.nav-group .collapse {
+    padding-block-start: 0.25rem;
+}

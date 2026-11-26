@@ -1,29 +1,39 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Modules\Shop\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 
-/**
- * 百货零售 ERP 的登录用户。
- *
- * 硬约束（HC-11）：五个产品各有自己的 users 表、User 模型、guard。
- * 五个模型类名相同但命名空间不同，互不引用，不做单点登录。
- */
 class User extends Authenticatable
 {
-    use HasRoles;
-    use Notifiable;
 
     protected $connection = 'shop';
-    protected $table = 'users';
 
-    protected $guarded = ['id'];
-    protected $hidden = ['password', 'remember_token'];
+    protected $guard_name = 'shop';
+
+    use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'username',
+        'email',
+        'avatar',
+        'phone',
+        'password',
+        'status',
+        'last_login_at',
+        'last_login_ip',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected function casts(): array
     {
@@ -32,5 +42,61 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class);
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(UserSession::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * 用户拥有的全部权限 code（经角色聚合）。
+     *
+     * @return list<string>
+     */
+    public function permissionCodes(): array
+    {
+        return $this->roles()
+            ->with('permissions')
+            ->get()
+            ->flatMap(fn (Role $role) => $role->permissions->pluck('code'))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    public function hasPermission(string $code): bool
+    {
+        return in_array($code, $this->permissionCodes(), true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->roles()->where('code', 'super-admin')->exists();
+    }
+
+    public function canManageAi(): bool
+    {
+        return $this->isAdmin() || $this->hasPermission('system.ai.manage');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
     }
 }

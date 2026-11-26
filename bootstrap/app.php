@@ -68,6 +68,15 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->view('portal::errors.404', [], 403);
         });
 
+        // POS 业务校验失败统一回 422（前端可直接展示 message），页面提交则回跳并带错误
+        $exceptions->render(function (\App\Modules\Shop\Exceptions\PosException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+
+            return back()->withInput()->withErrors(['pos' => $e->getMessage()]);
+        });
+
         // 门户统一的 404 页：客户点到一个不存在的产品或被关闭的产品时，
         // 不要看到 Laravel 默认报错页，而是回到"产品列表"（HC-30 的体验层）
         $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $e, Request $request) {

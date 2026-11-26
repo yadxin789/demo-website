@@ -1,29 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', '百货零售 ERP')</title>
-    <link rel="stylesheet" href="{{ asset('assets/shop/shop.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', config('shop.name')) | {{ config('shop.name') }}</title>
+
+    @include('shop::partials.theme-head')
+
+    {{-- 本地托管静态资源（离线运行，禁止 CDN） --}}
+    <link rel="stylesheet" href="{{ asset(config('shop.assets.bootstrap.css')) }}">
+    <link rel="stylesheet" href="{{ asset(config('shop.assets.fontawesome.css')) }}">
+    <link rel="stylesheet" href="{{ asset('assets/shop/css/shop.css') }}">
+    @stack('styles')
 </head>
 <body>
-    <header class="app-header">
-        <div class="app-wrap">
-            <a class="app-brand" href="{{ route('shop.root') }}">
-                <span class="app-dot"></span>百货零售 ERP
-            </a>
-            <span class="app-company">{{ config('products.products.shop.company') }}</span>
-        </div>
-    </header>
+    <a href="#app-main" class="skip-link">跳转到主内容</a>
 
-    <main class="app-wrap app-main">
-        @yield('content')
-    </main>
+    <div class="app-shell">
+        @include('shop::partials.sidebar')
 
-    <footer class="app-footer">
-        <div class="app-wrap">
-            演示环境 · {{ config('products.products.shop.company') }} · 演示账号密码统一 123456
+        <div class="d-flex flex-column" style="min-block-size:100vh;">
+            @include('shop::partials.navbar')
+
+            <main id="app-main" class="app-main" tabindex="-1">
+                @hasSection('content')
+                    @yield('content')
+                @else
+                    @yield('main')
+                @endif
+            </main>
+
+            @include('shop::partials.footer')
         </div>
-    </footer>
+    </div>
+
+    <script src="{{ asset(config('shop.assets.bootstrap.js')) }}"></script>
+    <script src="{{ asset(config('shop.assets.qrcode.js')) }}"></script>
+    <script src="{{ asset(config('shop.assets.jsqr.js')) }}"></script>
+    <script>
+        window.ERP_SCAN = {
+            resolveUrl: @json(route('shop.scan.resolve')),
+            csrf: @json(csrf_token())
+        };
+    </script>
+    <script src="{{ asset('assets/shop/js/scan.js') }}"></script>
+    <script src="{{ asset('assets/shop/js/shop.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>
