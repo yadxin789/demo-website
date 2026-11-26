@@ -177,10 +177,36 @@ if ($g06.Count -gt 0) {
 # G-07 路由条数差集（需基线快照）
 # ---------------------------------------------------------------------------
 $baselineFile = Join-Path $script:Root 'tools\baseline\routes.json'
-if (Test-Path -LiteralPath $baselineFile) {
-    AddResult 'G-07' '路由条数差集' 'PASS' '基线快照存在（S2 起逐产品比对）'
+if (-not (Test-Path -LiteralPath $baselineFile)) {
+    AddResult 'G-07' '路由条数差集' 'SKIP' '无基线快照（先跑 tools\snapshot-routes.ps1）'
 } else {
-    AddResult 'G-07' '路由条数差集' 'SKIP' '无基线快照（S2 搬 ERP 前生成）'
+    $base = Get-Content -LiteralPath $baselineFile -Raw | ConvertFrom-Json
+    Push-Location $script:Root
+    $jsonRoutes = & php artisan route:list --json --except-vendor 2>$null | ConvertFrom-Json
+    Pop-Location
+    $segCount = @{}
+    foreach ($r in $jsonRoutes) {
+        $seg = ([string]$r.uri -split '/')[0]
+        if ($seg -eq '') { $seg = '(root)' }
+        if (-not $segCount.ContainsKey($seg)) { $segCount[$seg] = 0 }
+        $segCount[$seg]++
+    }
+    $g07 = New-Object System.Collections.Generic.List[string]
+    foreach ($code in $Products) {
+        $b = $base.products.$code
+        if ($null -eq $b) { continue }
+        if (-not $b.migrated) { continue }
+        $act = 0
+        if ($segCount.ContainsKey($code)) { $act = $segCount[$code] }
+        $min = [int][Math]::Floor([double]$b.expected * 0.7)
+        if ($act -lt $min) { $g07.Add("$code 实际 $act 条 < 基线下限 $min（源 expected=$($b.expected)）") }
+    }
+    if ($g07.Count -gt 0) {
+        AddResult 'G-07' '路由条数差集' 'FAIL' ($g07.Count.ToString() + ' 个产品路由数量低于基线')
+        $script:Hits['G-07'] = $g07
+    } else {
+        AddResult 'G-07' '路由条数差集' 'PASS' ('基线比对通过，共 ' + $jsonRoutes.Count.ToString() + ' 条路由')
+    }
 }
 
 # ---------------------------------------------------------------------------

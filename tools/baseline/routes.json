@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-11-26 16:54:07",
+  "note": "G-07 基线：expected=源项目 Route:: 出现次数；migrated=true 的产品要求实际路由数不低于 expected 的 70%",
+  "products": {
+    "pm": {
+      "source": "E:\\my-pm\\pm-server-openEuler",
+      "expected": 246,
+      "migrated": true,
+      "actual": 196
+    },
+    "erp": {
+      "source": "E:\\ddwl-erp\\erp",
+      "expected": 456,
+      "migrated": false,
+      "actual": 4
+    },
+    "shop": {
+      "source": "E:\\erp-shop",
+      "expected": 186,
+      "migrated": false,
+      "actual": 4
+    }
+  }
+}
