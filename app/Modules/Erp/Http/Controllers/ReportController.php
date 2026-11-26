@@ -1,0 +1,194 @@
+<?php
+
+namespace App\Modules\Erp\Http\Controllers;
+
+use App\Modules\Erp\Models\Finance\CustomerInvoice;
+use App\Modules\Erp\Models\Finance\SupplierBill;
+use App\Modules\Erp\Models\MasterData\Supplier;
+use App\Modules\Erp\Models\Organization\Department;
+use App\Modules\Erp\Models\Purchasing\GoodsReceipt;
+use App\Modules\Erp\Models\Quality\Defect;
+use App\Modules\Erp\Models\Quality\InspectionRecord;
+use App\Modules\Erp\Models\Sales\SalesOrder;
+use App\Modules\Erp\Models\Sales\SalesOrderLine;
+use App\Modules\Erp\Services\SupplierPerformanceService;
+use App\Modules\Erp\Support\DataScopeService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * 报表中心与四张岗位报表（G4 / G7）
+ *
+ * 口径（v1.3 §4.29 / D-10）：收入按**开票**确认，不用订单额代替收入。
+ * P0-08：全部报表走行级范围（模型全局 scope 生效），页头明示当前数据范围；
+ *        访问权限由 report.view 拆为 report.sales / quality / supplier / finance 四条。
+ */
+class ReportController extends Controller
+{
+    /** 当前账号的报表数据范围文案（页头展示，避免"看到数但不知道口径"） */
+    private function scopeLabel(): string
+    {
+        $service = app(DataScopeService::class);
+        $deptName = Department::query()->find($service->departmentId())?->dept_name;
+
+        return match ($service->forCurrentUser()) {
+            DataScopeService::ALL => '全部业务数据',
+            DataScopeService::DEPARTMENT => '本部门（' . ($deptName ?? '未设置部门') . '）',
+            DataScopeService::NONE => '无业务数据（系统管理岗）',
+            default => '仅本人负责的数据',
+        };
+    }
+
+    public function center()
+    {
+        $cards = [
+            ['name' => '销售分析', 'route' => 'erp.report.sales', 'desc' => '开票收入 / 客户贡献 / 订单状态', 'icon' => 'fa-chart-line'],
+            ['name' => '质量报表', 'route' => 'erp.report.quality', 'desc' => '检验合格率 / 缺陷 TOP', 'icon' => 'fa-shield-halved'],
+            ['name' => '供应商绩效', 'route' => 'erp.report.supplier', 'desc' => '到货笔数 / 收货金额', 'icon' => 'fa-industry'],
+            ['name' => '财务报表', 'route' => 'erp.report.finance', 'desc' => '开票收入 / 应收应付 / 账龄', 'icon' => 'fa-coins'],
+            ['name' => '经营驾驶舱', 'route' => 'erp.dashboard.exec', 'desc' => '老板只读汇总', 'icon' => 'fa-gauge-high'],
+        ];
+
+        return view('erp::reports.center', compact('cards'));
+    }
+
+    public function sales()
+    {
+        // 开票口径收入
+        $invoicedTotal = (float) CustomerInvoice::sum('amount');
+        $invoicedPaid = (float) CustomerInvoice::sum('paid_amount');
+
+        $topCustomers = CustomerInvoice::query()
+            ->join('customers', 'customers.id', '=', 'customer_invoices.customer_id')
+            ->select('customers.customer_name', DB::raw('SUM(customer_invoices.amount) as invoiced'))
+            ->groupBy('customers.customer_name')
+            ->orderByDesc('invoiced')
+            ->limit(10)
+            ->get();
+
+        $ordersByStatus = SalesOrder::query()
+            ->select('status', DB::raw('COUNT(*) as cnt'), DB::raw('SUM(total_amount) as amount'))
+            ->groupBy('status')
+            ->get();
+
+        $topProducts = SalesOrderLine::query()
+            ->whereHas('order')
+            ->join('materials', 'materials.id', '=', 'sales_order_lines.material_id')
+            ->select('materials.material_code', 'materials.name', DB::raw('SUM(sales_order_lines.qty) as qty'))
+            ->groupBy('materials.material_code', 'materials.name')
+            ->orderByDesc('qty')
+            ->limit(10)
+            ->get();
+
+        $scopeLabel = $this->scopeLabel();
+
+        return view('erp::reports.sales', compact('invoicedTotal', 'invoicedPaid', 'topCustomers', 'ordersByStatus', 'topProducts', 'scopeLabel'));
+    }
+
+    public function quality()
+    {
+        $total = (int) InspectionRecord::count();
+        $qualified = (int) InspectionRecord::sum('qualified_qty');
+        $defective = (int) InspectionRecord::sum('defect_qty');
+        $sample = (int) InspectionRecord::sum('sample_qty');
+        $passRate = $sample > 0 ? round($qualified / $sample * 100, 2) : null;
+
+        $byStage = InspectionRecord::query()
+            ->select('stage', DB::raw('COUNT(*) as cnt'), DB::raw('SUM(qualified_qty) as ok'), DB::raw('SUM(defect_qty) as ng'))
+            ->groupBy('stage')
+            ->get();
+
+        $topDefects = InspectionRecord::query()
+            ->whereNotNull('remark')
+            ->select('remark', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('remark')
+            ->orderByDesc('cnt')
+            ->limit(10)
+            ->get();
+
+        $defectCodes = Defect::query()->orderBy('code')->limit(50)->get(['code', 'name']);
+
+        $scopeLabel = $this->scopeLabel();
+
+        return view('erp::reports.quality', compact('total', 'qualified', 'defective', 'sample', 'passRate', 'byStage', 'topDefects', 'defectCodes', 'scopeLabel'));
+    }
+
+    public function supplier(Request $request, SupplierPerformanceService $performance)
+    {
+        $receipts = GoodsReceipt::query()->count();
+        $receiptQty = (float) GoodsReceipt::query()->sum('total_qty');
+
+        $topSuppliers = SupplierBill::query()
+            ->join('suppliers', 'suppliers.id', '=', 'supplier_bills.supplier_id')
+            ->select('suppliers.supplier_name', DB::raw('SUM(supplier_bills.amount) as billed'))
+            ->groupBy('suppliers.supplier_name')
+            ->orderByDesc('billed')
+            ->limit(10)
+            ->get();
+
+        $supplierCount = Supplier::count();
+
+        // P3-6：按期读取已生成的供应商绩效快照
+        try {
+            $scoreStart = $request->filled('start') ? Carbon::parse($request->input('start'))->startOfDay() : now()->startOfMonth();
+            $scoreEnd = $request->filled('end') ? Carbon::parse($request->input('end'))->startOfDay() : now()->endOfMonth();
+        } catch (\Throwable) {
+            $scoreStart = now()->startOfMonth();
+            $scoreEnd = now()->endOfMonth();
+        }
+        if ($scoreEnd->lt($scoreStart)) {
+            [$scoreStart, $scoreEnd] = [$scoreEnd, $scoreStart];
+        }
+        $scores = $performance->forPeriod($scoreStart, $scoreEnd);
+
+        $scopeLabel = $this->scopeLabel();
+
+        return view('erp::reports.supplier', compact(
+            'receipts', 'receiptQty', 'topSuppliers', 'supplierCount',
+            'scores', 'scoreStart', 'scoreEnd', 'scopeLabel'
+        ));
+    }
+
+    /** P3-6：生成/刷新某周期的供应商绩效快照（幂等，按周期+供应商覆盖）。 */
+    public function scoreSupplier(Request $request, SupplierPerformanceService $performance)
+    {
+        $data = $request->validate([
+            'start' => ['required', 'date'],
+            'end' => ['required', 'date', 'after_or_equal:start'],
+        ]);
+
+        $start = Carbon::parse($data['start'])->startOfDay();
+        $end = Carbon::parse($data['end'])->startOfDay();
+        if ($start->diffInDays($end) > 366) {
+            return back()->withErrors(['score' => '统计区间最长 366 天。']);
+        }
+
+        try {
+            $rows = $performance->generate($start, $end, (int) $request->user()->id);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['score' => $e->getMessage()]);
+        }
+
+        return redirect()->route('erp.report.supplier', [
+            'start' => $start->toDateString(),
+            'end' => $end->toDateString(),
+        ])->with('success', "供应商绩效已生成：{$rows->count()} 家供应商（{$start->toDateString()} ~ {$end->toDateString()}）。");
+    }
+
+
+    public function finance()
+    {
+        $invoiced = (float) CustomerInvoice::sum('amount');
+        $collected = (float) CustomerInvoice::sum('paid_amount');
+        $ar = (float) CustomerInvoice::where('status', '!=', 'paid')->sum(DB::raw('amount - paid_amount'));
+
+        $billed = (float) SupplierBill::sum('amount');
+        $paid = (float) SupplierBill::sum('paid_amount');
+        $ap = (float) SupplierBill::where('status', '!=', 'paid')->sum(DB::raw('amount - paid_amount'));
+
+        $scopeLabel = $this->scopeLabel();
+
+        return view('erp::reports.finance', compact('invoiced', 'collected', 'ar', 'billed', 'paid', 'ap', 'scopeLabel'));
+    }
+}

@@ -1,30 +1,100 @@
-@extends('erp::layouts.app')
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - DDWL-ERP 电子厂管理系统</title>
+    <link rel="stylesheet" href="{{ asset('assets/erp/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/erp/css/all.min.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            font-size: .9rem;
+        }
+        .login-card {
+            width: 100%; max-width: 400px;
+            border: none; border-radius: .75rem;
+            box-shadow: 0 20px 45px rgba(0,0,0,.35);
+        }
+        .login-card .brand-icon {
+            width: 56px; height: 56px; border-radius: 14px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff; font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .form-control { padding: .65rem .9rem; }
+        .btn-primary {
+            background: #2563eb; border-color: #2563eb;
+            padding: .65rem 1rem; font-weight: 600;
+        }
+        .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+        .demo-accounts {
+            background: #f8fafc; border-radius: .5rem;
+            font-size: .8rem; color: #64748b;
+        }
+    </style>
+</head>
+<body>
+<div class="card login-card">
+    <div class="card-body p-4 p-md-5">
+        <div class="brand-icon"><i class="fa-solid fa-industry"></i></div>
+        <h4 class="text-center fw-bold mb-1">DDWL-ERP</h4>
+        <p class="text-center text-muted mb-4">电子厂管理系统</p>
 
-@section('title', '登录 · 电子制造 ERP')
+        @if ($errors->any())
+            <div class="alert alert-danger py-2">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-@section('content')
-    <div class="login-card">
-        <div class="login-head">
-            <div class="login-icon"> ERP</div>
-            <h1>电子制造 ERP</h1>
-            <p>请登录后进入系统</p>
-        </div>
+        @if (session('success'))
+            <div class="alert alert-success py-2">
+                {{ session('success') }}
+            </div>
+        @endif
 
-        <form method="POST" action="{{ route('erp.root') }}">
+        <form method="POST" action="{{ route('erp.login') }}">
             @csrf
-            <label class="field">
-                <span>用户名 / 邮箱</span>
-                <input type="text" name="email" value="{{ config('products.products.erp.demo_account.email') }}" autocomplete="username">
-            </label>
-
-            <label class="field">
-                <span>密码</span>
-                <input type="password" name="password" value="123456" autocomplete="current-password">
-            </label>
-
-            <button type="submit" class="btn-primary">登录</button>
+            <div class="mb-3">
+                <label class="form-label">账号（用户名或邮箱）</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="account" class="form-control" value="{{ old('account') }}" required autofocus autocomplete="username">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" class="form-control" required autocomplete="current-password">
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="remember" class="form-check-input" id="remember">
+                <label class="form-check-label" for="remember">记住我</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-right-to-bracket me-2"></i>登 录
+            </button>
         </form>
 
-        <p class="login-note">演示账号已预填，直接点登录即可。</p>
+        <div class="demo-accounts p-3 mt-4">
+            <div class="fw-semibold mb-2"><i class="fa-solid fa-circle-info me-1"></i>演示账号（密码均为 123456）</div>
+            <div>系统管理员：张三</div>
+            <div>仓库主管：李四</div>
+            <div>采购专员：赵六</div>
+            <div>销售专员：钱七</div>
+            <div class="text-muted mt-1">其余岗位账号见《用户管理》列表。</div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3 small">
+            <span class="text-muted">忘记密码：请联系管理员注销旧账号后重新注册</span>
+            <a href="{{ route('erp.register') }}" class="fw-semibold text-decoration-none">注册账号</a>
+        </div>
     </div>
-@endsection
+</div>
+</body>
+</html>

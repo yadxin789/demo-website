@@ -41,8 +41,8 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
         // 产品根：已登录直接进工作台，否则进登录页
         Route::get('/', function () {
             return auth('pm')->check()
-                ? redirect()->route('pm.pm.dashboard')
-                : redirect()->route('pm.pm.login');
+                ? redirect()->route('pm.dashboard')
+                : redirect()->route('pm.login');
         })->name('root');
 
         Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');

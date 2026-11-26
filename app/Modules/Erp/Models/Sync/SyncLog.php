@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Modules\Erp\Models\Sync;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class SyncLog extends \App\Modules\Erp\Models\BaseModel
+{
+    protected $fillable = ['sync_task_id', 'run_at', 'status', 'total_count', 'success_count', 'message', 'replay_of', 'replayed_at'];
+    protected $casts = ['run_at' => 'datetime', 'replayed_at' => 'datetime'];
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(SyncTask::class, 'sync_task_id');
+    }
+}
