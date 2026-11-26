@@ -43,3 +43,10 @@ Thumbs.db
 # 上传文件不入库
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# 本地备份与业务上传（不进仓库）
+/backups/
+/storage/app/backups/
+/storage/app/products/
+/storage/app/ai-chat/
+/storage/app/ai-staging/

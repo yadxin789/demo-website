@@ -47,6 +47,49 @@ return [
             'report' => false,
         ],
 
+        // ── 以下五个盘由 Shop 模块使用，全部落本地，不进 public、不对外暴露 ──
+        // HC-22：第三方/业务资源一律本地存储，禁用 CDN 与外链
+
+        // 商品图片：由应用路由读流输出，断网环境仍可见
+        'products' => [
+            'driver' => 'local',
+            'root' => storage_path('app/products'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // 本地备份包：storage/app/backups
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backups'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // AI 聊天附件（图片 / 文件 / ZIP 解压工作区）
+        'ai_chat' => [
+            'driver' => 'local',
+            'root' => storage_path('app/ai-chat'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // AI 文档生成资源（模板 / 范例 / 支援文件）
+        'ai_docs' => [
+            'driver' => 'local',
+            'root' => storage_path('app'),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // AI 变更提案暂存区：确认后转正式库，驳回/过期即清理
+        'ai_staging' => [
+            'driver' => 'local',
+            'root' => storage_path('app/ai-staging'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

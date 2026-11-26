@@ -147,6 +147,13 @@ if (-not $routeRows) {
 } else {
     foreach ($r in $routeRows) {
         if (-not $r.name) { continue }
+        # 框架基础设施路由不归属任何产品，必须放行：
+        #   storage.local / storage.local.upload —— Storage::disk('local')->serve(true) 注册的文件流
+        #   generated::* —— 框架内部生成名
+        #   路由名看不出归属但 uri 恰为 up —— Laravel 12 内置健康检查 /up
+        if ($r.name -match '^storage\.local(\.|$)') { continue }
+        if ($r.name -match '^generated::') { continue }
+        if ($r.uri -eq 'up') { continue }
         $owner = ($r.name -split '\.')[0]
         if ($owner -eq 'portal') { continue }
         if ($Products -notcontains $owner) {

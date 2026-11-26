@@ -77,11 +77,30 @@ return Application::configure(basePath: dirname(__DIR__))
             return back()->withInput()->withErrors(['pos' => $e->getMessage()]);
         });
 
-        // 门户统一的 404 页：客户点到一个不存在的产品或被关闭的产品时，
-        // 不要看到 Laravel 默认报错页，而是回到"产品列表"（HC-30 的体验层）
+        // HC-24：错误页按产品分流 —— 每个产品带自己的 403/404/500，缺了才回门户，
+        // 让客户在任何产品里出错时看到的都是那个产品的牌子，而不是"同一套系统"。
         $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $e, Request $request) {
-            if ($response->getStatusCode() === 404 && ! $request->expectsJson()) {
-                return response()->view('portal::errors.404', [], 404);
+            if ($request->expectsJson()) {
+                return $response;
+            }
+
+            $status = $response->getStatusCode();
+
+            if ($status === 404 || $status === 500) {
+                $code = $request->segment(1);
+                $errView = $code . '::errors.' . $status;
+
+                if ($code !== null && Product::isEnabled($code) && view()->exists($errView)) {
+                    try {
+                        return response()->view($errView, [], $status);
+                    } catch (\Throwable) {
+                        // 渲染产品错误页本身失败时，退回默认响应，避免递归渲染
+                    }
+                }
+
+                if ($status === 404) {
+                    return response()->view('portal::errors.404', [], 404);
+                }
             }
 
             return $response;

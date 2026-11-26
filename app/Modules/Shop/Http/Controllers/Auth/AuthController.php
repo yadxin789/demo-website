@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect('shop/');
+            return redirect()->route('shop.dashboard');
         }
 
         return view('shop::auth.login');
@@ -68,7 +68,7 @@ class AuthController extends Controller
             'last_login_ip' => $request->ip(),
         ])->save();
 
-        return redirect()->intended('/')->with('status', '登录成功');
+        return redirect()->intended(route('shop.dashboard'))->with('status', '登录成功');
     }
 
     public function logout(Request $request): RedirectResponse

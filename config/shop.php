@@ -8,7 +8,7 @@
 return [
 
     // 应用基础信息
-    'name' => env('APP_NAME', '百货零售ERP'),
+    'name' => '百货零售 ERP',
     'currency' => 'CNY',
     'currency_symbol' => '¥',
     // 金额小数位（存储 DECIMAL(18,4)，展示按此）
@@ -24,29 +24,29 @@ return [
     'assets' => [
         'bootstrap' => [
             'version' => '5.3.8',
-            'css' => 'vendor/bootstrap/css/bootstrap.min.css',
-            'js' => 'vendor/bootstrap/js/bootstrap.bundle.min.js',
+            'css' => 'assets/shop/vendor/bootstrap/css/bootstrap.min.css',
+            'js' => 'assets/shop/vendor/bootstrap/js/bootstrap.bundle.min.js',
         ],
         'fontawesome' => [
             'version' => '6.7.2',
-            'css' => 'vendor/fontawesome/css/all.min.css',
+            'css' => 'assets/shop/vendor/fontawesome/css/all.min.css',
             // webfonts 与 css 同级 ../webfonts/，相对引用
         ],
         'chartjs' => [
             'version' => '4.4.7',
-            'js' => 'vendor/chartjs/chart.umd.min.js',
+            'js' => 'assets/shop/vendor/chartjs/chart.umd.min.js',
         ],
         'jsbarcode' => [
             'version' => '3.11.6',
-            'js' => 'vendor/jsbarcode/JsBarcode.all.min.js',
+            'js' => 'assets/shop/vendor/jsbarcode/JsBarcode.all.min.js',
         ],
         'qrcode' => [
             'version' => '1.0.0',
-            'js' => 'vendor/qrcode/qrcode.min.js',
+            'js' => 'assets/shop/vendor/qrcode/qrcode.min.js',
         ],
         'jsqr' => [
             'version' => '1.4.0',
-            'js' => 'vendor/jsqr/jsQR.js',
+            'js' => 'assets/shop/vendor/jsqr/jsQR.js',
         ],
     ],
 
