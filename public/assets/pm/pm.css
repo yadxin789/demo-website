@@ -1,0 +1,119 @@
+:root {
+    --brand: #198754;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --bg: #f8fafc;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+}
+
+.app-wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+.app-header {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+}
+
+.app-header .app-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.app-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.app-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--brand);
+    display: inline-block;
+}
+
+.app-company { color: var(--muted); font-size: 13px; }
+
+.app-main { padding: 32px 20px 64px; }
+
+.app-footer {
+    border-top: 1px solid var(--line);
+    padding: 18px 0;
+    color: var(--muted);
+    font-size: 13px;
+    background: #fff;
+}
+
+.login-card {
+    max-width: 400px;
+    margin: 40px auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 32px;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, .06);
+}
+
+.login-head { text-align: center; margin-bottom: 24px; }
+
+.login-icon {
+    width: 44px; height: 44px; line-height: 44px;
+    margin: 0 auto 12px;
+    border-radius: 10px;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.login-head h1 { font-size: 20px; margin: 0 0 6px; }
+.login-head p { color: var(--muted); font-size: 14px; margin: 0; }
+
+.field { display: block; margin-bottom: 16px; }
+.field span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+
+.field input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 11px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--brand);
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.login-note { margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; }
+
+.page-head h1 { font-size: 22px; margin: 0 0 4px; }
+.page-head p { color: var(--muted); font-size: 13px; margin: 0 0 24px; }
+
+.empty-note {
+    background: #fff;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 28px;
+    color: var(--muted);
+    font-size: 14px;
+}

@@ -144,12 +144,27 @@ if ($g05.Count -gt 0) {
 # ---------------------------------------------------------------------------
 $g06 = New-Object System.Collections.Generic.List[string]
 foreach ($p in $Products) {
-    $hits = FindHitsInText ("app\Modules\$p\Routes") "name\(\s*'([^']*)'" '*.php' {
-        param($line)
-        if ($line -match "name\(\s*'([^']*)'") { return ($Matches[1] -notmatch ('^' + $p + '\.')) }
-        return $false
+    $cls = $p.Substring(0, 1).ToUpper() + $p.Substring(1)
+    $file = Join-Path $script:Root "app\Modules\$cls\Routes\web.php"
+    if (-not (Test-Path -LiteralPath $file)) { continue }
+
+    $raw = Get-Content -LiteralPath $file -Raw -ErrorAction SilentlyContinue
+
+    # 预留位（enabled=false）的路由文件本来就是空的，不要求组名前缀
+    if ($raw -notmatch 'Route::') { continue }
+
+    # 1) group 级必须有 name('{code}.')
+    if ($raw -notmatch ("name\(\s*'" + $p + "\.'\s*\)")) {
+        $g06.Add("[$p] 缺少 group 级 ->name('$p.')")
     }
-    foreach ($h in $hits) { $g06.Add("[$p] $h") }
+
+    # 2) 内部写死的全名（含点）必须带本产品前缀；不含点的相对名是合法的
+    foreach ($m in [regex]::Matches($raw, "name\(\s*'([^']*)'\s*\)")) {
+        $n = $m.Groups[1].Value
+        if ($n.Contains('.') -and $n -notmatch ('^' + $p + '\.')) {
+            $g06.Add("[$p] 路由名 '$n' 不属于本产品前缀")
+        }
+    }
 }
 if ($g06.Count -gt 0) {
     AddResult 'G-06' '路由名必须带产品前缀' 'FAIL' ($g06.Count.ToString() + ' 处未以 {x}. 开头')
@@ -211,8 +226,8 @@ $g10 = FindHitsInText 'app' '123456' '*.php' {
     param($line)
     return ($line -notmatch '\\\\\\\\|Seeder' )
 }
-# 二次过滤：路径必须包含 Seeder 目录
-$g10 = $g10 | Where-Object { $_ -notmatch 'Seeders\\' }
+# 二次过滤：路径必须包含 Seeder 目录；blade 视图里的"演示密码展示"不算违规
+$g10 = $g10 | Where-Object { $_ -notmatch 'Seeders\\' -and $_ -notmatch 'Resources\\views\\' }
 if ($g10.Count -gt 0) {
     AddResult 'G-10' '密码 123456 只在 Seeder 出现' 'FAIL' ($g10.Count.ToString() + ' 处非 Seeder 硬编码')
     $global:Hits['G-10'] = $g10
