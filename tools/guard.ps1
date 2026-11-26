@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Continue'
 $script:Root = Split-Path -Parent $PSScriptRoot
 $Products = @('erp', 'pm', 'shop', 'mes', 'hr')
 $script:Results = New-Object System.Collections.Generic.List[object]
-$global:Hits = @{}
+$script:Hits = @{}
 
 function AddResult {
     param($Id, $Title, $Status, $Detail)
@@ -85,7 +85,7 @@ foreach ($p in $Products) {
 }
 if ($g01Fails.Count -gt 0) {
     AddResult 'G-01' '零跨产品代码依赖' 'FAIL' ($g01Fails.Count.ToString() + ' 处引用其他产品命名空间')
-    $global:Hits['G-01'] = $g01Fails
+    $script:Hits['G-01'] = $g01Fails
 } else { AddResult 'G-01' '零跨产品代码依赖' 'PASS' '无跨产品命名空间引用' }
 
 # ---------------------------------------------------------------------------
@@ -94,7 +94,7 @@ if ($g01Fails.Count -gt 0) {
 $g02 = FindHits 'app\Modules' 'extends\s+Model\b' | Where-Object { $_ -notmatch 'BaseModel' }
 if ($g02.Count -gt 0) {
     AddResult 'G-02' '模型必须 extends BaseModel' 'FAIL' ($g02.Count.ToString() + ' 处裸 extends Model')
-    $global:Hits['G-02'] = $g02
+    $script:Hits['G-02'] = $g02
 } else { AddResult 'G-02' '模型必须 extends BaseModel' 'PASS' '无裸 extends Model' }
 
 # ---------------------------------------------------------------------------
@@ -103,7 +103,7 @@ if ($g02.Count -gt 0) {
 $g03 = FindHitsInText 'app\Modules' "view\(\s*'" '*.php' { param($line) $line -notmatch "view\(\s*'[^']*::" }
 if ($g03.Count -gt 0) {
     AddResult 'G-03' '视图必须带 {x}:: 前缀' 'FAIL' ($g03.Count.ToString() + ' 处裸 view()')
-    $global:Hits['G-03'] = $g03
+    $script:Hits['G-03'] = $g03
 } else { AddResult 'G-03' '视图必须带 {x}:: 前缀' 'PASS' '无裸 view()' }
 
 # ---------------------------------------------------------------------------
@@ -115,7 +115,7 @@ foreach ($d in @('app', 'resources', 'config', 'routes', 'bootstrap')) {
 }
 if ($g04.Count -gt 0) {
     AddResult 'G-04' '禁止 View::share()' 'FAIL' ($g04.Count.ToString() + ' 处')
-    $global:Hits['G-04'] = $g04
+    $script:Hits['G-04'] = $g04
 } else { AddResult 'G-04' '禁止 View::share()' 'PASS' '无全局视图共享' }
 
 # ---------------------------------------------------------------------------
@@ -136,7 +136,7 @@ foreach ($p in $Products) {
 }
 if ($g05.Count -gt 0) {
     AddResult 'G-05' '禁止跨库连接' 'FAIL' ($g05.Count.ToString() + ' 处指向他产品连接')
-    $global:Hits['G-05'] = $g05
+    $script:Hits['G-05'] = $g05
 } else { AddResult 'G-05' '禁止跨库连接' 'PASS' '无跨库连接' }
 
 # ---------------------------------------------------------------------------
@@ -161,14 +161,16 @@ foreach ($p in $Products) {
     # 2) 内部写死的全名（含点）必须带本产品前缀；不含点的相对名是合法的
     foreach ($m in [regex]::Matches($raw, "name\(\s*'([^']*)'\s*\)")) {
         $n = $m.Groups[1].Value
-        if ($n.Contains('.') -and $n -notmatch ('^' + $p + '\.')) {
-            $g06.Add("[$p] 路由名 '$n' 不属于本产品前缀")
+        # 含点的相对名（如 admin.users）会被 group 前缀拼成 pm.admin.users，合法；
+        # 只有误用了其它产品前缀才违规（HC-06）
+        if (($n -match '^(erp|pm|shop|mes|hr)\.') -and (-not $n.StartsWith($p + '.'))) {
+            $g06.Add("[$p] 路由名 '$n' 误用了其它产品前缀")
         }
     }
 }
 if ($g06.Count -gt 0) {
     AddResult 'G-06' '路由名必须带产品前缀' 'FAIL' ($g06.Count.ToString() + ' 处未以 {x}. 开头')
-    $global:Hits['G-06'] = $g06
+    $script:Hits['G-06'] = $g06
 } else { AddResult 'G-06' '路由名必须带产品前缀' 'PASS' '全部合规' }
 
 # ---------------------------------------------------------------------------
@@ -203,7 +205,7 @@ foreach ($p in $Products) {
 }
 if ($g08.Count -gt 0) {
     AddResult 'G-08' '迁移表名归属唯一' 'FAIL' ($g08.Count.ToString() + ' 处表名跨产品重复')
-    $global:Hits['G-08'] = $g08
+    $script:Hits['G-08'] = $g08
 } else { AddResult 'G-08' '迁移表名归属唯一' 'PASS' ($tableOwners.Count.ToString() + ' 张表无跨产品重复') }
 
 # ---------------------------------------------------------------------------
@@ -216,7 +218,7 @@ foreach ($d in @('resources\views', 'app\Modules')) {
 }
 if ($g09.Count -gt 0) {
     AddResult 'G-09' '禁止 CDN 引用' 'FAIL' ($g09.Count.ToString() + ' 处外链')
-    $global:Hits['G-09'] = $g09
+    $script:Hits['G-09'] = $g09
 } else { AddResult 'G-09' '禁止 CDN 引用' 'PASS' '全部本地资产' }
 
 # ---------------------------------------------------------------------------
@@ -230,7 +232,7 @@ $g10 = FindHitsInText 'app' '123456' '*.php' {
 $g10 = $g10 | Where-Object { $_ -notmatch 'Seeders\\' -and $_ -notmatch 'Resources\\views\\' }
 if ($g10.Count -gt 0) {
     AddResult 'G-10' '密码 123456 只在 Seeder 出现' 'FAIL' ($g10.Count.ToString() + ' 处非 Seeder 硬编码')
-    $global:Hits['G-10'] = $g10
+    $script:Hits['G-10'] = $g10
 } else { AddResult 'G-10' '密码 123456 只在 Seeder 出现' 'PASS' '无越界硬编码' }
 
 # ---------------------------------------------------------------------------
@@ -247,7 +249,7 @@ if (Test-Path (Join-Path $script:Root 'routes\console.php')) {
 }
 if ($g11.Count -gt 0) {
     AddResult 'G-11' '禁止定时任务' 'FAIL' ($g11.Count.ToString() + ' 处')
-    $global:Hits['G-11'] = $g11
+    $script:Hits['G-11'] = $g11
 } else { AddResult 'G-11' '禁止定时任务' 'PASS' '无调度代码' }
 
 # ---------------------------------------------------------------------------
@@ -260,7 +262,7 @@ foreach ($d in @('app', 'resources', 'config', 'routes', 'public\assets')) {
 $g12 = $g12 | Where-Object { $_ -notmatch 'tools\\guard' }
 if ($g12.Count -gt 0) {
     AddResult 'G-12' 'PM 协同办公/电话会议已清除' 'FAIL' ($g12.Count.ToString() + ' 处残留')
-    $global:Hits['G-12'] = $g12
+    $script:Hits['G-12'] = $g12
 } else { AddResult 'G-12' 'PM 协同办公/电话会议已清除' 'PASS' '无残留' }
 
 # ---------------------------------------------------------------------------
@@ -277,7 +279,7 @@ if ($SkipLint) {
     }
     if ($g13.Count -gt 0) {
         AddResult 'G-13' '全量 php -l' 'FAIL' ($g13.Count.ToString() + ' 个文件语法错误')
-        $global:Hits['G-13'] = $g13
+        $script:Hits['G-13'] = $g13
     } else { AddResult 'G-13' '全量 php -l' 'PASS' ($files.Count.ToString() + ' 个文件通过') }
 }
 
@@ -306,7 +308,7 @@ foreach ($p in $Products) {
 }
 if ($g15.Count -gt 0) {
     AddResult 'G-15' '五产品资产齐备' 'WARN' ($g15.Count.ToString() + ' 项待补（S0/S5/S6 补齐）')
-    $global:Hits['G-15'] = $g15
+    $script:Hits['G-15'] = $g15
 } else { AddResult 'G-15' '五产品资产齐备' 'PASS' '五套主题 css 均在位' }
 
 # ---------------------------------------------------------------------------
@@ -328,7 +330,7 @@ foreach ($p in @('mes', 'hr')) {
 }
 if ($g16.Count -gt 0) {
     AddResult 'G-16' '预留位白名单' 'FAIL' ($g16.Count.ToString() + ' 个越界文件')
-    $global:Hits['G-16'] = $g16
+    $script:Hits['G-16'] = $g16
 } else { AddResult 'G-16' '预留位白名单' 'PASS' 'Mes/Hr 无越界实现' }
 
 # ---------------------------------------------------------------------------
@@ -360,7 +362,7 @@ if (-not (Test-Path -LiteralPath $cfg)) {
         }
         if ($g17.Count -gt 0) {
             AddResult 'G-17' 'enabled 一致性' 'FAIL' ($g17.Count.ToString() + ' 处不一致')
-            $global:Hits['G-17'] = $g17
+            $script:Hits['G-17'] = $g17
         } else { AddResult 'G-17' 'enabled 一致性' 'PASS' '五产品开关与路由一致' }
     }
 }
@@ -373,11 +375,11 @@ $failCount = ($script:Results | Where-Object { $_.Status -eq 'FAIL' }).Count
 $warnCount = ($script:Results | Where-Object { $_.Status -eq 'WARN' }).Count
 $skipCount = ($script:Results | Where-Object { $_.Status -eq 'SKIP' }).Count
 
-foreach ($k in $Hits.Keys) {
+foreach ($k in $script:Hits.Keys) {
     Write-Output ''
     Write-Output ("[$k] 违规清单：")
-    foreach ($h in ($global:Hits[$k] | Select-Object -First 30)) { Write-Output ('  - ' + $h) }
-    if ($global:Hits[$k].Count -gt 30) { Write-Output ('  ... 共 ' + $global:Hits[$k].Count + ' 条') }
+    foreach ($h in ($script:Hits[$k] | Select-Object -First 30)) { Write-Output ('  - ' + $h) }
+    if ($script:Hits[$k].Count -gt 30) { Write-Output ('  ... 共 ' + $script:Hits[$k].Count + ' 条') }
 }
 
 Write-Output ''
