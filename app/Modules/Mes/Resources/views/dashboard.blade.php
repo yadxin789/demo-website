@@ -32,6 +32,34 @@
         </div>
     </div>
 
+    @if ($pendingInspections->isNotEmpty())
+        <div class="mes-card" style="margin-top:16px; border-left:4px solid #f08c00">
+            <h3 style="display:flex; justify-content:space-between; align-items:center">
+                <span>质检待办 · {{ $pendingInspections->count() }} 张</span>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('mes.quality.inspections.index', ['result' => 'pending']) }}">全部待检</a>
+            </h3>
+            <table class="mes-table">
+                <thead>
+                <tr><th>检验单号</th><th>工单</th><th>模板</th><th>类型</th><th style="width:120px">操作</th></tr>
+                </thead>
+                <tbody>
+                @foreach ($pendingInspections as $ins)
+                    <tr>
+                        <td style="font-family:ui-monospace,Consolas,monospace">{{ $ins->inspection_no }}</td>
+                        <td>
+                            {{ $ins->workOrder?->order_no }}
+                            <span style="color:#8a97a8; font-size:12px">{{ $ins->workOrder?->product?->name }}</span>
+                        </td>
+                        <td style="color:#4a5568">{{ $ins->template?->name }}</td>
+                        <td><span class="mes-badge {{ $ins->type === 'IQC' ? 'b-draft' : ($ins->type === 'IPQC' ? 'b-progress' : 'b-released') }}">{{ $ins->type }}</span></td>
+                        <td><a class="btn btn-sm btn-primary" href="{{ route('mes.quality.inspections.show', $ins) }}">去判定</a></td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+
     <div class="mes-card" style="margin-top:16px">
         <h3>工单进度</h3>
         @if ($orders->isEmpty())
@@ -91,10 +119,10 @@
     <div class="mes-card" style="margin-top:16px">
         <h3>演示走查建议（5 分钟）</h3>
         <ol style="margin:0; padding-left:18px; line-height:2; font-size:13.5px; color:#42526b">
-            <li>先看「工单」列表：在制、待下达、卡质检的工单各有一张，进度条能看出差异。</li>
-            <li>点开一张工单的详情：工序进度、报工流水、领料、检验四个 Tab。</li>
-            <li>去「车间看板」：工作中心 × 5 天的排产甘特图。</li>
-            <li>回「主数据」看物料与 BOM：编码统一 <b>MJ-</b> 前缀，与 ERP 的 <b>MAT-</b> 明确区分。</li>
+            <li>「工单」列表：在制、待下达、卡质检的工单各有一张，进度条能看出差异。</li>
+            <li>点开一张工单：工序时间轴、齐套欠料检查、最近报工、检验结果、领料单一屏看全。</li>
+            <li>「我的任务」切到 <b>只看我的</b>，用手机尺寸打开报工页 —— 操作工扫码就能报工。</li>
+            <li>「质检待办」里挑一张去判定，填错一项就是不合格，接着去「不良记录」转返工。</li>
             <li>需要把您现有系统里的物料搬过来？用「Excel 导入」，模板可直接下载。</li>
         </ol>
     </div>

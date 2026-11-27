@@ -97,17 +97,17 @@ class DemoSeeder extends Seeder
     {
         $defs = [
             'IQC-ELEC' => ['来料电性能检验', 'IQC', 0, [
-                ['name' => '阻值', 'std' => '10K±5%', 'ok' => '10.0K'],
-                ['name' => '绝缘电阻', 'std' => '>100MΩ', 'ok' => '500MΩ'],
+                ['name' => '阻值', 'std' => '10K±5%', 'min' => '9.5', 'max' => '10.5', 'unit' => 'KΩ', 'expect' => '10.0'],
+                ['name' => '绝缘电阻', 'std' => '>100MΩ', 'min' => '100', 'unit' => 'MΩ', 'expect' => '500'],
             ]],
             'IPQC-WELD' => ['焊接质量检验', 'IPQC', 30, [
-                ['name' => '焊点光泽', 'std' => '饱满光亮', 'ok' => '合格'],
-                ['name' => '虚焊数', 'std' => '0', 'ok' => '0'],
+                ['name' => '焊点光泽', 'std' => '饱满光亮', 'expect' => '合格'],
+                ['name' => '虚焊数', 'std' => '0', 'unit' => '处', 'expect' => '0'],
             ]],
             'OQC-FUNC' => ['成品功能检验', 'OQC', 50, [
-                ['name' => '通电测试', 'std' => '正常启动', 'ok' => '正常'],
-                ['name' => '通讯测试', 'std' => 'Modbus 应答', 'ok' => '应答正常'],
-                ['name' => '外观', 'std' => '无划伤', 'ok' => '合格'],
+                ['name' => '通电测试', 'std' => '正常启动', 'expect' => '正常'],
+                ['name' => '通讯测试', 'std' => 'Modbus 应答', 'expect' => '应答正常'],
+                ['name' => '外观', 'std' => '无划伤', 'expect' => '合格'],
             ]],
         ];
 
@@ -123,7 +123,10 @@ class DemoSeeder extends Seeder
                     'items' => array_map(fn ($it) => [
                         'name' => $it['name'],
                         'std' => $it['std'],
-                        'unit' => '',
+                        'min' => $it['min'] ?? '',
+                        'max' => $it['max'] ?? '',
+                        'unit' => $it['unit'] ?? '',
+                        'expect' => $it['expect'] ?? '',
                     ], $items),
                     'is_active' => true,
                 ]
@@ -315,6 +318,10 @@ class DemoSeeder extends Seeder
             $type = $status === 'completed' ? 'OQC-FUNC' : 'IPQC-WELD';
             $tpl = $templates[$type] ?? null;
             $seq === 7 ? $this->pendingInspection($wo, $templates['IPQC-WELD'] ?? null, $lead) : null;
+            // 再留两张待判定，让工作台的"质检待办"有内容
+            in_array($seq, [10, 14], true)
+                ? $this->pendingInspection($wo, $templates['OQC-FUNC'] ?? null, $lead, '-P2')
+                : null;
 
             if ($seq !== 7) {
                 /** @var Inspection $insp */
@@ -339,6 +346,14 @@ class DemoSeeder extends Seeder
             }
         }
 
+        // ---- 补充检验：IQC / IPQC 各一张，让检验页覆盖三种类型（共 25 张）----
+        if ($status === 'in_progress') {
+            $this->extraInspection($wo, $templates['IQC-ELEC'] ?? null, $qc, '-IQC', 'IQC');
+        }
+        if ($status === 'completed') {
+            $this->extraInspection($wo, $templates['IPQC-WELD'] ?? null, $qc, '-IPQC', 'IPQC');
+        }
+
         // ---- 不良记录（16 号单良率偏低）----
         $wo->defects()->delete();
         if ($seq === 16) {
@@ -353,14 +368,82 @@ class DemoSeeder extends Seeder
                 'status' => 'open',
             ]);
         }
+
+        // ---- 其他不良：覆盖返工/报废、未处置/处置中/已结案三种状态 ----
+        $extraDefects = [
+            9 => [
+                ['WELD-COLD', 3, 'rework', 'handling', '波峰焊预热不足'],
+                ['SOLDER-BRIDGE', 4, 'rework', 'open', '钢网开口偏大导致连锡'],
+            ],
+            10 => [['COMP-SHIFT', 2, 'scrap', 'closed', '贴片机吸嘴偏移']],
+            11 => [
+                ['WELD-COLD', 5, 'rework', 'handling', '波峰焊预热不足'],
+                ['SCRATCH', 3, 'scrap', 'closed', '周转箱划伤'],
+            ],
+            12 => [
+                ['FUNC-FAIL', 2, 'rework', 'open', '测试治具接触不良'],
+                ['COMP-SHIFT', 1, 'scrap', 'closed', '手贴元件偏移'],
+            ],
+            13 => [['COMP-SHIFT', 6, 'rework', 'closed', '换料时元件偏移']],
+            14 => [
+                ['SOLDER-BRIDGE', 8, 'rework', 'open', '锡膏印刷偏厚'],
+                ['WELD-COLD', 2, 'scrap', 'closed', '手焊温度不足'],
+                ['FUNC-FAIL', 1, 'rework', 'handling', '功能测试偶发不通'],
+            ],
+            15 => [['SCRATCH', 4, 'scrap', 'open', '包装前外观划伤']],
+            16 => [
+                ['WELD-COLD', 6, 'rework', 'open', '回流焊温区 5 偏低'],
+                ['FUNC-FAIL', 3, 'rework', 'handling', '老化测试超时'],
+                ['SCRATCH', 2, 'scrap', 'closed', '返修后外观不良'],
+            ],
+        ];
+
+        foreach ($extraDefects[$seq] ?? [] as [$code, $qty, $disposal, $defectStatus, $cause]) {
+            Defect::query()->create([
+                'work_order_id' => $wo->id,
+                'operation_id' => $wo->operations()->where('status', 'done')->value('id'),
+                'defect_code' => $code,
+                'qty' => $qty,
+                'disposal' => $disposal,
+                'cause' => $cause,
+                'owner_id' => $qc?->id,
+                'status' => $defectStatus,
+            ]);
+        }
     }
 
-    /** 0011 号单之外的"卡质检"场景：工序已完工，检验仍 pending */
-    private function pendingInspection(WorkOrder $wo, ?InspectionTemplate $tpl, ?User $lead): void
+    /** 补一张已判合格的检验单（带一条实测明细），用于覆盖 IQC / IPQC 类型 */
+    private function extraInspection(WorkOrder $wo, ?InspectionTemplate $tpl, ?User $qc, string $suffix, string $type): void
     {
         /** @var Inspection $insp */
         $insp = Inspection::query()->create([
-            'inspection_no' => 'QC-'.substr($wo->order_no, 3).'-P',
+            'inspection_no' => 'QC-' . substr($wo->order_no, 3) . $suffix,
+            'work_order_id' => $wo->id,
+            'operation_id' => $wo->operations()->where('status', 'done')->value('id'),
+            'template_id' => $tpl?->id,
+            'type' => $type,
+            'result' => 'pass',
+            'inspector_id' => $qc?->id,
+            'inspected_at' => now()->subHours(8),
+        ]);
+
+        $first = (array) ($tpl?->items ?? [])[0] ?? ['name' => '外观', 'std' => '合格', 'expect' => '合格'];
+
+        InspectionResult::query()->create([
+            'inspection_id' => $insp->id,
+            'item_name' => (string) ($first['name'] ?? '外观'),
+            'std_value' => (string) ($first['std'] ?? ''),
+            'actual_value' => (string) ($first['expect'] ?? '合格'),
+            'verdict' => 'ok',
+        ]);
+    }
+
+    /** 0011 号单之外的"卡质检"场景：工序已完工，检验仍 pending */
+    private function pendingInspection(WorkOrder $wo, ?InspectionTemplate $tpl, ?User $lead, string $suffix = '-P'): void
+    {
+        /** @var Inspection $insp */
+        $insp = Inspection::query()->create([
+            'inspection_no' => 'QC-' . substr($wo->order_no, 3) . $suffix,
             'work_order_id' => $wo->id,
             'operation_id' => $wo->operations()->where('status', 'done')->value('id'),
             'template_id' => $tpl?->id,

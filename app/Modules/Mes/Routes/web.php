@@ -23,6 +23,9 @@ use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\MaterialIssueController;
 use App\Modules\Mes\Http\Controllers\MyTaskController;
+use App\Modules\Mes\Http\Controllers\Quality\DefectController;
+use App\Modules\Mes\Http\Controllers\Quality\InspectionController;
+use App\Modules\Mes\Http\Controllers\Quality\InspectionTemplateController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
@@ -132,8 +135,28 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                     ->name('shifts.update');
             });
 
-            // 质量（M4 替换）
-            Route::get('quality/inspections', [PlaceholderController::class, 'show'])->name('quality.inspections.index');
+            // 质量（M4：检验模板 / 检验单 / 不良记录）
+            Route::prefix('quality')->name('quality.')->group(function () {
+                Route::get('inspections', [InspectionController::class, 'index'])->name('inspections.index');
+                Route::get('inspections/{inspection}', [InspectionController::class, 'show'])
+                    ->whereNumber('inspection')->name('inspections.show');
+                Route::post('inspections/{inspection}', [InspectionController::class, 'submit'])
+                    ->whereNumber('inspection')->name('inspections.submit');
+
+                Route::prefix('templates')->name('templates.')->group(function () {
+                    Route::get('/', [InspectionTemplateController::class, 'index'])->name('index');
+                    Route::post('/', [InspectionTemplateController::class, 'store'])->name('store');
+                    Route::put('{template}', [InspectionTemplateController::class, 'update'])
+                        ->whereNumber('template')->name('update');
+                });
+
+                Route::get('defects', [DefectController::class, 'index'])->name('defects.index');
+                Route::post('defects', [DefectController::class, 'store'])->name('defects.store');
+                Route::put('defects/{defect}', [DefectController::class, 'update'])
+                    ->whereNumber('defect')->name('defects.update');
+                Route::post('defects/{defect}/rework', [DefectController::class, 'rework'])
+                    ->whereNumber('defect')->name('defects.rework');
+            });
 
             // 设备（M5 替换）
             Route::get('equipment', [PlaceholderController::class, 'show'])->name('equipment.index');

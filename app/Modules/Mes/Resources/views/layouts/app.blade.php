@@ -59,8 +59,14 @@
             </a>
 
             <div class="grp">质量与设备</div>
-            <a class="{{ request()->routeIs('mes.quality.*') ? 'on' : '' }}" href="{{ route('mes.quality.inspections.index') }}">
-                <i class="fa-solid fa-clipboard-check"></i> 检验
+            <a class="{{ request()->routeIs('mes.quality.inspections.*') ? 'on' : '' }}" href="{{ route('mes.quality.inspections.index') }}">
+                <i class="fa-solid fa-clipboard-check"></i> 检验单
+            </a>
+            <a class="{{ request()->routeIs('mes.quality.templates.*') ? 'on' : '' }}" href="{{ route('mes.quality.templates.index') }}">
+                <i class="fa-solid fa-list-check"></i> 检验模板
+            </a>
+            <a class="{{ request()->routeIs('mes.quality.defects.*') ? 'on' : '' }}" href="{{ route('mes.quality.defects.index') }}">
+                <i class="fa-solid fa-triangle-exclamation"></i> 不良记录
             </a>
             <a class="{{ request()->routeIs('mes.equipment.*') ? 'on' : '' }}" href="{{ route('mes.equipment.index') }}">
                 <i class="fa-solid fa-screwdriver-wrench"></i> 设备

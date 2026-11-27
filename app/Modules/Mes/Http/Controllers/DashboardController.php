@@ -6,6 +6,7 @@ namespace App\Modules\Mes\Http\Controllers;
 
 use App\Modules\Mes\Models\Defect;
 use App\Modules\Mes\Models\Equipment;
+use App\Modules\Mes\Models\Inspection;
 use App\Modules\Mes\Models\ProductionReport;
 use App\Modules\Mes\Models\WorkOrder;
 use Illuminate\View\View;
@@ -33,6 +34,14 @@ class DashboardController extends Controller
         $openDefects = Defect::query()->where('status', 'open')->count();
         $equipIssues = Equipment::query()->whereIn('status', ['repairing', 'scrapped'])->count();
 
+        // 质检待办：还没判定的检验单，按工单交期排
+        $pendingInspections = Inspection::query()
+            ->with(['workOrder:id,order_no,plan_end,product_material_id', 'workOrder.product:id,name', 'template:id,code,name'])
+            ->whereNull('result')
+            ->orderByDesc('id')
+            ->limit(8)
+            ->get();
+
         $orders = WorkOrder::query()
             ->with('product')
             ->orderByRaw("case status when 'in_progress' then 0 when 'released' then 1 when 'draft' then 2 else 3 end")
@@ -46,6 +55,7 @@ class DashboardController extends Controller
             'yield' => $yield,
             'openDefects' => $openDefects,
             'equipIssues' => $equipIssues,
+            'pendingInspections' => $pendingInspections,
             'orders' => $orders,
         ]);
     }
