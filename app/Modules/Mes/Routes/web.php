@@ -30,6 +30,9 @@ use App\Modules\Mes\Http\Controllers\Quality\InspectionController;
 use App\Modules\Mes\Http\Controllers\Quality\InspectionTemplateController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
+use App\Modules\Mes\Http\Controllers\Reports\LaborController;
+use App\Modules\Mes\Http\Controllers\Reports\OutputController;
+use App\Modules\Mes\Http\Controllers\Reports\YieldController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +91,11 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
 
             // 报工流水（M3）
             Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+
+            // 报表（M6-03）：产量趋势 / 良率分析 / 工时效率
+            Route::get('reports/output', [OutputController::class, 'index'])->name('reports.output');
+            Route::get('reports/yield', [YieldController::class, 'index'])->name('reports.yield');
+            Route::get('reports/labor', [LaborController::class, 'index'])->name('reports.labor');
 
             // 主数据（M1：物料已真实落地，其余逐步替换）
             Route::prefix('master')->name('master.')->group(function () {

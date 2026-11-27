@@ -31,7 +31,7 @@
             <a class="{{ request()->routeIs('mes.work-orders.*') ? 'on' : '' }}" href="{{ route('mes.work-orders.index') }}">
                 <i class="fa-solid fa-clipboard-list"></i> 工单
             </a>
-            <a class="{{ request()->routeIs('mes.reports.*') ? 'on' : '' }}" href="{{ route('mes.reports.index') }}">
+            <a class="{{ request()->routeIs('mes.reports.index') ? 'on' : '' }}" href="{{ route('mes.reports.index') }}">
                 <i class="fa-solid fa-clock-rotate-left"></i> 报工记录
             </a>
             <a class="{{ request()->routeIs('mes.issues.*') ? 'on' : '' }}" href="{{ route('mes.issues.index') }}">
@@ -39,6 +39,17 @@
             </a>
             <a class="{{ request()->routeIs('mes.kanban') ? 'on' : '' }}" href="{{ route('mes.kanban') }}">
                 <i class="fa-solid fa-tv"></i> 车间看板
+            </a>
+
+            <div class="grp">报表</div>
+            <a class="{{ request()->routeIs('mes.reports.output') ? 'on' : '' }}" href="{{ route('mes.reports.output') }}">
+                <i class="fa-solid fa-chart-column"></i> 产量趋势
+            </a>
+            <a class="{{ request()->routeIs('mes.reports.yield') ? 'on' : '' }}" href="{{ route('mes.reports.yield') }}">
+                <i class="fa-solid fa-percent"></i> 良率分析
+            </a>
+            <a class="{{ request()->routeIs('mes.reports.labor') ? 'on' : '' }}" href="{{ route('mes.reports.labor') }}">
+                <i class="fa-solid fa-gauge-simple-high"></i> 工时效率
             </a>
 
             <div class="grp">主数据</div>

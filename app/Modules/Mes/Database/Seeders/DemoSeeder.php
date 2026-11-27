@@ -315,15 +315,24 @@ class DemoSeeder extends Seeder
         // ---- 报工 ----
         $wo->reports()->delete();
         if ($doneQty > 0) {
-            foreach (range(1, min(3, max(1, (int) floor($doneQty / 100)))) as $r) {
+            $doneOp = $wo->operations()->where('status', 'done')->first();
+            $opStd = (float) ($doneOp?->std_minutes ?? 2.0);   // 每件标准分钟，工时报工按它缩放
+            $batches = min(3, max(1, (int) floor($doneQty / 100)));
+
+            foreach (range(1, $batches) as $r) {
+                $okPer = max(1, (int) floor($doneQty / 3));
+                $ngPer = max(0, (int) floor($defectQty / 3));
+                // 实际工时 ≈ 标准工时 × (0.88 ~ 1.02)，让工时效率落在 90%~110% 的可解释区间
+                $factor = 0.88 + ($r % 3) * 0.06;
+
                 ProductionReport::query()->create([
                     'work_order_id' => $wo->id,
-                    'operation_id' => $wo->operations()->where('status', 'done')->value('id'),
+                    'operation_id' => $doneOp?->id,
                     'user_id' => $lead?->id,
                     'shift_id' => $shift?->id,
-                    'ok_qty' => max(1, (int) floor($doneQty / 3)),
-                    'defect_qty' => max(0, (int) floor($defectQty / 3)),
-                    'minutes' => 90,
+                    'ok_qty' => $okPer,
+                    'defect_qty' => $ngPer,
+                    'minutes' => (int) max(15, round(($okPer + $ngPer) * $opStd * $factor)),
                     'reported_at' => $r === 1
                         ? now()->setTime(9, 10)                       // 今日首条，让看板「今日产出」不是 0
                         : now()->subDays(1)->setTime(10 + $r, 20),
