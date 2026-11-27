@@ -1,0 +1,180 @@
+/* 五产品统一外框皮肤（S10）
+   基准：E:\my-pm\pm-server-openEuler 的 layouts/app.blade.php（深色侧栏 + 白色顶栏 + 浅灰内容区）
+   原则：只统一"皮肤"（配色 / 字体 / 激活态 / 圆角 / 阴影 / 间距），不改各产品的几何布局，
+         避免 200+ 业务视图因宽度变化而错位。
+   加载顺序：必须放在各 layout 的 </head> 最后，以覆盖各产品自带的同权重样式。
+   品牌色：各 layout 在 head 里写 :root{--brand: <config products.theme.primary>}。 */
+
+:root {
+    --brand: #0d6efd;
+    --brand-dark: #0b5ed7;
+    --shell-side-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    --shell-side-fg: #b9c2d0;
+    --shell-side-fg-dim: #6b7891;
+    --shell-side-active-bg: rgba(255, 255, 255, .07);
+    --shell-bar-bg: #ffffff;
+    --shell-bar-border: #e9ecef;
+    --shell-page-bg: #f7f8fa;
+    --shell-card-border: #e9ecef;
+    --shell-text: #1f2937;
+    --shell-text-dim: #6b7280;
+    --shell-radius: 10px;
+    --shell-shadow: 0 1px 2px rgba(17, 24, 39, .04);
+    --shell-font: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+body,
+.mes-body,
+.hr-body {
+    font-family: var(--shell-font);
+    color: var(--shell-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============ 一、侧栏（五种结构各自映射到同一观感） ============ */
+.sidebar,                       /* ERP */
+.mes-side,                      /* MES */
+.hr-side,                       /* HR */
+#app-sidebar, .app-sidebar {    /* Shop */
+    background: var(--shell-side-bg) !important;
+    color: var(--shell-side-fg);
+    border-right: none !important;
+    box-shadow: none !important;
+}
+
+/* PM 的侧栏是 Bootstrap 栅格列，同样给深色底 */
+nav.sidebar .sidebar-sticky,
+.sidebar-sticky {
+    background: transparent;
+}
+
+.sidebar a, .sidebar .nav-link,
+.mes-side a, .mes-nav a,
+.hr-side a, .hr-nav a,
+#app-sidebar a, .app-sidebar a {
+    color: var(--shell-side-fg) !important;
+    font-size: 13.5px;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.sidebar a:hover, .sidebar .nav-link:hover,
+.mes-side a:hover, .hr-side a:hover, #app-sidebar a:hover {
+    color: #ffffff !important;
+    background: var(--shell-side-active-bg) !important;
+}
+
+/* 激活态：左侧 3px 品牌色条 + 轻微底色 */
+.sidebar .active, .sidebar a.active, .sidebar .nav-link.active,
+.mes-nav a.on, .hr-nav a.on, #app-sidebar a.active {
+    color: #ffffff !important;
+    background: var(--shell-side-active-bg) !important;
+    box-shadow: inset 3px 0 0 0 var(--brand);
+    font-weight: 600;
+}
+
+/* 分组标题 */
+.sidebar .grp, .sidebar .sidebar-heading, .sidebar .nav-section,
+.mes-side .grp, .hr-side .grp, .mes-nav .grp, .hr-nav .grp,
+#app-sidebar .grp, .app-sidebar .nav-section {
+    color: var(--shell-side-fg-dim) !important;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin: 16px 0 6px;
+    padding: 0 10px;
+}
+
+/* 侧栏品牌区统一 */
+.sidebar .brand, .mes-side .brand, .hr-side .brand, #app-sidebar .brand {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+/* ============ 二、顶栏 ============ */
+.topbar,                        /* ERP */
+.app-topbar,                    /* Shop */
+.mes-topbar, .hr-topbar {       /* MES / HR */
+    background: var(--shell-bar-bg) !important;
+    border-bottom: 1px solid var(--shell-bar-border) !important;
+    min-height: 56px;
+}
+
+.mes-topbar .ttl, .hr-topbar .ttl {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--shell-text);
+}
+
+.mes-topbar .sub, .hr-topbar .sub {
+    font-size: 12.5px;
+    color: var(--shell-text-dim);
+}
+
+.topbar .page-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--shell-text);
+}
+
+/* ============ 三、内容区 ============ */
+.content, .mes-content, .hr-content, .app-main {   /* ERP / MES / HR / Shop */
+    background: var(--shell-page-bg);
+    padding: 22px 24px 40px;
+}
+
+main[role="main"] {                                /* PM 用栅格列做主区 */
+    background: var(--shell-page-bg);
+    padding-top: 14px;
+}
+
+/* 页标题统一 */
+.content h1, .mes-content h1, .hr-content h1,
+.content .page-heading, .mes-content .page-title, .hr-content .page-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+/* ============ 四、卡片 / 表格 / 按钮基础 token ============ */
+.card, .mes-content .card, .hr-content .card, .content .card {
+    border: 1px solid var(--shell-card-border) !important;
+    border-radius: var(--shell-radius) !important;
+    box-shadow: var(--shell-shadow) !important;
+}
+
+.card-header {
+    background: #fff !important;
+    border-bottom: 1px solid var(--shell-card-border) !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.table > :not(caption) > * > * { padding: .55rem .7rem; }
+.table thead th {
+    background: #f8fafc !important;
+    color: var(--shell-text-dim) !important;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    border-bottom: 1px solid var(--shell-card-border) !important;
+}
+.table tbody td { font-size: 13.5px; color: #374151; vertical-align: middle; }
+
+.btn { border-radius: 8px; font-size: 13.5px; font-weight: 500; }
+.btn-primary {
+    background: var(--brand) !important;
+    border-color: var(--brand) !important;
+}
+.btn-primary:hover { background: var(--brand-dark) !important; border-color: var(--brand-dark) !important; }
+.btn-outline-primary { color: var(--brand) !important; border-color: var(--brand) !important; }
+
+.form-control, .form-select { border-radius: 8px; font-size: 13.5px; border-color: #d5d9de; }
+.form-control:focus, .form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 14%, #fff);
+}
+
+/* 徽标（badge）统一圆角 */
+.badge { border-radius: 6px; font-weight: 500; }

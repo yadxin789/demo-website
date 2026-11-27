@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="{{ asset(config('shop.assets.fontawesome.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/shop/css/shop.css') }}">
     @stack('styles')
+    {{-- 五产品统一外框皮肤（S10）：放在最后加载，覆盖本产品自带样式 --}}
+    <style>:root { --brand: {{ config('products.products.shop.theme.primary') }}; --brand-dark: {{ config('products.products.shop.theme.accent') }}; }</style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/shell.css') }}">
 </head>
 <body>
     <a href="#app-main" class="skip-link">跳转到主内容</a>

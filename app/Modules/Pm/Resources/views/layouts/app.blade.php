@@ -67,6 +67,9 @@
         }
     </style>
     @yield('head')
+    {{-- 五产品统一外框皮肤（S10）：放在最后加载，覆盖本产品自带样式 --}}
+    <style>:root { --brand: {{ config('products.products.pm.theme.primary') }}; --brand-dark: {{ config('products.products.pm.theme.accent') }}; }</style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/shell.css') }}">
 </head>
 <body>
     @php

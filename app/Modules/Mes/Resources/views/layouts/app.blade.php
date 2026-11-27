@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{{ asset('assets/mes/vendor/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/mes/mes.css') }}">
     @stack('styles')
+    {{-- 五产品统一外框皮肤（S10）：放在最后加载，覆盖本产品自带样式 --}}
+    <style>:root { --brand: {{ config('products.products.mes.theme.primary') }}; --brand-dark: {{ config('products.products.mes.theme.accent') }}; }</style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/shell.css') }}">
 </head>
 <body class="mes-body">
 <div class="mes-shell">
