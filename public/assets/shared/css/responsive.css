@@ -48,8 +48,22 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
     .pagination { flex-wrap: wrap; }
 }
 
-/* 登录卡片（窄屏留白，避免贴边） */
-@media (max-width: 575.98px) {
+/* MES / HR 顶栏（标题 + 账户信息）窄屏换行，避免挤成竖排 */
+@media (max-width: 767.98px) {
+    .hr-topbar, .mes-topbar {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 8px 12px;
+    }
+    .hr-topbar .who, .mes-topbar .who {
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        font-size: .82rem;
+    }
+    .hr-topbar .who form, .mes-topbar .who form { margin-left: 0 !important; }
+}
+
+/* 登录卡片（窄屏留白，避免贴边） */@media (max-width: 575.98px) {
     .login-card, .auth-card { max-width: calc(100vw - 24px) !important; margin: 12px; }
     .login-card .card-body, .auth-card .card-body { padding: 1.25rem 1rem; }
     .demo-accounts { font-size: .75rem; }
