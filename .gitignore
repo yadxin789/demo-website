@@ -54,3 +54,6 @@ Thumbs.db
 # 导入验收用的临时表格
 /storage/tests/
 
+
+# 部署包不入库
+storage/deploy-*.tar.gz
