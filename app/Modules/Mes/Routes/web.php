@@ -15,7 +15,9 @@ declare(strict_types=1);
 
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
+use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
+use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
 use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
@@ -58,8 +60,32 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                     ->whereNumber('material')
                     ->name('materials.update');
 
-                Route::get('boms', [PlaceholderController::class, 'show'])->name('boms.index');
-                Route::get('routings', [PlaceholderController::class, 'show'])->name('routings.index');
+                Route::prefix('boms')->name('boms.')->group(function () {
+                    Route::get('/', [BomController::class, 'index'])->name('index');
+                    Route::post('/', [BomController::class, 'store'])->name('store');
+                    Route::get('{bom}', [BomController::class, 'show'])->whereNumber('bom')->name('show');
+                    Route::put('{bom}', [BomController::class, 'update'])->whereNumber('bom')->name('update');
+                    Route::delete('{bom}', [BomController::class, 'destroy'])->whereNumber('bom')->name('destroy');
+                    Route::post('{bom}/lines', [BomController::class, 'addLine'])->whereNumber('bom')->name('lines.store');
+                    Route::put('{bom}/lines/{line}', [BomController::class, 'updateLine'])
+                        ->whereNumber('bom')->whereNumber('line')->name('lines.update');
+                    Route::delete('{bom}/lines/{line}', [BomController::class, 'destroyLine'])
+                        ->whereNumber('bom')->whereNumber('line')->name('lines.destroy');
+                });
+
+                Route::prefix('routings')->name('routings.')->group(function () {
+                    Route::get('/', [RoutingController::class, 'index'])->name('index');
+                    Route::post('/', [RoutingController::class, 'store'])->name('store');
+                    Route::get('{routing}', [RoutingController::class, 'show'])->whereNumber('routing')->name('show');
+                    Route::put('{routing}', [RoutingController::class, 'update'])->whereNumber('routing')->name('update');
+                    Route::delete('{routing}', [RoutingController::class, 'destroy'])->whereNumber('routing')->name('destroy');
+                    Route::post('{routing}/operations', [RoutingController::class, 'addOperation'])
+                        ->whereNumber('routing')->name('operations.store');
+                    Route::put('{routing}/operations/{operation}', [RoutingController::class, 'updateOperation'])
+                        ->whereNumber('routing')->whereNumber('operation')->name('operations.update');
+                    Route::delete('{routing}/operations/{operation}', [RoutingController::class, 'destroyOperation'])
+                        ->whereNumber('routing')->whereNumber('operation')->name('operations.destroy');
+                });
 
                 Route::get('work-centers', [WorkCenterController::class, 'index'])->name('work-centers.index');
                 Route::post('work-centers', [WorkCenterController::class, 'store'])->name('work-centers.store');
