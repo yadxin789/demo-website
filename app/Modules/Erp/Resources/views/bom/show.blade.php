@@ -11,7 +11,7 @@
             <dd class="col-sm-4">{{ $bom->product->material_code ?? '-' }} {{ $bom->product->name ?? '' }}</dd>
             <dt class="col-sm-2">状态</dt>
             <dd class="col-sm-4">
-                {{ \App\Modules\Erp\Enums\BomStatus::label($bom->status) }}
+                {{ \App\Modules\Erp\Enums\BomStatus::tryFrom($bom->status)?->label() ?? $bom->status }}
                 @if ($bom->status === 'draft')
                     <form method="POST" action="{{ route('erp.bom.approve', $bom) }}" class="d-inline ms-2">
                         @csrf

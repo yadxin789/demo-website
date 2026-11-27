@@ -59,6 +59,20 @@ class PositionRoleSeeder extends Seeder
             }
         }
 
+        // 演示管理员：system_admin 的岗位数据范围是 none（系统管理员不参与业务），
+        // 演示时客户/订单详情会被行级范围过滤成 404。这里额外叠加总经理岗，
+        // 让"演示管理员"既能做系统配置，也能翻全部业务数据。
+        if (in_array('role_gm', $existing, true)) {
+            $admins = User::query()->where('username', 'admin')->get();
+            foreach ($admins as $user) {
+                $roles = $user->getRoleNames()->all();
+                if (in_array('system_admin', $roles, true) && ! in_array('role_gm', $roles, true)) {
+                    $user->syncRoles(array_values(array_unique([...$roles, 'role_gm'])));
+                    $fixed++;
+                }
+            }
+        }
+
         $this->command?->info("按岗位补齐角色：{$fixed} 个账号已同步，{$skipped} 个跳过（无岗位或无有效角色）");
     }
 
