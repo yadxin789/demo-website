@@ -46,7 +46,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 403：按产品渲染各自的岗位拦截页（HC-24）。产品没有自己的 403 页就回门户列表，
         // 不能让客户看到 Laravel 默认的英文报错页。
-        $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException|\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, Request $request) {
+        $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException|\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException|\Symfony\Component\HttpKernel\Exception\HttpException $e, Request $request) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+                && ! $e instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+                && $e->getStatusCode() !== 403) {
+                return null;
+            }
+
             $code = $request->segment(1);
 
             if ($request->expectsJson()) {

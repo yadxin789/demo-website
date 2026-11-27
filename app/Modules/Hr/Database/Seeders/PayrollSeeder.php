@@ -91,6 +91,11 @@ class PayrollSeeder extends Seeder
 
                 // 绩效系数：试用期 0.8，其他人 0.9–1.1
                 $factor = $e->status === 'probation' ? 0.8 : (0.9 + (($e->id % 5) * 0.05));
+                // 上一批次（已发放）按 0.95 折算，模拟"上月绩效偏低"，
+                // 这样两个批次的金额有真实差异，人力成本页的环比不会恒为 0%
+                if ($i === 0) {
+                    $factor = round($factor * 0.95, 4);
+                }
                 $perf = round($perf * $factor, 2);
 
                 $hourly = $base / 174;

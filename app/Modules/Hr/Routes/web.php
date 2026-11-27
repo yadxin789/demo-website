@@ -9,8 +9,7 @@ declare(strict_types=1);
 | 全部路由挂在 /hr 前缀与 hr. 名字空间下，与其它四个产品零交叉（HC-06/07/08）。
 | 中间件链固定：web → module:hr（切容器/连接/会话上下文）→ product.only:hr（enabled 校验）。
 |
-| S6-H0 阶段：登录 + 看板真实可用，其余页面先由 PlaceholderController 承接，
-| 随 H1~H6 逐步替换为真实控制器，保证期间导航不出现 404。
+| H0~H5 各阶段页面均接真实控制器，H6 段已清空（无占位路由、无占位视图）。
 */
 
 use App\Modules\Hr\Http\Controllers\AttendanceController;
@@ -18,6 +17,7 @@ use App\Modules\Hr\Http\Controllers\Auth\LoginController;
 use App\Modules\Hr\Http\Controllers\ContractController;
 use App\Modules\Hr\Http\Controllers\DashboardController;
 use App\Modules\Hr\Http\Controllers\EmployeeController;
+use App\Modules\Hr\Http\Controllers\ImportController;
 use App\Modules\Hr\Http\Controllers\LeaveController;
 use App\Modules\Hr\Http\Controllers\MovementController;
 use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
@@ -25,8 +25,9 @@ use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
 use App\Modules\Hr\Http\Controllers\Org\PositionController;
 use App\Modules\Hr\Http\Controllers\PayrollController;
 use App\Modules\Hr\Http\Controllers\PerformanceController;
-use App\Modules\Hr\Http\Controllers\PlaceholderController;
 use App\Modules\Hr\Http\Controllers\RecruitmentController;
+use App\Modules\Hr\Http\Controllers\ReportController;
+use App\Modules\Hr\Http\Controllers\SystemController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:hr', 'product.only:hr'])
@@ -165,12 +166,30 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::get('performance/results', [PerformanceController::class, 'results'])->name('performance.results');
 
             // H6 报表与系统
-            Route::get('reports/headcount', [PlaceholderController::class, 'show'])->name('reports.headcount');
-            Route::get('reports/attendance', [PlaceholderController::class, 'show'])->name('reports.attendance');
-            Route::get('reports/payroll', [PlaceholderController::class, 'show'])->name('reports.payroll');
-            Route::get('import', [PlaceholderController::class, 'show'])->name('import.index');
-            Route::get('system/users', [PlaceholderController::class, 'show'])->name('system.users.index');
-            Route::get('system/roles', [PlaceholderController::class, 'show'])->name('system.roles.index');
-            Route::get('system/notifications', [PlaceholderController::class, 'show'])->name('system.notifications');
+            Route::get('reports/headcount', [ReportController::class, 'headcount'])->name('reports.headcount');
+            Route::get('reports/attendance', [ReportController::class, 'attendance'])->name('reports.attendance');
+            Route::get('reports/payroll', [ReportController::class, 'payroll'])->name('reports.payroll');
+
+            Route::get('import', [ImportController::class, 'index'])->name('import.index');
+            Route::get('import/template/{type}', [ImportController::class, 'template'])->name('import.template');
+            Route::post('import/upload/{type}', [ImportController::class, 'upload'])->name('import.upload');
+            Route::post('import/confirm', [ImportController::class, 'confirm'])->name('import.confirm');
+            Route::post('import/cancel', [ImportController::class, 'cancel'])->name('import.cancel');
+            Route::get('import/export/attendance', [ImportController::class, 'exportAttendance'])->name('import.export.attendance');
+
+            Route::get('system/users', [SystemController::class, 'users'])->name('system.users.index');
+            Route::post('system/users/{user}/role', [SystemController::class, 'userRole'])
+                ->whereNumber('user')->name('system.users.role');
+            Route::post('system/users/{user}/toggle', [SystemController::class, 'userToggle'])
+                ->whereNumber('user')->name('system.users.toggle');
+
+            Route::get('system/roles', [SystemController::class, 'roles'])->name('system.roles.index');
+            Route::post('system/roles/{role}/permissions', [SystemController::class, 'rolePermissions'])
+                ->name('system.roles.permissions');
+
+            Route::get('system/notifications', [SystemController::class, 'notifications'])->name('system.notifications');
+            Route::post('system/notifications', [SystemController::class, 'notifySend'])->name('system.notifications.send');
+            Route::post('system/notifications/read', [SystemController::class, 'notifyRead'])->name('system.notifications.read');
         });
     });
+
