@@ -116,7 +116,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
         bottom: 0;
         left: 0;
         width: min(270px, 86vw) !important;
-        height: auto !important;
+        height: 100dvh !important;
         flex: none;
         transform: translateX(-104%);
         transition: transform .22s ease;
