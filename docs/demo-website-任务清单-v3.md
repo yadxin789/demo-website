@@ -308,6 +308,7 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 | 踩坑（已修进脚本） | `deploy.sh` 原把 `database/` 设成 750、库文件 640，FPM（www-data）只读 → 登录报 `attempt to write a readonly database`。已改 770 + 660 + `g+s`，并提交 `c25ca2d` |
 | 待办 | 域名 HTTPS 目前握手被拦（证书 CN/SAN 正常、IP 443 可达），属未备案域名 443 受限；备案下来后再验 `https://yad-erp.com`。备案号未批复期间页脚显示"ICP 备案办理中"，批复后只改 `.env` 的 `PORTAL_ICP` 即生效 |
 | 门户对外信息 | 邮箱 `yadxin789@163.com`、微信 `yadxin789`（已上线）；**不提供电话**（`PORTAL_CONTACT_PHONE` 留空，模板按空值自动不渲染，避免骚扰） |
+| 线索通知 | 不做"新线索发邮件"通知（用户 2026-11-27 明确暂不需要）；线索仍落 `portal.sqlite.leads`，等 ICP 备案批复后再决定是否加通知 |
 
 ---
 
