@@ -127,6 +127,12 @@ class ProfileController extends Controller
         $user = $request->user();
         $file = $this->resolveAvatarFile($user->avatar);
 
+        // 没上传也没选默认头像时，落到内置第一张，避免页面出现破图
+        if ($file === null) {
+            $fallback = public_path('avatars/'.self::DEFAULT_DIRECTORY.'/'.self::DEFAULT_AVATARS[0]);
+            $file = is_file($fallback) ? $fallback : null;
+        }
+
         abort_if($file === null, 404, '头像不存在');
 
         return response()->file($file, [

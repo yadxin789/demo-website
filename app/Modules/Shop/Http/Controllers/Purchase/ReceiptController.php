@@ -29,9 +29,17 @@ class ReceiptController extends Controller
         return view('shop::purchase.receipts.index', compact('receipts'));
     }
 
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
         $poId = (int) $request->query('purchase_order', 0);
+
+        // 到货单必须挂在一张采购订单上：直接打开无参链接时回采购单列表，而不是抛 404
+        if ($poId <= 0 && ! PurchaseOrder::whereKey($poId)->exists()) {
+            return redirect()
+                ->route('shop.purchase-orders.index')
+                ->with('info', '请从采购订单列表选择要收货的单据，再进入到货登记。');
+        }
+
         $purchaseOrder = PurchaseOrder::with('lines.product')->findOrFail($poId);
         $locations = Location::where('warehouse_id', $purchaseOrder->warehouse_id)->orderBy('code')->get();
 

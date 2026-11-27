@@ -26,10 +26,30 @@ class DevopsController extends Controller
             Log::error('Devops 页面报告数据库连接失败', ['err' => $e->getMessage()]);
         }
 
-        $tables = count(DB::select('SHOW TABLES'));
+        $tables = $this->tableCount();
         $migrations = DB::table('migrations')->count();
 
         return view('erp::devops.index', compact('info', 'dbStatus', 'tables', 'migrations'));
+    }
+
+    /** 表数量：MySQL 走 SHOW TABLES，SQLite（本地演示）走 sqlite_master */
+    private function tableCount(): int
+    {
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $rows = DB::select("select count(*) as c from sqlite_master where type = 'table' and name not like 'sqlite_%'");
+
+            return (int) ($rows[0]->c ?? 0);
+        }
+
+        if ($driver === 'pgsql') {
+            $rows = DB::select("select count(*) as c from information_schema.tables where table_schema = 'public'");
+
+            return (int) ($rows[0]->c ?? 0);
+        }
+
+        return count(DB::select('SHOW TABLES'));
     }
 
     public function clearCache()

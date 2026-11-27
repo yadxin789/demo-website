@@ -629,7 +629,7 @@ class TaskController extends Controller
         
         $tasks = $query->orderBy('end_date', 'asc')->paginate(15);
         
-        $view = $role === 'executor' ? 'task.my-tasks-status' : 'task.my-audit-tasks-status';
+        $view = $role === 'executor' ? 'pm::task.my-tasks-status' : 'pm::task.my-audit-tasks-status';
         
         return view($view, compact('tasks', 'statusLabel'));
     }

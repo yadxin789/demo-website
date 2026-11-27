@@ -153,6 +153,20 @@ class NavigationService
     }
 
     /**
+     * 菜单配置里的路由名 → 演示站真实路由名（裸名优先，其次补 erp. 前缀）。
+     */
+    private function resolveRouteName(string $routeName): ?string
+    {
+        foreach ([$routeName, 'erp.' . $routeName] as $candidate) {
+            if (Route::has($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * 名称 → 可渲染菜单项；不可渲染返回 null。
      */
     private function resolve(string $name, Authenticatable $user, array $shared): ?array
@@ -163,7 +177,14 @@ class NavigationService
         }
 
         $routeName = $map[$name]['route'] ?? null;
-        if (! $routeName || ! Route::has($routeName)) {
+        if (! $routeName) {
+            return null;
+        }
+
+        // 配置里的路由名沿用参考项目的裸名（home / office.todos …），
+        // 演示站的路由带产品前缀（erp.home …），这里做一次前缀兜底解析。
+        $routeName = $this->resolveRouteName($routeName);
+        if ($routeName === null) {
             return null;   // 缺口页未建：跳过，不渲染死链接
         }
 
