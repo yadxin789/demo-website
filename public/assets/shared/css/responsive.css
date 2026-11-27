@@ -136,26 +136,23 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
     .sys-body { padding: 14px !important; }
 }
 
-/* ---------------- 移动端抽屉按钮 ---------------- */
+/* ---------------- 移动端抽屉按钮（右下角浮动） ---------------- */
 .mobile-nav-toggle {
     position: fixed;
-    top: 10px;
-    left: 10px;
+    right: 16px;
+    bottom: 18px;
     z-index: 1060;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    border: 1px solid rgba(15, 23, 42, .12);
-    background: #fff;
-    color: #1f2937;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 0;
+    background: #1f2937;
+    color: #fff;
     display: none;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, .12);
+    font-size: 18px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .3);
 }
-@media (max-width: 991.98px) {
-    .mobile-nav-toggle.is-needed { display: inline-flex; }
-    /* 抽屉按钮占位，避免压住标题 */
-    body.has-mobile-toggle .topbar,
-    body.has-mobile-toggle .mes-main-head { padding-left: 56px; }
-}
+.mobile-nav-toggle.is-show { display: inline-flex; }
+body.nav-open .mobile-nav-toggle { opacity: 0; pointer-events: none; }

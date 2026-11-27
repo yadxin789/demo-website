@@ -17,7 +17,7 @@
     }
 
     function wrapTables() {
-        document.querySelectorAll('table.table').forEach(function (t) {
+        document.querySelectorAll('table').forEach(function (t) {
             if (t.closest('.table-responsive')) return;
             if (t.closest('.no-table-scroll')) return;
             var wrap = document.createElement('div');
@@ -59,16 +59,12 @@
         if (!toggle) {
             autoBtn = document.createElement('button');
             autoBtn.type = 'button';
-            autoBtn.className = 'mobile-nav-toggle is-needed';
+            autoBtn.className = 'mobile-nav-toggle';
             autoBtn.setAttribute('aria-label', '打开导航菜单');
-            autoBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+            autoBtn.innerHTML = '☰';
             document.body.appendChild(autoBtn);
-            document.body.classList.add('has-mobile-toggle');
+            if (isMobile()) autoBtn.classList.add('is-show');
             toggle = autoBtn;
-
-            // HR / MES / 系统后台 没有顶栏，给主区让出按钮位置
-            var main = q('.mes-main') || q('.hr-main') || q('.sys-main');
-            if (main) main.style.paddingTop = '56px';
         }
 
         function isOpen() {
@@ -116,9 +112,9 @@
         window.addEventListener('resize', function () {
             if (!isMobile()) {
                 close();
-                if (autoBtn) autoBtn.style.display = 'none';
+                if (autoBtn) autoBtn.classList.remove('is-show');
             } else if (autoBtn) {
-                autoBtn.style.display = '';
+                autoBtn.classList.add('is-show');
             }
         });
     }
