@@ -770,3 +770,14 @@ PM 那 2 条是形式差异：`/admin/departments/{id}`、`/admin/roles/{id}` �
    - 参考 `WecomSettingsController::messageLogs()` 指向不存在的视图 `admin.wecom.message-logs`；演示站补建了同结构日志页（表格 + 分页 + 空态提示），路由保持与参考一致。
    - 参考未见 `wecom` 通知通道注册，而演示站全站通知走 `database` 通道；为避免未配置企微的环境在发通知时抛 `Driver [wecom] not supported`，`pm\Notifications\BaseNotification::via()` 暂不追加 `wecom`，通道类已就位，具备凭据后可一行开启。
 7. **验收**：本地 `/pm/admin/wecom/settings`、`/pm/admin/wecom/message-logs`、`/pm/profile/wecom`、`/pm/wecom-file` 均 200；配置页回调地址渲染为 `/pm/wecom/callback/event`；后台侧栏出现"企业微信"，角色侧栏出现"企业微信绑定""企微文件收件箱"；线上冒烟补充 4 条 PM 企微页面。
+
+**12.20 PM 移动端与参考目录完全同内容（顶栏 / 侧栏）**
+
+1. **问题**：手机上看 PM 管理员首页，顶栏只剩汉堡按钮，铃铛 + 未读徽章 + 头像用户名下拉被 Bootstrap 的 `collapse` 折叠掉；侧栏抽屉用的是"精简版"菜单，缺「AI 设置 / AI 智能助手 / AI 授权中心」等项，却多出一个「退出登录」。用户要求：移动端只改呈现，不改内容，侧栏条目必须与桌面一致，退出登录只能在头像下拉里。
+2. **做法**：
+   - 把桌面侧栏的 `<ul class="nav flex-column">` 整段抽成 `pm::layouts.partials.sidebar-menu`，桌面侧栏与移动端抽屉**引用同一份 partial**，从机制上保证条目、顺序、角色可见性完全一致；
+   - 顶栏右侧容器去掉 `collapse` 折叠（改为常显 flex，`navbar-expand` 断点内强制横排），窄屏 <576px 只隐藏用户名/角色文字，保留头像；铃铛与未读徽章因此手机端同样可见；
+   - 抽屉删除「退出登录」，退出登录仅保留在头像下拉（与参考一致）；
+   - 顶栏补回参考目录里的企业微信图标入口（`/pm/profile/wecom`）。
+3. **不变项**：桌面端侧栏宽度、分组、条目与改造前完全一致；没有新增或删除任何业务页面；菜单文案与图标沿用参考。
+4. **验收**：线上 `/pm/admin` 抽屉含「AI 设置 / AI 授权中心 / 用户管理 … 企业微信」共 16 项、无「退出登录」；顶栏含铃铛（未读徽章）与头像下拉；普通角色抽屉含「AI 智能助手 / 企业微信绑定 / 企微文件收件箱」；冒烟 133 项全绿。
