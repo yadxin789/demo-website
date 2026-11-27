@@ -156,8 +156,11 @@ fi
 # ---- 5. 权限 ----
 log "设置目录属主与权限"
 $SUDO chown -R "$WEB_USER:$WEB_GROUP" "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/database"
-chmod 750 "$APP_DIR/database"
-chmod 640 "$APP_DIR"/database/*.sqlite 2>/dev/null || true
+# SQLite 是"文件即库"：FPM 进程（组 $WEB_GROUP）必须能写库文件，还要能在 database/ 里建 -journal/-wal，
+# 所以目录 770、库文件 660；750/640 会让登录、写业务数据全部报 "attempt to write a readonly database"。
+chmod 770 "$APP_DIR/database"
+chmod 660 "$APP_DIR"/database/*.sqlite 2>/dev/null || true
+chmod g+s "$APP_DIR/database"
 chmod 640 "$APP_DIR/.env"
 chmod -R g+rwX "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
 
