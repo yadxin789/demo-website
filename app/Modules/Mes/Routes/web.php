@@ -22,6 +22,7 @@ use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
 use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
+use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +62,11 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                 ->whereNumber('workOrder')->name('work-orders.dispatch-all');
             Route::post('work-orders/{workOrder}/operations/{operation}/dispatch', [WorkOrderController::class, 'dispatch'])
                 ->whereNumber('workOrder')->whereNumber('operation')->name('work-orders.operations.dispatch');
+            Route::post('work-orders/{workOrder}/operations/{operation}/report', [WorkOrderController::class, 'report'])
+                ->whereNumber('workOrder')->whereNumber('operation')->name('work-orders.operations.report');
+
+            // 报工流水（M3）
+            Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 
             // 主数据（M1：物料已真实落地，其余逐步替换）
             Route::prefix('master')->name('master.')->group(function () {

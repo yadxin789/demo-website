@@ -43,6 +43,8 @@ class DemoSeeder extends Seeder
 
     public function run(): void
     {
+        $this->resetBusinessData();
+
         $shiftA = Shift::query()->where('code', 'SH-A')->first();
         $admin = User::query()->where('email', 'admin@mes.demo')->first();
         $lead = User::query()->where('email', 'lead@mes.demo')->first() ?: $admin;
@@ -60,6 +62,34 @@ class DemoSeeder extends Seeder
         }
 
         $this->seedAps();
+    }
+
+    /**
+     * 清空全部演示业务数据（严格按外键依赖倒序）。
+     *
+     * 工序被 inspections / defects / aps_schedules / production_reports 从
+     * operation_id 引用且没有级联，顺序错了就会撞 FK，所以统一在这里处理，
+     * 让 DemoSeeder 可重复执行。
+     */
+    private function resetBusinessData(): void
+    {
+        $db = \DB::connection('mes');
+
+        foreach ([
+            'inspection_results',
+            'defects',
+            'inspections',
+            'production_reports',
+            'material_issue_lines',
+            'material_issues',
+            'aps_schedules',
+            'equipment_checks',
+            'equipment_repairs',
+            'work_order_operations',
+            'work_orders',
+        ] as $table) {
+            $db->table($table)->delete();
+        }
     }
 
     /** @return array<string, InspectionTemplate> */
@@ -192,17 +222,30 @@ class DemoSeeder extends Seeder
         );
 
         // ---- 工序 ----
+        // 先删报工：production_reports.operation_id 外键指向工序，顺序反了会撞外键
+        $wo->reports()->delete();
         $wo->operations()->delete();
         $ops = $routing?->operations ?? collect();
         $opCount = max(1, $ops->count());
 
         foreach ($ops as $idx => $routeOp) {
-            $opDone = (int) floor($doneQty * ($idx + 1) / $opCount);
+            // 已完工：每道工序都做满计划量；
+            // 在制：末道 = 工单完成数（瓶颈），前道有在制品堆积（1.35 倍但不超过计划量）。
+            if ($status === 'completed') {
+                $opDone = $planQty;
+            } elseif ($idx + 1 === $opCount) {
+                $opDone = $doneQty;
+            } else {
+                $opDone = min($planQty, (int) ceil($doneQty * 1.35));
+            }
+
             $opStatus = match (true) {
                 $status === 'draft' => 'pending',
                 $status === 'released' => 'dispatched',
                 $status === 'completed' => 'done',
-                default => $opDone > 0 ? 'done' : 'in_progress',
+                $opDone >= $planQty => 'done',
+                $opDone > 0 => 'in_progress',
+                default => 'dispatched',
             };
 
             WorkOrderOperation::query()->create([

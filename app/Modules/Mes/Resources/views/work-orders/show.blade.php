@@ -130,6 +130,11 @@
                                 <span class="wo-tl-name">{{ $op->op_name }}</span>
                                 <span class="mes-badge {{ $opMap[$op->status][0] ?? 'b-draft' }}">{{ $opMap[$op->status][1] ?? $op->status }}</span>
                                 <span class="wo-tl-act">
+                                    <button class="btn btn-sm btn-primary py-0 px-2"
+                                            data-bs-toggle="modal" data-bs-target="#reportModal"
+                                            onclick='fillReport({{ $op->id }}, {{ $op->op_no }}, @json($op->op_name), {{ (float) $op->plan_qty }}, {{ (float) $op->done_qty }})'>
+                                        报工
+                                    </button>
                                     @if ($op->status !== 'done')
                                         <button class="btn btn-sm btn-outline-secondary py-0 px-2"
                                                 data-bs-toggle="modal" data-bs-target="#dispatchModal"
@@ -279,10 +284,74 @@
             </form>
         </div>
     </div>
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="post" id="reportForm">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportTitle">报工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="reportHint" style="font-size:12px; color:#6b7a90; margin-bottom:10px"></div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">合格数</label>
+                            <input name="ok_qty" type="number" step="0.001" min="0" class="form-control" value="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">不良数</label>
+                            <input name="defect_qty" type="number" step="0.001" min="0" class="form-control" value="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">工时（分钟）</label>
+                            <input name="minutes" type="number" min="0" max="1440" class="form-control" value="60">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">班次</label>
+                            <select name="shift_id" class="form-select" required>
+                                <option value="">请选择班次</option>
+                                @foreach ($shifts as $s)
+                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">备注</label>
+                            <input name="remark" class="form-control" placeholder="可留空，例如：首件偏位已调整">
+                        </div>
+                    </div>
+                    @if ($errors->any())
+                        <div class="alert alert-danger py-2 mt-3 mb-0">{{ $errors->first() }}</div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button class="btn btn-primary" type="submit">提交报工</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script>
+function fillReport(opId, opNo, opName, planQty, doneQty) {
+    const form = document.getElementById('reportForm');
+    form.action = "/mes/work-orders/{{ $order->id }}/operations/" + opId + "/report";
+    document.getElementById('reportTitle').textContent = '报工 · ' + opNo + ' ' + opName;
+    document.getElementById('reportHint').textContent =
+        '这道工序计划 ' + planQty + ' 件，已完成 ' + doneQty + ' 件，还剩 ' + Math.max(0, planQty - doneQty) + ' 件。';
+    form.querySelector('[name=ok_qty]').value = Math.max(0, planQty - doneQty) || 0;
+    form.querySelector('[name=defect_qty]').value = 0;
+
+    // 班次默认取第一个，减少操作步骤（提交仍要求选班次）
+    const shift = form.querySelector('[name=shift_id]');
+    if (shift && ! shift.value && shift.options.length > 1) {
+        shift.selectedIndex = 1;
+    }
+}
+
 function fillDispatch(opId, opNo, opName, assigneeId, team) {
     const form = document.getElementById('dispatchForm');
     form.action = "/mes/work-orders/{{ $order->id }}/operations/" + opId + "/dispatch";

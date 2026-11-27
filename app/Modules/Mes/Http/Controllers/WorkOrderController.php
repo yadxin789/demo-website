@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Mes\Http\Controllers;
 
+use App\Modules\Mes\Http\Requests\ProductionReportRequest;
 use App\Modules\Mes\Http\Requests\WorkOrderRequest;
+use App\Modules\Mes\Models\Shift;
 use App\Modules\Mes\Models\WorkOrder;
 use App\Modules\Mes\Models\WorkOrderOperation;
+use App\Modules\Mes\Services\ReportService;
 use App\Modules\Mes\Services\WorkOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,8 +24,10 @@ class WorkOrderController extends Controller
 {
     private const OPEN = ['released', 'in_progress'];
 
-    public function __construct(private readonly WorkOrderService $service)
-    {
+    public function __construct(
+        private readonly WorkOrderService $service,
+        private readonly ReportService $reporter,
+    ) {
     }
 
     public function index(Request $request): View
@@ -119,6 +124,7 @@ class WorkOrderController extends Controller
             'reportedMinutes' => $reportedMinutes,
             'leader' => $this->service->defaultLeader(),
             'assignees' => \App\Modules\Mes\Models\User::query()->where('status', 'active')->orderBy('name')->get(['id', 'name']),
+            'shifts' => Shift::query()->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name']),
         ]);
     }
 
@@ -201,5 +207,31 @@ class WorkOrderController extends Controller
                 $count > 0
                     ? "已把 {$count} 道待派工序派给" . ($leader?->name ?? '车间') . '。'
                     : '没有待派的工序（可能都已经派过了）。');
+    }
+
+    /** 工序报工（M3） */
+    public function report(ProductionReportRequest $request, WorkOrder $workOrder, WorkOrderOperation $operation): RedirectResponse
+    {
+        abort_unless($operation->work_order_id === $workOrder->id, 404);
+
+        $data = $request->validated();
+        $report = $this->reporter->create($operation, $data, auth('mes')->id());
+
+        $workOrder->refresh();
+
+        $fmt = fn ($v) => rtrim(rtrim(number_format((float) $v, 3), '0'), '.');
+
+        return redirect()
+            ->route('mes.work-orders.show', $workOrder)
+            ->with('status', sprintf(
+                '工序 %s %s 已报工：合格 %s，不良 %s，工时 %s 分钟。工单完成 %s / %s。',
+                $operation->op_no,
+                $operation->op_name,
+                $fmt($report->ok_qty),
+                $fmt($report->defect_qty),
+                $report->minutes,
+                $fmt($workOrder->done_qty),
+                $fmt($workOrder->plan_qty)
+            ));
     }
 }
