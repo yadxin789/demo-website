@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Mes\Services;
 
+use App\Modules\Mes\Models\Defect;
 use App\Modules\Mes\Models\Inspection;
 use App\Modules\Mes\Models\InspectionResult;
 use Illuminate\Support\Facades\DB;
@@ -101,17 +102,21 @@ class InspectionService
     }
 
     /**
-     * 提交检验结果：写明细 + 定整体结果。
+     * 提交检验结果：写明细 + 定整体结果；判不合格时自动登记一条不良，把"检验 → 不良 → 返工"连起来。
+     *
+     * 自动不良的数量固定记 1 件，cause 里带检验单号，避免同一张单反复重检时重复登记；
+     * 真实数量由质检员到不良记录页按实际修正（演示主链路就是这么走的）。
      *
      * @param  array<int, string>  $actuals
-     * @return array{overall: string, ng: int, ok: int}
+     * @return array{overall: string, ng: int, ok: int, defect_no: string|null}
      */
     public function submit(Inspection $inspection, array $actuals, ?int $inspectorId): array
     {
         $items = (array) ($inspection->template?->items ?? []);
         $verdict = $this->judge($items, $actuals);
+        $autoDefect = null;
 
-        DB::connection('mes')->transaction(function () use ($inspection, $verdict, $inspectorId) {
+        DB::connection('mes')->transaction(function () use ($inspection, $verdict, $inspectorId, &$autoDefect) {
             InspectionResult::query()->where('inspection_id', $inspection->id)->delete();
 
             foreach ($verdict['rows'] as $row) {
@@ -129,9 +134,39 @@ class InspectionService
                 'inspector_id' => $inspectorId,
                 'inspected_at' => now(),
             ]);
+
+            if ($verdict['overall'] !== 'fail' || ! $inspection->work_order_id) {
+                return;
+            }
+
+            $cause = '检验不合格自动登记 · ' . $inspection->inspection_no;
+            $exists = Defect::query()
+                ->where('work_order_id', $inspection->work_order_id)
+                ->where('cause', $cause)
+                ->exists();
+
+            if ($exists) {
+                return;
+            }
+
+            $defect = Defect::query()->create([
+                'work_order_id' => $inspection->work_order_id,
+                'operation_id' => $inspection->operation_id,
+                'defect_code' => 'FUNC-FAIL',
+                'qty' => 1,
+                'cause' => $cause,
+                'status' => 'open',
+            ]);
+
+            $autoDefect = '#'.$defect->id;
         });
 
-        return ['overall' => $verdict['overall'], 'ng' => $verdict['ng'], 'ok' => $verdict['ok']];
+        return [
+            'overall' => $verdict['overall'],
+            'ng' => $verdict['ng'],
+            'ok' => $verdict['ok'],
+            'defect_no' => $autoDefect,
+        ];
     }
 
     /** 模板项的"标准"展示文本：区间优先。 */

@@ -99,7 +99,7 @@ class InspectionController extends Controller
 
         $msg = $result['overall'] === 'pass'
             ? "检验单 {$inspection->inspection_no} 判定合格（{$result['ok']} 项全过）。"
-            : "检验单 {$inspection->inspection_no} 判定不合格：{$result['ng']} 项超差，后续到不良记录页登记处置。";
+            : "检验单 {$inspection->inspection_no} 判定不合格：{$result['ng']} 项超差，已自动登记不良 {$result['defect_no']}（数量先记 1 件，到不良记录页按实际修正后转返工）。";
 
         return redirect()
             ->route('mes.quality.inspections.show', $inspection)
