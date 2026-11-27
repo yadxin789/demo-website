@@ -20,6 +20,7 @@
             </span>
         </div>
 
+        @php($me = auth('mes')->user())
         <nav class="mes-nav">
             <div class="grp">现场</div>
             <a class="{{ request()->routeIs('mes.dashboard') ? 'on' : '' }}" href="{{ route('mes.dashboard') }}">
@@ -52,43 +53,53 @@
                 <i class="fa-solid fa-gauge-simple-high"></i> 工时效率
             </a>
 
-            <div class="grp">主数据</div>
-            <a class="{{ request()->routeIs('mes.master.materials.*') ? 'on' : '' }}" href="{{ route('mes.master.materials.index') }}">
-                <i class="fa-solid fa-boxes-stacked"></i> 物料
-            </a>
-            <a class="{{ request()->routeIs('mes.master.boms.*') ? 'on' : '' }}" href="{{ route('mes.master.boms.index') }}">
-                <i class="fa-solid fa-sitemap"></i> BOM
-            </a>
-            <a class="{{ request()->routeIs('mes.master.routings.*') ? 'on' : '' }}" href="{{ route('mes.master.routings.index') }}">
-                <i class="fa-solid fa-route"></i> 工艺路线
-            </a>
-            <a class="{{ request()->routeIs('mes.master.work-centers.*') ? 'on' : '' }}" href="{{ route('mes.master.work-centers.index') }}">
-                <i class="fa-solid fa-industry"></i> 工作中心
-            </a>
-            <a class="{{ request()->routeIs('mes.master.shifts.*') ? 'on' : '' }}" href="{{ route('mes.master.shifts.index') }}">
-                <i class="fa-solid fa-clock"></i> 班次
-            </a>
+            @if ($me?->hasAnyPermission(['master.view', 'master.manage']))
+                <div class="grp">主数据</div>
+                <a class="{{ request()->routeIs('mes.master.materials.*') ? 'on' : '' }}" href="{{ route('mes.master.materials.index') }}">
+                    <i class="fa-solid fa-boxes-stacked"></i> 物料
+                </a>
+                <a class="{{ request()->routeIs('mes.master.boms.*') ? 'on' : '' }}" href="{{ route('mes.master.boms.index') }}">
+                    <i class="fa-solid fa-sitemap"></i> BOM
+                </a>
+                <a class="{{ request()->routeIs('mes.master.routings.*') ? 'on' : '' }}" href="{{ route('mes.master.routings.index') }}">
+                    <i class="fa-solid fa-route"></i> 工艺路线
+                </a>
+                <a class="{{ request()->routeIs('mes.master.work-centers.*') ? 'on' : '' }}" href="{{ route('mes.master.work-centers.index') }}">
+                    <i class="fa-solid fa-industry"></i> 工作中心
+                </a>
+                <a class="{{ request()->routeIs('mes.master.shifts.*') ? 'on' : '' }}" href="{{ route('mes.master.shifts.index') }}">
+                    <i class="fa-solid fa-clock"></i> 班次
+                </a>
+            @endif
 
-            <div class="grp">质量与设备</div>
-            <a class="{{ request()->routeIs('mes.quality.inspections.*') ? 'on' : '' }}" href="{{ route('mes.quality.inspections.index') }}">
-                <i class="fa-solid fa-clipboard-check"></i> 检验单
-            </a>
-            <a class="{{ request()->routeIs('mes.quality.templates.*') ? 'on' : '' }}" href="{{ route('mes.quality.templates.index') }}">
-                <i class="fa-solid fa-list-check"></i> 检验模板
-            </a>
-            <a class="{{ request()->routeIs('mes.quality.defects.*') ? 'on' : '' }}" href="{{ route('mes.quality.defects.index') }}">
-                <i class="fa-solid fa-triangle-exclamation"></i> 不良记录
-            </a>
-            <a class="{{ request()->routeIs('mes.equipment.*') ? 'on' : '' }}" href="{{ route('mes.equipment.index') }}">
-                <i class="fa-solid fa-screwdriver-wrench"></i> 设备
-            </a>
+            @if ($me?->hasAnyPermission(['quality.view', 'quality.manage', 'equipment.view', 'equipment.manage']))
+                <div class="grp">质量与设备</div>
+            @endif
+            @if ($me?->hasAnyPermission(['quality.view', 'quality.manage']))
+                <a class="{{ request()->routeIs('mes.quality.inspections.*') ? 'on' : '' }}" href="{{ route('mes.quality.inspections.index') }}">
+                    <i class="fa-solid fa-clipboard-check"></i> 检验单
+                </a>
+                <a class="{{ request()->routeIs('mes.quality.templates.*') ? 'on' : '' }}" href="{{ route('mes.quality.templates.index') }}">
+                    <i class="fa-solid fa-list-check"></i> 检验模板
+                </a>
+                <a class="{{ request()->routeIs('mes.quality.defects.*') ? 'on' : '' }}" href="{{ route('mes.quality.defects.index') }}">
+                    <i class="fa-solid fa-triangle-exclamation"></i> 不良记录
+                </a>
+            @endif
+            @if ($me?->hasAnyPermission(['equipment.view', 'equipment.manage']))
+                <a class="{{ request()->routeIs('mes.equipment.*') ? 'on' : '' }}" href="{{ route('mes.equipment.index') }}">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> 设备
+                </a>
+            @endif
 
-            <div class="grp">导入导出</div>
-            <a class="{{ request()->routeIs('mes.import.*') ? 'on' : '' }}" href="{{ route('mes.import.index') }}">
-                <i class="fa-solid fa-file-import"></i> Excel 导入
-            </a>
+            @if ($me?->hasAnyPermission(['import.run']))
+                <div class="grp">导入导出</div>
+                <a class="{{ request()->routeIs('mes.import.*') ? 'on' : '' }}" href="{{ route('mes.import.index') }}">
+                    <i class="fa-solid fa-file-import"></i> Excel 导入
+                </a>
+            @endif
 
-            @if (auth('mes')->user()?->hasRole('admin'))
+            @if ($me?->hasRole('admin'))
                 <div class="grp">系统</div>
                 <a class="{{ request()->routeIs('mes.system.users.*') ? 'on' : '' }}" href="{{ route('mes.system.users.index') }}">
                     <i class="fa-solid fa-users"></i> 账号
