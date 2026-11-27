@@ -26,12 +26,13 @@ $paths = @(
     @{p = '/hr/login'; n = @('邮箱或用户名') }
 )
 
-$home = ''
+$homeBody = ''
 foreach ($item in $paths) {
     $line, $body = Get-Page $item.p $item.n
     Write-Output $line
-    if ($item.p -eq '/') { $home = $body }
+    if ($item.p -eq '/') { $homeBody = $body }
 }
 
-Write-Output ("首页仍含旧文案「一个站点，5 套独立系统」={0}" -f ($home -match '一个站点'))
-Write-Output ("首页含备案位={0}，含微信={1}" -f ($home -match '备案'), ($home -match 'yadxin789'))
+Write-Output ("首页仍含旧文案「一个站点，5 套独立系统」={0}" -f ($homeBody -match '一个站点'))
+Write-Output ("首页含备案位={0}，含微信={1}" -f ($homeBody -match '备案'), ($homeBody -match 'yadxin789'))
+
