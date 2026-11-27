@@ -324,7 +324,9 @@ class DemoSeeder extends Seeder
                     'ok_qty' => max(1, (int) floor($doneQty / 3)),
                     'defect_qty' => max(0, (int) floor($defectQty / 3)),
                     'minutes' => 90,
-                    'reported_at' => now()->subHours(24 - $r * 4),
+                    'reported_at' => $r === 1
+                        ? now()->setTime(9, 10)                       // 今日首条，让看板「今日产出」不是 0
+                        : now()->subDays(1)->setTime(10 + $r, 20),
                 ]);
             }
         }

@@ -17,6 +17,7 @@ use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
 use App\Modules\Mes\Http\Controllers\EquipmentController;
 use App\Modules\Mes\Http\Controllers\ImportController;
+use App\Modules\Mes\Http\Controllers\KanbanController;
 use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
 use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
@@ -53,7 +54,7 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
             // 现场
-            Route::get('kanban', [PlaceholderController::class, 'show'])->name('kanban');
+            Route::get('kanban', [KanbanController::class, 'index'])->name('kanban');
 
             // 我的任务（M3-07，操作工视角；报工页移动优先）
             Route::get('my-tasks', [MyTaskController::class, 'index'])->name('my-tasks.index');
