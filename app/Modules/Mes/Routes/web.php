@@ -13,6 +13,7 @@ declare(strict_types=1);
 | 随 M1~M6 逐步替换为真实控制器，保证期间导航不出现 404。
 */
 
+use App\Modules\Mes\Http\Controllers\ApsController;
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
 use App\Modules\Mes\Http\Controllers\EquipmentController;
@@ -91,6 +92,10 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                 ->whereNumber('issue')->name('issues.show');
             Route::post('issues/{issue}/issue', [MaterialIssueController::class, 'issue'])
                 ->whereNumber('issue')->name('issues.issue');
+
+            // 排产（M2-08 / M2-09）：甘特图 + 一键重排
+            Route::get('aps', [ApsController::class, 'index'])->name('aps.index');
+            Route::post('aps/schedule', [ApsController::class, 'schedule'])->name('aps.schedule');
 
             // 报工流水（M3）
             Route::get('reports', [ReportController::class, 'index'])->name('reports.index');

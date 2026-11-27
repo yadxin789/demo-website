@@ -32,6 +32,9 @@
             <a class="{{ request()->routeIs('mes.work-orders.*') ? 'on' : '' }}" href="{{ route('mes.work-orders.index') }}">
                 <i class="fa-solid fa-clipboard-list"></i> 工单
             </a>
+            <a class="{{ request()->routeIs('mes.aps.*') ? 'on' : '' }}" href="{{ route('mes.aps.index') }}">
+                <i class="fa-solid fa-calendar-days"></i> 排产计划
+            </a>
             <a class="{{ request()->routeIs('mes.reports.index') ? 'on' : '' }}" href="{{ route('mes.reports.index') }}">
                 <i class="fa-solid fa-clock-rotate-left"></i> 报工记录
             </a>

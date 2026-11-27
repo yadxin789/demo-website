@@ -182,13 +182,14 @@ class MasterSeeder extends Seeder
     private function seedRoutings(array $materials, array $centers): void
     {
         // 8 个成品工艺：标准电子制造流程
+        // 第 4 个数字是「单件标准分钟」（SMT 1.5 分/件 ≈ 40 件/小时），不是整批工时
         $common = [
-            ['10', 'SMT 贴片', 'WC-SMT', 45, false],
-            ['20', '回流焊接', 'WC-SMT', 30, true],
-            ['30', '插件焊接', 'WC-THT', 40, true],
-            ['40', '整机装配', 'WC-ASM', 60, false],
-            ['50', '功能测试', 'WC-TST', 35, true],
-            ['60', '包装入库', 'WC-TST', 20, false],
+            ['10', 'SMT 贴片', 'WC-SMT', 1.5, false],
+            ['20', '回流焊接', 'WC-SMT', 1.0, true],
+            ['30', '插件焊接', 'WC-THT', 1.2, true],
+            ['40', '整机装配', 'WC-ASM', 2.0, false],
+            ['50', '功能测试', 'WC-TST', 1.2, true],
+            ['60', '包装入库', 'WC-TST', 0.6, false],
         ];
 
         for ($i = 1; $i <= 8; $i++) {
