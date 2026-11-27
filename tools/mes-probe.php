@@ -44,6 +44,54 @@ if ($cmd === 'line-value') {
     exit(0);
 }
 
+if ($cmd === 'sql') {
+    // 只允许简单 select，避免误写
+    $sql = $argv[2] ?? '';
+    if (! preg_match('/^\s*select\s/i', $sql)) {
+        echo '只接受 select 语句';
+        exit(1);
+    }
+    echo json_encode(DB::connection('mes')->select($sql), JSON_UNESCAPED_UNICODE);
+    exit(0);
+}
+
+if ($cmd === 'cleanup-import') {
+    $codes = ['MJ-RM-901', 'MJ-FG-901', 'MJ-RM-902'];
+    $mats = $db->table('materials')->whereIn('code', $codes)->pluck('id')->all();
+
+    $bomIds = $db->table('boms')->where('code', 'like', 'BOM-FG-9%')->pluck('id')->all();
+    foreach ($bomIds as $id) {
+        $db->table('bom_lines')->where('bom_id', $id)->delete();
+        $db->table('boms')->where('id', $id)->delete();
+    }
+
+    $woIds = $db->table('work_orders')->where('order_no', 'like', 'WO-2026-9%')->pluck('id')->all();
+    foreach ($woIds as $id) {
+        $db->table('work_order_operations')->where('work_order_id', $id)->delete();
+        $db->table('production_reports')->where('work_order_id', $id)->delete();
+        $db->table('work_orders')->where('id', $id)->delete();
+    }
+
+    if ($mats !== []) {
+        $db->table('materials')->whereIn('id', $mats)->delete();
+    }
+
+    printf(
+        "cleanup-import: materials=%d boms=%d work_orders=%d\n",
+        count($mats),
+        count($bomIds),
+        count($woIds)
+    );
+    printf(
+        "  现有：materials=%d boms=%d bom_lines=%d work_orders=%d\n",
+        $db->table('materials')->count(),
+        $db->table('boms')->count(),
+        $db->table('bom_lines')->count(),
+        $db->table('work_orders')->count()
+    );
+    exit(0);
+}
+
 if ($cmd === 'cleanup') {
     $boms = $db->table('boms')->where('code', 'like', 'BOM-FG-09%')->pluck('id')->all();
     foreach ($boms as $id) {

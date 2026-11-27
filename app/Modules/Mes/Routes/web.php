@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
+use App\Modules\Mes\Http\Controllers\ImportController;
 use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
 use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
@@ -106,8 +107,15 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             // 设备（M5 替换）
             Route::get('equipment', [PlaceholderController::class, 'show'])->name('equipment.index');
 
-            // 导入（M1 替换）
-            Route::get('import', [PlaceholderController::class, 'show'])->name('import.index');
+            // 导入（M1-11~M1-14：模板下载 / 上传校验 / 预览 / 确认入库）
+            Route::prefix('import')->name('import.')->group(function () {
+                Route::get('/', [ImportController::class, 'index'])->name('index');
+                Route::get('template/{type}', [ImportController::class, 'template'])->name('template');
+                Route::post('{type}', [ImportController::class, 'upload'])->name('upload');
+                Route::get('{type}/preview', [ImportController::class, 'preview'])->name('preview');
+                Route::post('{type}/commit', [ImportController::class, 'commit'])->name('commit');
+                Route::delete('{type}/preview', [ImportController::class, 'discard'])->name('discard');
+            });
 
             // 系统（M6 替换）
             Route::get('system/users', [PlaceholderController::class, 'show'])->name('system.users.index');

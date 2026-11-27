@@ -50,3 +50,7 @@ Thumbs.db
 /storage/app/products/
 /storage/app/ai-chat/
 /storage/app/ai-staging/
+
+# 导入验收用的临时表格
+/storage/tests/
+
