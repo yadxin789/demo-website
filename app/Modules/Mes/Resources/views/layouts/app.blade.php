@@ -51,6 +51,9 @@
             <a class="{{ request()->routeIs('mes.trace.*') ? 'on' : '' }}" href="{{ route('mes.trace.index') }}">
                 <i class="fa-solid fa-barcode"></i> 批次追溯
             </a>
+            <a class="{{ request()->routeIs('mes.sop.*') ? 'on' : '' }}" href="{{ route('mes.sop.index') }}">
+                <i class="fa-solid fa-book-open"></i> 工艺文件 SOP
+            </a>
             <a class="{{ request()->routeIs('mes.kanban') ? 'on' : '' }}" href="{{ route('mes.kanban') }}">
                 <i class="fa-solid fa-tv"></i> 车间看板
             </a>

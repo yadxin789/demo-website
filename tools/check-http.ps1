@@ -117,11 +117,13 @@ foreach ($x in @(
         @{p = 'mes'; u = '/mes/maintenance/orders' },
         @{p = 'mes'; u = '/mes/trace' },
         @{p = 'mes'; u = '/mes/reports/oee' },
+        @{p = 'mes'; u = '/mes/sop' },
         @{p = 'hr'; u = '/hr/training' },
         @{p = 'hr'; u = '/hr/skills' },
         @{p = 'hr'; u = '/hr/skills/certificates' },
         @{p = 'hr'; u = '/hr/attendance/roster' },
-        @{p = 'hr'; u = '/hr/me' })) {
+        @{p = 'hr'; u = '/hr/me' },
+        @{p = 'hr'; u = '/hr/leaves/accrual' })) {
     $sess = $sessions[$x.p]
     if ($sess -is [array]) { $sess = $sess[0] }
     if (-not $sess) { No ("  {0,-30}" -f $x.u) '无可用会话'; continue }

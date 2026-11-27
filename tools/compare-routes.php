@@ -65,24 +65,23 @@ function normalize(array $r, string $code, array $products): array
 }
 
 $refKeys = [];
-$refAction = [];
 foreach ($ref as $r) {
     [$m, $u, $a] = normalize($r, $code, $products);
-    $key = $m . ' ' . $u;
-    $refKeys[$key] = $a;
-    $refAction[$a] = true;
+    // 多方法路由（PUT|PATCH）拆成单方法键，避免与参考项目里分开注册的两条错判为缺失
+    foreach (explode('|', $m) as $one) {
+        $refKeys[$one . ' ' . $u] = $a;
+    }
 }
 
 $demoKeys = [];
-$demoAction = [];
 foreach ($demo as $r) {
     if (! preg_match('#^/(' . $code . ')(/.*)?$#', '/' . ltrim((string) $r['uri'], '/')) && (string) $r['uri'] !== $code) {
         continue;
     }
     [$m, $u, $a] = normalize($r, $code, $products);
-    $key = $m . ' ' . $u;
-    $demoKeys[$key] = $a;
-    $demoAction[$a] = true;
+    foreach (explode('|', $m) as $one) {
+        $demoKeys[$one . ' ' . $u] = $a;
+    }
 }
 
 $missing = array_diff_key($refKeys, $demoKeys);

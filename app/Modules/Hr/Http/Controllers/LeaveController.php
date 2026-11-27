@@ -8,6 +8,7 @@ use App\Modules\Hr\Models\Department;
 use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\Leave;
 use App\Modules\Hr\Models\LeaveBalance;
+use App\Modules\Hr\Services\LeaveAccrualService;
 use App\Modules\Hr\Services\LeaveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -169,5 +170,39 @@ class LeaveController extends Controller
             'typeText' => LeaveService::typeText(),
             'departments' => Department::query()->orderBy('level')->orderBy('sort')->get(['id', 'code', 'name']),
         ]);
+    }
+
+    /** 年假核算（按司龄规则算应享额度，先看差异再一键发放） */
+    public function accrual(Request $request): View
+    {
+        $year = (int) $request->query('year', (int) now()->format('Y'));
+        $rows = $this->accrualService()->preview($year);
+
+        return view('hr::leaves.accrual', [
+            'rows' => $rows,
+            'year' => $year,
+            'rules' => LeaveAccrualService::rules(),
+            'stat' => [
+                'people' => $rows->count(),
+                'entitled_days' => round((float) $rows->sum('entitled'), 1),
+                'need_adjust' => $rows->filter(fn ($r) => abs((float) $r['delta']) >= 0.01)->count(),
+                'no_balance' => $rows->where('has_balance', false)->count(),
+            ],
+        ]);
+    }
+
+    /** 执行核算：写 leave_balances（type=annual），保留已休天数 */
+    public function accrualRun(Request $request): RedirectResponse
+    {
+        $year = (int) $request->input('year', (int) now()->format('Y'));
+        $stat = $this->accrualService()->run($year);
+
+        return redirect()->route('hr.leaves.accrual', ['year' => $year])
+            ->with('status', "{$year} 年年假核算完成：新增 {$stat['created']} 人、调整 {$stat['updated']} 人、无变化 {$stat['unchanged']} 人，合计授予 {$stat['total_days']} 天。");
+    }
+
+    private function accrualService(): LeaveAccrualService
+    {
+        return app(LeaveAccrualService::class);
     }
 }

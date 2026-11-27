@@ -1,5 +1,3 @@
-MISSING	PATCH|PUT /admin/departments/{*}	AdminController@update
-MISSING	PATCH|PUT /admin/roles/{*}	AdminController@update
 MISSING	GET /admin/wecom/message-logs	WecomSettingsController@messageLogs
 MISSING	GET /admin/wecom/settings	WecomSettingsController@index
 MISSING	POST /admin/wecom/settings	WecomSettingsController@save

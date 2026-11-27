@@ -123,14 +123,14 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
                 Route::get('/departments/create', [AdminController::class, 'createDepartment'])->name('departments.create');
                 Route::post('/departments', [AdminController::class, 'storeDepartment'])->name('departments.store');
                 Route::get('/departments/{department}/edit', [AdminController::class, 'editDepartment'])->name('departments.edit');
-                Route::put('/departments/{department}', [AdminController::class, 'updateDepartment'])->name('departments.update');
+                Route::match(['put', 'patch'], '/departments/{department}', [AdminController::class, 'updateDepartment'])->name('departments.update');
                 Route::delete('/departments/{department}', [AdminController::class, 'deleteDepartment'])->name('departments.destroy');
 
                 Route::get('/roles', [AdminController::class, 'roles'])->name('roles');
                 Route::get('/roles/create', [AdminController::class, 'createRole'])->name('roles.create');
                 Route::post('/roles', [AdminController::class, 'storeRole'])->name('roles.store');
                 Route::get('/roles/{role}/edit', [AdminController::class, 'editRole'])->name('roles.edit');
-                Route::put('/roles/{role}', [AdminController::class, 'updateRole'])->name('roles.update');
+                Route::match(['put', 'patch'], '/roles/{role}', [AdminController::class, 'updateRole'])->name('roles.update');
                 Route::delete('/roles/{role}', [AdminController::class, 'deleteRole'])->name('roles.destroy');
 
                 Route::get('/statuses', [AdminController::class, 'statuses'])->name('statuses');

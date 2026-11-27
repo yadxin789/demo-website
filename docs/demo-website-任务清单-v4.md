@@ -476,6 +476,40 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 
 ---
 
+
+## 第 9.9 部分｜S15 对齐收口与最后一公里补全（2026-11-27 第二段）
+
+> 完成标记：`S15-patch-sop-accrual`。目标：把 PM 的形式差异清零，再给 MES / HR 各补一个"现场真会用"的环节。
+
+### A. 对齐收口（4 项）
+- [x] S15-A01 `Route::match(['put','patch'], ...)` 补齐 PM 的 `/admin/departments/{id}`、`/admin/roles/{id}`
+- [x] S15-A02 `tools/compare-routes.php` 修正多方法口径：`PUT|PATCH` 拆成单方法键再比对
+- [x] S15-A03 重跑三产品对账：ERP 缺 0 / Shop 缺 12（全 AI API）/ PM 缺 72（api 38 + 企微 17 + 协同 13 + 电话会议 2 + 注册 2）
+- [x] S15-A04 结论：PM 功能性缺口清零，剩余全为"演示站不复刻的模块"
+
+### B. MES 工艺文件 SOP（7 项）
+- [x] S15-M01 迁移 `2026_11_27_220001_create_mes_sop_documents`：`sop_documents`（routing_operation_id / code / title / version / content / file_path / status / effective_on / author）
+- [x] S15-M02 模型 `SopDocument`：状态文案、`isEffective()`（生效日未到的算待生效）、`hasFile()`
+- [x] S15-M03 控制器 `SopController`：index（按路线看覆盖）/ create / show / store / update / destroy / download
+- [x] S15-M04 视图 `sop/index`（工序表 + 覆盖状态 + 覆盖率 KPI）、`sop/form`（登记与编辑共用，含附件上传）
+- [x] S15-M05 路由 7 条 + 菜单「工艺文件 SOP」，放在现场组
+- [x] S15-M06 种子 `SopSeeder`：40 道工序配 37 份 SOP（留 3 道未下发做演示），6 份带 txt 附件，幂等
+- [x] S15-M07 实测：5 类页面 200、登记 / 升版 / 上传附件 / 删除全通；无附件时下载导出 txt
+
+### C. HR 年假核算（5 项）
+- [x] S15-H01 `LeaveAccrualService`：五档司龄规则 + 单人应享计算 + 全员预览 + 一键发放（只改 total / remaining）
+- [x] S15-H02 `LeaveController::accrual` / `accrualRun` 两个动作，核算年度可切换
+- [x] S15-H03 视图 `leaves/accrual`：规则对照 + 差异预览表（应享/现额度/已休/差额/适用档）+ 一键发放
+- [x] S15-H04 路由 2 条 + 菜单「年假核算」，放在考勤与假期组
+- [x] S15-H05 实测：页面 200、需调整 68 人 → 发放调整 68 / 无变化 8 / 授予 468 天 → 再核算需调整 0 人（幂等）
+
+### D. 回归与交付（4 项）
+- [x] S15-R01 `check-http.ps1` 再补 2 项（`/mes/sop`、`/hr/leaves/accrual`），项数 70 → 72
+- [x] S15-R02 `guard.ps1` 17/0、视觉 45/0、独立性 31/0、走查 17/0、HTTP 72/0
+- [x] S15-R03 提交推送 main（commit 见规划书 12.13 与 git log）
+- [x] S15-R04 线上部署：MES/HR 两条新迁移 + SOP 种子，线上页面验证 200
+
+---
 ## 第 10 部分｜验收清单
 
 ### 里程碑 A（`S4-live3`）

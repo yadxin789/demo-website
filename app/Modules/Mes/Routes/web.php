@@ -21,6 +21,7 @@ use App\Modules\Mes\Http\Controllers\FinishedReceiptController;
 use App\Modules\Mes\Http\Controllers\ImportController;
 use App\Modules\Mes\Http\Controllers\KanbanController;
 use App\Modules\Mes\Http\Controllers\MaintenanceController;
+use App\Modules\Mes\Http\Controllers\SopController;
 use App\Modules\Mes\Http\Controllers\TraceController;
 use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
@@ -107,6 +108,15 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             Route::get('trace', [TraceController::class, 'index'])->name('trace.index');
             Route::get('trace/{lot}', [TraceController::class, 'show'])
                 ->where('lot', '[A-Za-z0-9\-]+')->name('trace.show');
+
+            // 工艺文件 SOP（M7 增补 2：按工序下发作业指导书）
+            Route::get('sop', [SopController::class, 'index'])->name('sop.index');
+            Route::get('sop/create', [SopController::class, 'create'])->name('sop.create');
+            Route::post('sop', [SopController::class, 'store'])->name('sop.store');
+            Route::get('sop/{sop}', [SopController::class, 'show'])->whereNumber('sop')->name('sop.show');
+            Route::put('sop/{sop}', [SopController::class, 'update'])->whereNumber('sop')->name('sop.update');
+            Route::delete('sop/{sop}', [SopController::class, 'destroy'])->whereNumber('sop')->name('sop.destroy');
+            Route::get('sop/{sop}/download', [SopController::class, 'download'])->whereNumber('sop')->name('sop.download');
 
             // 设备保养（M7 增补：计划 / 到期生成 / 保养与维修单）
             Route::prefix('maintenance')->name('maintenance.')->group(function () {

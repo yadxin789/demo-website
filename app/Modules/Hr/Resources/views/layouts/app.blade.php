@@ -83,6 +83,9 @@
             <a class="{{ request()->routeIs('hr.leaves.balances*') ? 'on' : '' }}" href="{{ route('hr.leaves.balances') }}">
                 <i class="fa-solid fa-wallet"></i> 假期余额
             </a>
+            <a class="{{ request()->routeIs('hr.leaves.accrual*') ? 'on' : '' }}" href="{{ route('hr.leaves.accrual') }}">
+                <i class="fa-solid fa-calculator"></i> 年假核算
+            </a>
 
             <div class="grp">薪资</div>
             <a class="{{ request()->routeIs('hr.payroll.runs.*') ? 'on' : '' }}" href="{{ route('hr.payroll.runs.index') }}">

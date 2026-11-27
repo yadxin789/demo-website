@@ -118,6 +118,8 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::post('leaves/{leave}/reject', [LeaveController::class, 'reject'])
                 ->whereNumber('leave')->name('leaves.reject');
             Route::get('leaves/balances', [LeaveController::class, 'balances'])->name('leaves.balances');
+            Route::get('leaves/accrual', [LeaveController::class, 'accrual'])->name('leaves.accrual');
+            Route::post('leaves/accrual', [LeaveController::class, 'accrualRun'])->name('leaves.accrual.run');
 
             // 排班表（M7 增补）
             Route::get('attendance/roster', [RosterController::class, 'index'])->name('attendance.roster');
