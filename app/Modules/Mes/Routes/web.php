@@ -22,6 +22,7 @@ use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
 use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
+use App\Modules\Mes\Http\Controllers\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:mes', 'product.only:mes'])
@@ -47,11 +48,19 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             // 现场
             Route::get('kanban', [PlaceholderController::class, 'show'])->name('kanban');
 
-            // 工单（M2 替换）
-            Route::get('work-orders', [PlaceholderController::class, 'show'])->name('work-orders.index');
-            Route::get('work-orders/{workOrder}', [PlaceholderController::class, 'show'])
-                ->whereNumber('workOrder')
-                ->name('work-orders.show');
+            // 工单（M2：列表 / 详情 / 建单 / 下达 / 派工）
+            Route::get('work-orders', [WorkOrderController::class, 'index'])->name('work-orders.index');
+            Route::post('work-orders', [WorkOrderController::class, 'store'])->name('work-orders.store');
+            Route::get('work-orders/{workOrder}', [WorkOrderController::class, 'show'])
+                ->whereNumber('workOrder')->name('work-orders.show');
+            Route::put('work-orders/{workOrder}', [WorkOrderController::class, 'update'])
+                ->whereNumber('workOrder')->name('work-orders.update');
+            Route::post('work-orders/{workOrder}/release', [WorkOrderController::class, 'release'])
+                ->whereNumber('workOrder')->name('work-orders.release');
+            Route::post('work-orders/{workOrder}/dispatch-all', [WorkOrderController::class, 'dispatchAll'])
+                ->whereNumber('workOrder')->name('work-orders.dispatch-all');
+            Route::post('work-orders/{workOrder}/operations/{operation}/dispatch', [WorkOrderController::class, 'dispatch'])
+                ->whereNumber('workOrder')->whereNumber('operation')->name('work-orders.operations.dispatch');
 
             // 主数据（M1：物料已真实落地，其余逐步替换）
             Route::prefix('master')->name('master.')->group(function () {

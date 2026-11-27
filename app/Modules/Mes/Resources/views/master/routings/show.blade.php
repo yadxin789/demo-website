@@ -71,7 +71,7 @@
                     <td class="num">{{ (float) $op->std_minutes }} min</td>
                     <td>
                         @if ($op->inspection_required)
-                            <span class="mes-badge b-warn">需检验</span>
+                            <span class="mes-badge b-progress">需检验</span>
                         @else
                             <span style="color:#a8b3c1; font-size:12px">—</span>
                         @endif
