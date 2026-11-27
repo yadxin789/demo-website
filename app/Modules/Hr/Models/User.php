@@ -21,6 +21,7 @@ class User extends Authenticatable
 
     protected $connection = 'hr';
     protected $table = 'users';
+    protected $guard_name = 'hr';   // spatie 按 guard 隔离角色/权限，必须与本产品 guard 同名
 
     protected $guarded = ['id'];
     protected $hidden = ['password', 'remember_token'];

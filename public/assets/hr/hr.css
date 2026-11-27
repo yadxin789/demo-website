@@ -1,0 +1,208 @@
+/* ==========================================================================
+   HR · 华瑞集团（控股）主题
+   紫 + 灰：人事系统偏"办公室"气质，与 MES 的车间深蓝橙、ERP 的商务蓝区分开
+   只服务 /hr/*，不得被其它产品引用（HC-21/22）
+   ========================================================================== */
+
+:root {
+    --hr-purple: #5f3dc4;
+    --hr-purple-2: #4c2fa8;
+    --hr-purple-soft: #ede9fe;
+    --hr-slate: #343a40;
+    --hr-line: #e4e4ef;
+    --hr-text: #22222e;
+    --hr-muted: #6f6f80;
+    --hr-bg: #f6f5fa;
+    --hr-ok: #2f9e44;
+    --hr-warn: #f59f00;
+    --hr-bad: #d6336c;
+}
+
+* { box-sizing: border-box; }
+
+body.hr-body {
+    margin: 0;
+    background: var(--hr-bg);
+    color: var(--hr-text);
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 14px;
+}
+
+/* ---------- 登录页 ---------- */
+.hr-login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(900px 520px at 12% 8%, rgba(147, 112, 219, .28), transparent 62%),
+        linear-gradient(150deg, #241a3d 0%, #34255c 55%, #46307a 100%);
+    padding: 32px 16px;
+}
+
+.hr-login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(22, 14, 44, .38);
+    padding: 34px 32px 28px;
+}
+
+.hr-login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+
+.hr-login-brand .mark {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--hr-purple), #9b7ff0);
+    color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .5px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.hr-login-brand h1 { font-size: 19px; margin: 0; font-weight: 600; }
+
+.hr-login-sub { color: var(--hr-muted); font-size: 13px; margin: 4px 0 22px; }
+
+.hr-login-card .form-label { font-size: 13px; color: var(--hr-muted); }
+.hr-login-card .form-control { height: 42px; }
+
+.hr-login-btn {
+    height: 44px; width: 100%; border: 0; border-radius: 8px;
+    background: var(--hr-purple); color: #fff; font-weight: 600; letter-spacing: .4px;
+}
+.hr-login-btn:hover { background: var(--hr-purple-2); }
+
+.hr-login-tip {
+    margin-top: 18px; padding: 10px 12px;
+    background: #faf9fd; border: 1px dashed var(--hr-line); border-radius: 8px;
+    font-size: 12px; color: var(--hr-muted); line-height: 1.7;
+}
+.hr-login-tip b { color: var(--hr-text); }
+
+.hr-login-foot { margin-top: 16px; text-align: center; font-size: 12px; color: #9a94b0; }
+
+/* ---------- 侧栏布局 ---------- */
+.hr-shell { display: flex; min-height: 100vh; }
+
+.hr-side {
+    width: 232px; flex: 0 0 232px;
+    background: linear-gradient(180deg, #241a3d 0%, #34255c 100%);
+    color: #d6d0e6;
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+}
+
+.hr-side-brand {
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    display: flex; align-items: center; gap: 10px;
+}
+.hr-side-brand .mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--hr-purple);
+    color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+}
+.hr-side-brand .txt { line-height: 1.2; }
+.hr-side-brand .txt b { display: block; color: #fff; font-size: 14px; font-weight: 600; }
+.hr-side-brand .txt span { font-size: 11px; color: #a79fc4; }
+
+.hr-nav { padding: 10px 10px 20px; overflow-y: auto; flex: 1; }
+.hr-nav .grp {
+    font-size: 11px; color: #8a82a6; letter-spacing: 1px;
+    padding: 14px 10px 6px; text-transform: uppercase;
+}
+.hr-nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 7px;
+    color: #d6d0e6; text-decoration: none; font-size: 13.5px;
+}
+.hr-nav a i { width: 16px; text-align: center; color: #9a92b8; font-size: 13px; }
+.hr-nav a:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+.hr-nav a.on { background: rgba(124, 92, 226, .22); color: #fff; box-shadow: inset 3px 0 0 #9b7ff0; }
+.hr-nav a.on i { color: #b9a4ff; }
+
+.hr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.hr-topbar {
+    background: #fff; border-bottom: 1px solid var(--hr-line);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    position: sticky; top: 0; z-index: 5;
+}
+.hr-topbar .ttl { font-size: 16px; font-weight: 600; }
+.hr-topbar .sub { font-size: 12px; color: var(--hr-muted); }
+.hr-topbar .who { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--hr-muted); }
+.hr-topbar .who b { color: var(--hr-text); }
+
+.hr-content { padding: 20px; }
+
+/* ---------- 通用卡片 / KPI ---------- */
+.hr-card {
+    background: #fff; border: 1px solid var(--hr-line);
+    border-radius: 10px; padding: 16px 18px;
+}
+.hr-card h3 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+
+.hr-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.hr-kpi {
+    background: #fff; border: 1px solid var(--hr-line);
+    border-radius: 10px; padding: 14px 16px;
+    border-top: 3px solid var(--hr-purple);
+}
+.hr-kpi.purple { border-top-color: var(--hr-purple); }
+.hr-kpi.ok { border-top-color: var(--hr-ok); }
+.hr-kpi.warn { border-top-color: var(--hr-warn); }
+.hr-kpi.bad { border-top-color: var(--hr-bad); }
+.hr-kpi .lbl { font-size: 12px; color: var(--hr-muted); }
+.hr-kpi .num { font-size: 24px; font-weight: 700; line-height: 1.5; }
+.hr-kpi .hint { font-size: 12px; color: var(--hr-muted); }
+
+/* ---------- 表格 ---------- */
+.hr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hr-table th, .hr-table td { padding: 9px 10px; border-bottom: 1px solid var(--hr-line); text-align: left; vertical-align: middle; }
+.hr-table th { color: var(--hr-muted); font-weight: 500; background: #fbfaff; }
+.hr-table tbody tr:hover { background: #fcfbff; }
+.hr-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.hr-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; line-height: 1.6; }
+.b-draft { background: #eeeef4; color: #5b5b6b; }
+.b-released { background: #e8e2ff; color: #4c2fa8; }
+.b-progress { background: #fff4e0; color: #b36b00; }
+.b-done { background: #e6f7ec; color: #227a39; }
+.b-bad { background: #ffe9ef; color: #a61e4d; }
+
+.hr-progress { height: 6px; background: #eeecf6; border-radius: 3px; overflow: hidden; min-width: 80px; }
+.hr-progress > span { display: block; height: 100%; background: var(--hr-purple); }
+
+.hr-empty { padding: 36px 10px; text-align: center; color: var(--hr-muted); font-size: 13px; }
+
+/* ---------- 部门树 ---------- */
+.hr-tree { font-size: 13.5px; }
+.hr-tree-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-bottom: 1px dashed #eeeaf7;
+}
+.hr-tree-row:hover { background: #fbfaff; }
+.hr-tree-row .indent { display: inline-block; }
+.hr-tree-row .code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--hr-muted); }
+.hr-tree-row .name { font-weight: 600; }
+.hr-tree-row .meta { margin-left: auto; color: var(--hr-muted); font-size: 12px; display: flex; gap: 14px; }
+
+/* ---------- 考勤日历格 ---------- */
+.hr-att-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.hr-att-cell {
+    border: 1px solid var(--hr-line); border-radius: 6px;
+    padding: 8px; font-size: 12px; background: #fff;
+}
+.hr-att-cell .d { color: var(--hr-muted); }
+.hr-att-cell .v { font-weight: 600; }
+.hr-att-cell.good { background: #f2fbf5; border-color: #cdebd6; }
+.hr-att-cell.warn { background: #fff9ec; border-color: #f6e2b8; }
+.hr-att-cell.bad { background: #fff1f5; border-color: #f6c9d8; }
+
+@media (max-width: 900px) {
+    .hr-shell { flex-direction: column; }
+    .hr-side { width: 100%; flex: none; height: auto; position: static; }
+    .hr-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .hr-nav .grp { grid-column: 1 / -1; }
+}
