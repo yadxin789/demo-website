@@ -78,13 +78,13 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
         left: 0;
         width: min(282px, 86vw) !important;
         margin-left: 0 !important;
-        transform: translateX(-104%);
+        transform: translateX(-104%) !important;
         transition: transform .22s ease;
         z-index: 1055;
         overflow-y: auto;
         box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
     }
-    .app-wrapper .sidebar.show { transform: none; }
+    .app-wrapper .sidebar.show { transform: none !important; }
     .main-content { margin-left: 0 !important; width: 100%; }
 }
 
@@ -97,13 +97,13 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
         bottom: 0;
         left: 0;
         width: min(270px, 86vw) !important;
-        transform: translateX(-104%);
+        transform: translateX(-104%) !important;
         transition: transform .22s ease;
         z-index: 1055;
         overflow-y: auto;
         box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
     }
-    .app-sidebar.is-open { transform: none; }
+    .app-sidebar.is-open { transform: none !important; }
     #app-sidebar, .app-sidebar { display: block; }
 }
 
@@ -118,14 +118,14 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
         width: min(270px, 86vw) !important;
         height: 100dvh !important;
         flex: none;
-        transform: translateX(-104%);
+        transform: translateX(-104%) !important;
         transition: transform .22s ease;
         z-index: 1055;
         overflow-y: auto;
         box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
         padding-bottom: 24px;
     }
-    .mes-side.is-open, .hr-side.is-open { transform: none; }
+    .mes-side.is-open, .hr-side.is-open { transform: none !important; }
     .mes-nav, .hr-nav { display: flex !important; flex-direction: column; gap: 2px; }
     .mes-nav .grp, .hr-nav .grp { grid-column: auto; }
     .mes-main, .hr-main { width: 100%; min-width: 0; }
@@ -138,12 +138,12 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
         top: 0;
         bottom: 0;
         width: min(260px, 86vw) !important;
-        transform: translateX(-104%);
+        transform: translateX(-104%) !important;
         transition: transform .22s ease;
         z-index: 1055;
         overflow-y: auto;
     }
-    .sys-side.is-open { transform: none; }
+    .sys-side.is-open { transform: none !important; }
     .sys-main { margin-left: 0 !important; }
     .sys-top { padding: 10px 14px !important; }
     .sys-top .s { display: none; }
