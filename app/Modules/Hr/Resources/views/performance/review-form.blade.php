@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '绩效评分 · ' . $employee->name)
-@section('sub', '华瑞集团（控股）· ' . $cycle->period . ' 周期，五项指标的上级评分')
+@section('sub', '' . $cycle->period . ' 周期，五项指标的上级评分')
 
 @section('content')
     <div class="hr-card mb-3">

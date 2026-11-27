@@ -4,7 +4,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('assets/erp/favicon.svg') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - DDWL-ERP 电子厂管理系统</title>
+    <title>登录 - 电子制造 ERP</title>
     <link rel="stylesheet" href="{{ asset('assets/erp/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/erp/css/all.min.css') }}">
     <style>
@@ -42,7 +42,7 @@
 <div class="card login-card">
     <div class="card-body p-4 p-md-5">
         <div class="brand-icon"><i class="fa-solid fa-industry"></i></div>
-        <h4 class="text-center fw-bold mb-1">DDWL-ERP</h4>
+        <h4 class="text-center fw-bold mb-1">电子制造 ERP</h4>
         <p class="text-center text-muted mb-4">电子厂管理系统</p>
 
         @if ($errors->any())

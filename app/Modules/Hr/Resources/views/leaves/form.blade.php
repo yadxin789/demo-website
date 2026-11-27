@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '提交请假')
-@section('sub', '华瑞集团（控股）· 提交后单号自动生成，天数按自然日含首尾计算')
+@section('sub', '提交后单号自动生成，天数按自然日含首尾计算')
 
 @section('content')
     <div class="hr-card" style="max-width:880px">

@@ -15,7 +15,7 @@
             <i class="fa-solid fa-diagram-project" style="font-size:2.2rem; color:#f59e0b;"></i>
             <h1 class="display-6 fw-bold mt-3 mb-1">404</h1>
             <h5 class="mb-3">这个工序卡不存在</h5>
-            <p class="text-muted mb-4">「精工精密制造 · 苏州一号车间」里没有这个地址。可能是工单已经归档，或链接输错了。</p>
+            <p class="text-muted mb-4">「演示车间 · 苏州一号车间」里没有这个地址。可能是工单已经归档，或链接输错了。</p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url('mes/dashboard') }}" class="btn text-white" style="background:#f59e0b;">返回生产看板</a>
                 <a href="{{ url('/') }}" class="btn btn-outline-secondary">看看其他产品</a>

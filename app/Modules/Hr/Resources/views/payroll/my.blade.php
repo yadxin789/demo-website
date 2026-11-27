@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '我的工资条')
-@section('sub', '华瑞集团（控股）· 只显示本人的工资明细（按工号匹配）')
+@section('sub', '只显示本人的工资明细（按工号匹配）')
 
 @section('content')
     @if (! $latest)

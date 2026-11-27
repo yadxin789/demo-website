@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '绩效结果')
-@section('sub', '华瑞集团（控股）· 分布、均分、部门对比、排名')
+@section('sub', '分布、均分、部门对比、排名')
 
 @section('content')
     @if (! $cycle)

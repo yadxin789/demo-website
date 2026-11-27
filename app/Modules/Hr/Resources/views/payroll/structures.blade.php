@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '薪资结构')
-@section('sub', '华瑞集团（控股）· 岗位四段薪资档：基本 / 岗位 / 绩效 / 补贴')
+@section('sub', '岗位四段薪资档：基本 / 岗位 / 绩效 / 补贴')
 
 @section('content')
     <div class="hr-kpis mb-3">

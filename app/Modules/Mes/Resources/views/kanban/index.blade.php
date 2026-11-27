@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="refresh" content="30">
-    <title>车间看板 · 精工精密制造</title>
+    <title>车间看板 · 演示车间</title>
     <style>
         :root {
             --bg: #08111f;
@@ -114,7 +114,7 @@
         <div class="brand">
             <div class="mark">MES</div>
             <div>
-                <h1>精工精密制造 · 一车间生产看板</h1>
+                <h1>演示车间 · 一车间生产看板</h1>
                 <div class="sub">数据源：工单 / 报工 / 检验 / 设备 · 良率口径 ok ÷ (ok + 不良) · 工单完成数取瓶颈工序</div>
             </div>
         </div>
@@ -218,7 +218,7 @@
     </div>
 
     <div class="kb-foot">
-        <span>精工精密制造（苏州）· 一号车间 · MES 演示环境</span>
+        <span>一号车间 · MES 演示环境</span>
         <span><a href="{{ route('mes.dashboard') }}">← 返回工作台</a></span>
     </div>
 </div>

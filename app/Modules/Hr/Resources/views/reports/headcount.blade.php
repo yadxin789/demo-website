@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '人数结构')
-@section('sub', '华瑞集团（控股）· 在册口径 = 在职 + 试用，离职单列')
+@section('sub', '在册口径 = 在职 + 试用，离职单列')
 
 @section('content')
     <div class="hr-kpis mb-3">

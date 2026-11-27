@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '请假审批')
-@section('sub', '华瑞集团（控股）· 批准即扣年假/调休余额，驳回要写原因')
+@section('sub', '批准即扣年假/调休余额，驳回要写原因')
 
 @section('content')
     <div class="hr-kpis mb-3">

@@ -13,7 +13,7 @@
             <i class="fa-solid fa-map text-secondary" style="font-size: 2.2rem;"></i>
             <h1 class="display-6 fw-bold mt-2 mb-1">404</h1>
             <h5 class="mb-3">页面不存在</h5>
-            <p class="text-muted mb-4">这个地址在「深圳智软科技 · 研发项目管理」里没有对应页面。可能是项目已经归档，或旧链接失效。</p>
+            <p class="text-muted mb-4">这个地址在「演示研发科技 · 研发项目管理」里没有对应页面。可能是项目已经归档，或旧链接失效。</p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url('pm/dashboard') }}" class="btn btn-primary">返回工作台</a>
                 <a href="{{ route('portal.home') }}" class="btn btn-outline-secondary">看看其他产品</a>

@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
             TaskTypeSeeder::class,
             UserSeeder::class,
             DemoSeeder::class,
+            // 演示站专用：通知/待办/文件/知识库/模板/AI 等空表补齐
+            DemoCoverageSeeder::class,
         ]);
     }
 }

@@ -14,7 +14,7 @@
     <div class="mes-login-card">
         <div class="mes-login-brand">
             <span class="mark">MES</span>
-            <h1>精工精密制造 · MES</h1>
+            <h1>演示车间 · MES</h1>
         </div>
         <p class="mes-login-sub">车间执行系统 · 苏州一号车间</p>
 

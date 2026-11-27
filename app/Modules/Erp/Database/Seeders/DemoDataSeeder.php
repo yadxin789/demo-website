@@ -200,9 +200,9 @@ class DemoDataSeeder extends Seeder
     private function seedCustomers(): void
     {
         $customers = [
-            ['customer_code' => 'C0001', 'customer_name' => '深圳华信电子有限公司', 'contact_person' => '张经理', 'contact_phone' => '13800000001', 'payment_terms' => '月结30天', 'credit_limit' => 500000],
-            ['customer_code' => 'C0002', 'customer_name' => '东莞创科科技有限公司', 'contact_person' => '李工', 'contact_phone' => '13800000002', 'payment_terms' => '月结60天', 'credit_limit' => 300000],
-            ['customer_code' => 'C0003', 'customer_name' => '广州明远贸易有限公司', 'contact_person' => '王总', 'contact_phone' => '13800000003', 'payment_terms' => '现款现货', 'credit_limit' => 100000],
+            ['customer_code' => 'C0001', 'customer_name' => '演示精密电子（深圳）有限公司', 'contact_person' => '张经理', 'contact_phone' => '13800000001', 'payment_terms' => '月结30天', 'credit_limit' => 500000],
+            ['customer_code' => 'C0002', 'customer_name' => '演示智造科技（东莞）有限公司', 'contact_person' => '李工', 'contact_phone' => '13800000002', 'payment_terms' => '月结60天', 'credit_limit' => 300000],
+            ['customer_code' => 'C0003', 'customer_name' => '演示商贸（广州）有限公司', 'contact_person' => '王总', 'contact_phone' => '13800000003', 'payment_terms' => '现款现货', 'credit_limit' => 100000],
         ];
 
         $sales = User::where('username', '钱七')->first();
@@ -225,10 +225,10 @@ class DemoDataSeeder extends Seeder
     private function seedSuppliers(): void
     {
         $suppliers = [
-            ['supplier_code' => 'S0001', 'supplier_name' => '国巨电子（中国）有限公司', 'contact_person' => '陈经理', 'contact_phone' => '13900000001', 'supplier_type' => '原厂', 'lead_time_days' => 7],
-            ['supplier_code' => 'S0002', 'supplier_name' => '村田电子贸易有限公司', 'contact_person' => '刘工', 'contact_phone' => '13900000002', 'supplier_type' => '原厂', 'lead_time_days' => 10],
-            ['supplier_code' => 'S0003', 'supplier_name' => '深圳世强先进科技有限公司', 'contact_person' => '赵经理', 'contact_phone' => '13900000003', 'supplier_type' => '代理', 'lead_time_days' => 3],
-            ['supplier_code' => 'S0004', 'supplier_name' => '深圳华强PCB板厂', 'contact_person' => '周工', 'contact_phone' => '13900000004', 'supplier_type' => '加工', 'lead_time_days' => 5],
+            ['supplier_code' => 'S0001', 'supplier_name' => '演示元器件（中国）有限公司', 'contact_person' => '陈经理', 'contact_phone' => '13900000001', 'supplier_type' => '原厂', 'lead_time_days' => 7],
+            ['supplier_code' => 'S0002', 'supplier_name' => '演示被动元件贸易有限公司', 'contact_person' => '刘工', 'contact_phone' => '13900000002', 'supplier_type' => '原厂', 'lead_time_days' => 10],
+            ['supplier_code' => 'S0003', 'supplier_name' => '演示半导体代理（深圳）有限公司', 'contact_person' => '赵经理', 'contact_phone' => '13900000003', 'supplier_type' => '代理', 'lead_time_days' => 3],
+            ['supplier_code' => 'S0004', 'supplier_name' => '演示PCB制造厂', 'contact_person' => '周工', 'contact_phone' => '13900000004', 'supplier_type' => '加工', 'lead_time_days' => 5],
         ];
 
         $purchase = User::where('username', '赵六')->first();

@@ -19,7 +19,7 @@
         <div class="mes-side-brand">
             <span class="mark">MES</span>
             <span class="txt">
-                <b>精工精密制造</b>
+                <b>演示车间</b>
                 <span>苏州 · 一号车间</span>
             </span>
         </div>
@@ -146,7 +146,7 @@
         <div class="mes-topbar">
             <div>
                 <div class="ttl">@yield('title', '工作台')</div>
-                <div class="sub">@yield('sub', '精工精密制造（苏州）· 演示环境')</div>
+                <div class="sub">@yield('sub', '演示环境')</div>
             </div>
             <div class="who">
                 <span>当前班次：<b>白班</b></span>

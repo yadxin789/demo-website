@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '考勤汇总')
-@section('sub', '华瑞集团（控股）· 按月聚合，只统计本库打卡记录')
+@section('sub', '按月聚合，只统计本库打卡记录')
 
 @section('content')
     <div class="hr-card mb-3">

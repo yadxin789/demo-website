@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册账号 - DDWL-ERP 电子厂管理系统</title>
+    <title>注册账号 - 电子制造 ERP</title>
     <link rel="stylesheet" href="{{ asset('assets/erp/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/erp/css/all.min.css') }}">
     <style>

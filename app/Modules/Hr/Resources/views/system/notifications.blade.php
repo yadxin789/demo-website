@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '站内通知')
-@section('sub', '华瑞集团（控股）· 通知只发给本产品账号，不跨产品')
+@section('sub', '通知只发给本产品账号，不跨产品')
 
 @section('content')
     <div class="row g-3">

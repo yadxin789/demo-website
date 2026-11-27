@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '招聘需求')
-@section('sub', '华瑞集团（控股）· 需求单 → 候选人 → 面试 → 入职，一条线跑通')
+@section('sub', '需求单 → 候选人 → 面试 → 入职，一条线跑通')
 
 @section('content')
     <div class="hr-kpis mb-3">

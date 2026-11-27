@@ -16,7 +16,7 @@
             <span class="mark">HR</span>
             <h1>人事管理 HR</h1>
         </div>
-        <p class="hr-login-sub">华瑞集团（控股）· 从招人进来到发工资走人</p>
+        <p class="hr-login-sub">从招人进来到发工资走人</p>
 
         @if (session('status'))
             <div class="alert alert-success py-2">{{ session('status') }}</div>

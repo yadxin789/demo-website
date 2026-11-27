@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '岗位')
-@section('sub', '华瑞集团（控股）· 岗位编码 / 职级 / 在职人数 / 薪资标准')
+@section('sub', '岗位编码 / 职级 / 在职人数 / 薪资标准')
 
 @section('content')
     <div class="hr-card mb-3">

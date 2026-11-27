@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '部门树')
-@section('sub', '华瑞集团（控股）· 多级组织与编制缺口')
+@section('sub', '多级组织与编制缺口')
 
 @section('content')
     <div class="hr-kpis mb-3">

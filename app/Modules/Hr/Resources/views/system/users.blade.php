@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '账号管理')
-@section('sub', '华瑞集团（控股）· 账号的新建、编辑、角色与启停；角色按 guard「hr」隔离')
+@section('sub', '账号的新建、编辑、角色与启停；角色按 guard「hr」隔离')
 
 @section('content')
     <div class="hr-card">

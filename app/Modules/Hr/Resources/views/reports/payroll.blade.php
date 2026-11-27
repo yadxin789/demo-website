@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '人力成本')
-@section('sub', '华瑞集团（控股）· 按工资批次看部门成本与结构')
+@section('sub', '按工资批次看部门成本与结构')
 
 @section('content')
     @if (! $run)

@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '考勤异常')
-@section('sub', '华瑞集团（控股）· 待处理的先来，处理完待办立刻减少')
+@section('sub', '待处理的先来，处理完待办立刻减少')
 
 @section('content')
     <div class="hr-kpis mb-3">

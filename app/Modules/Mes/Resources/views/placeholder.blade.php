@@ -1,7 +1,7 @@
 @extends('mes::layouts.app')
 
 @section('title', $title)
-@section('sub', '精工精密制造（苏州）· 该模块正在建设')
+@section('sub', '该模块正在建设')
 
 @section('content')
     <div class="mes-card" style="max-width:720px">

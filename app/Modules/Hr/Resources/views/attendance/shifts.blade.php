@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '班次')
-@section('sub', '华瑞集团（控股）· 标准班 / 早班 / 夜班，迟到容忍按班次单独设')
+@section('sub', '标准班 / 早班 / 夜班，迟到容忍按班次单独设')
 
 @section('content')
     <div class="hr-card mb-3">

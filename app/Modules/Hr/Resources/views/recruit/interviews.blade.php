@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '面试记录')
-@section('sub', '华瑞集团（控股）· 谁面了谁、第几轮、几分、什么结论')
+@section('sub', '谁面了谁、第几轮、几分、什么结论')
 
 @section('content')
     <div class="hr-kpis mb-3">

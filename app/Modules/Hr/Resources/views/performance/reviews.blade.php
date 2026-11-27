@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '绩效评分')
-@section('sub', '华瑞集团（控股）· 按员工逐项补上级评分，五项齐了才算完成')
+@section('sub', '按员工逐项补上级评分，五项齐了才算完成')
 
 @section('content')
     @if (! $cycle)

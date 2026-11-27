@@ -101,6 +101,22 @@ class ApprovalFlowSeeder extends Seeder
             ],
         ];
 
+        // 演示口径：系统管理员（admin）作为各节点代批人，保证演示账号登录后审批中心不为空
+        $adminId = $uid('admin') ?: $uid('admin@erp.demo');
+        if ($adminId > 0) {
+            foreach ($flows as &$f) {
+                foreach ($f['steps'] as &$step) {
+                    $delegates = array_map('intval', $step['delegate_ids'] ?? []);
+                    if (!in_array($adminId, $delegates, true)) {
+                        $delegates[] = $adminId;
+                    }
+                    $step['delegate_ids'] = $delegates;
+                }
+                unset($step);
+            }
+            unset($f);
+        }
+
         foreach ($flows as $f) {
             // 只补缺失，不覆盖后台调整过的审批人、步骤与启停状态
             ApprovalFlow::firstOrCreate(

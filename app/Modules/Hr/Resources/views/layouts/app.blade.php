@@ -19,7 +19,7 @@
         <div class="hr-side-brand">
             <span class="mark">HR</span>
             <span class="txt">
-                <b>华瑞集团（控股）</b>
+                <b>演示企业</b>
                 <span>人力共享服务中心</span>
             </span>
         </div>
@@ -157,7 +157,7 @@
         <div class="hr-topbar">
             <div>
                 <div class="ttl">@yield('title', '工作台')</div>
-                <div class="sub">@yield('sub', '华瑞集团（控股）· 演示环境')</div>
+                <div class="sub">@yield('sub', '演示环境')</div>
             </div>
             <div class="who">
                 <span>考勤期间：<b>{{ now()->format('Y-m') }}</b></span>

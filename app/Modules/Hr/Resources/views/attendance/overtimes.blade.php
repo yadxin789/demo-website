@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '加班')
-@section('sub', '华瑞集团（控股）· 申请 → 审批 → 计入工时')
+@section('sub', '申请 → 审批 → 计入工时')
 
 @section('content')
     <div class="hr-kpis mb-3">

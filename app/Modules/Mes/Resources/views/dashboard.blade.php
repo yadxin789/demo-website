@@ -1,7 +1,7 @@
 @extends('mes::layouts.app')
 
 @section('title', '车间工作台')
-@section('sub', '精工精密制造（苏州）· 一号车间 · 今日')
+@section('sub', '一号车间 · 今日')
 
 @section('content')
     <div class="mes-kpis">

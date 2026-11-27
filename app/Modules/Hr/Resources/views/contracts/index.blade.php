@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '合同与到期')
-@section('sub', '华瑞集团（控股）· 30 / 60 / 90 天到期预警')
+@section('sub', '30 / 60 / 90 天到期预警')
 
 @section('content')
     <div class="hr-kpis mb-3">

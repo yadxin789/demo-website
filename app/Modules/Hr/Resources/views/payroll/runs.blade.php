@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '工资批次')
-@section('sub', '华瑞集团（控股）· 按月生成草稿，确认后标记发放')
+@section('sub', '按月生成草稿，确认后标记发放')
 
 @section('content')
     <div class="hr-card mb-3">

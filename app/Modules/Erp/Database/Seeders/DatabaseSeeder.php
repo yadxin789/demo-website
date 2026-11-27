@@ -42,6 +42,10 @@ class DatabaseSeeder extends Seeder
             EcomDemoSeeder::class,
             // 演示站专用：admin/123456，全权限（客户点开就能跑完整流程）
             DemoAdminSeeder::class,
+            // 演示数据覆盖：五套系统全部业务列表页都要有内容，且能演示完整单据链路
+            DemoCoverageSeeder::class,        // 第一批：销售/采购/生产/库存/质量/审批/通知
+            DemoCoverageExtraSeeder::class,   // 第二批：财务/CRM/人事/商品营销/平台事件/协同/研发/计划/AI/多租户/企微/语音/电商
+            DemoCoverageFinalSeeder::class,   // 第三批：设计图档/回收站/目录类主数据补充
         ]);
     }
 }

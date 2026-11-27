@@ -33,6 +33,29 @@ class RndController extends Controller
     }
 
     /**
+     * 跨数据库的状态优先级排序：
+     * MySQL/MariaDB 用原生 FIELD()，SQLite 等其它驱动退化为等价 CASE WHEN，避免 "no such function: FIELD"。
+     *
+     * @param  array<int, string>  $values  期望的优先级顺序（越靠前越优先）
+     */
+    protected function statusOrderRaw(string $column, array $values): string
+    {
+        $driver = \DB::connection((new RndProject())->getConnectionName())->getDriverName();
+        $quoted = array_map(fn ($v) => "'" . str_replace("'", "''", (string) $v) . "'", $values);
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            return "FIELD($column, " . implode(', ', $quoted) . ")";
+        }
+
+        $cases = [];
+        foreach ($quoted as $i => $q) {
+            $cases[] = "WHEN $q THEN $i";
+        }
+
+        return "CASE $column " . implode(' ', $cases) . ' ELSE ' . count($values) . ' END';
+    }
+
+    /**
      * 研发项目列表：页签按四态切换（全部 / 立项中 / 进行中 / 已暂停 / 已完成）。
      * 研发经理与系统管理员可看全量；其余人只看到自己参入的项目（创建 / 执行 / 审核）。
      */
@@ -50,7 +73,7 @@ class RndController extends Controller
 
         $projects = $base()->byStatus($status)
             ->with(['creator', 'tasks.executor', 'tasks.auditor'])
-            ->orderByRaw("FIELD(status, 'in_progress', 'initiation', 'paused', 'completed')")
+            ->orderByRaw($this->statusOrderRaw('status', ['in_progress', 'initiation', 'paused', 'completed']))
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
@@ -602,7 +625,7 @@ class RndController extends Controller
             ->where(function ($q) use ($userId) {
                 $q->where('executor_id', $userId)->orWhere('auditor_id', $userId);
             })
-            ->orderByRaw("FIELD(status, 'overdue', 'rejected', 'pending', 'submitted', 'approved', 'completed', 'cancelled')")
+            ->orderByRaw($this->statusOrderRaw('status', ['overdue', 'rejected', 'pending', 'submitted', 'approved', 'completed', 'cancelled']))
             ->orderBy('end_date')
             ->paginate(20);
 
@@ -619,7 +642,7 @@ class RndController extends Controller
         $tasks = RndProjectTask::with(['project', 'taskType', 'documents.file'])
             ->where('executor_id', $userId)
             ->whereIn('status', ['pending', 'overdue', 'rejected'])
-            ->orderByRaw("FIELD(status, 'overdue', 'rejected', 'pending')")
+            ->orderByRaw($this->statusOrderRaw('status', ['overdue', 'rejected', 'pending']))
             ->orderBy('end_date')
             ->paginate(20);
 

@@ -276,10 +276,10 @@ class DemoDataSeeder extends Seeder
         }
 
         foreach ([
-            ['code' => self::P.'SUP-01', 'name' => '华南食品供应链有限公司', 'contact' => '陈经理', 'phone' => '020-88880001', 'address' => '广州市荔湾区食品产业园', 'tax' => '91440101DEMO001X'],
-            ['code' => self::P.'SUP-02', 'name' => '华东日化贸易有限公司', 'contact' => '周经理', 'phone' => '021-66660002', 'address' => '上海市青浦区日化园', 'tax' => '91310118DEMO002X'],
+            ['code' => self::P.'SUP-01', 'name' => '演示食品供应链（华南）有限公司', 'contact' => '陈经理', 'phone' => '020-88880001', 'address' => '广州市荔湾区食品产业园', 'tax' => '91440101DEMO001X'],
+            ['code' => self::P.'SUP-02', 'name' => '演示日化贸易（华东）有限公司', 'contact' => '周经理', 'phone' => '021-66660002', 'address' => '上海市青浦区日化园', 'tax' => '91310118DEMO002X'],
             ['code' => self::P.'SUP-03', 'name' => '粤家电直供中心', 'contact' => '梁经理', 'phone' => '0757-26660003', 'address' => '佛山市顺德区家电城', 'tax' => '91440606DEMO003X'],
-            ['code' => self::P.'SUP-04', 'name' => '岭南粮油有限公司', 'contact' => '黄经理', 'phone' => '020-85550004', 'address' => '广州市黄埔区粮油市场', 'tax' => '91440112DEMO004X'],
+            ['code' => self::P.'SUP-04', 'name' => '演示粮油（华南）有限公司', 'contact' => '黄经理', 'phone' => '020-85550004', 'address' => '广州市黄埔区粮油市场', 'tax' => '91440112DEMO004X'],
         ] as $supplier) {
             $this->supplierIds[$supplier['code']] = DB::table('suppliers')->insertGetId([
                 'code' => $supplier['code'],
@@ -1717,7 +1717,7 @@ class DemoDataSeeder extends Seeder
             'statement_date' => Carbon::today()->subDays(12)->toDateString(),
             'direction' => BankStatement::DIRECTION_PAY,
             'amount' => 800.00,
-            'counterparty' => '华南食品供应链有限公司',
+            'counterparty' => '演示食品供应链（华南）有限公司',
             'reference' => 'PAY-DEMO-P02',
             'memo' => '供应商货款',
             'status' => BankStatement::STATUS_MATCHED,

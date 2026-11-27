@@ -15,7 +15,7 @@
             <i class="fa-solid fa-folder-open" style="font-size:2.2rem; color:#7c5ce2;"></i>
             <h1 class="display-6 fw-bold mt-3 mb-1">404</h1>
             <h5 class="mb-3">这个页面不在花名册里</h5>
-            <p class="text-muted mb-4">「华瑞集团（控股）· 人力共享服务中心」没有这个地址。可能是单据已归档，或链接输错了。</p>
+            <p class="text-muted mb-4">「人力共享服务中心」没有这个地址。可能是单据已归档，或链接输错了。</p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
                 <a href="{{ url('hr/dashboard') }}" class="btn text-white" style="background:#5f3dc4;">回人力看板</a>
                 <a href="{{ url('/') }}" class="btn btn-outline-secondary">看看其他产品</a>

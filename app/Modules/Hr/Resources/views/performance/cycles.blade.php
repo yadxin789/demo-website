@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '绩效周期')
-@section('sub', '华瑞集团（控股）· 先定周期，再配指标，最后评分')
+@section('sub', '先定周期，再配指标，最后评分')
 
 @section('content')
     <div class="row g-3">

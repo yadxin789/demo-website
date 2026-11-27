@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '人力看板')
-@section('sub', '华瑞集团（控股）· 今天要处理的事')
+@section('sub', '今天要处理的事')
 
 @section('content')
     <div class="hr-kpis mb-3">

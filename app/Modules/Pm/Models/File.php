@@ -44,6 +44,14 @@ class File extends BaseModel
         return $this->belongsTo(User::class, 'uploader_id');
     }
 
+    /**
+     * 兼容旧视图：部分列表页按 uploader 的别名 `user` 预加载上传人。
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'uploader_id');
+    }
+
     public function auditor()
     {
         return $this->belongsTo(User::class, 'auditor_id');

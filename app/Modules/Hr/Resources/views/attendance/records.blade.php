@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '打卡记录')
-@section('sub', '华瑞集团（控股）· {{ $month }} 期间，按人、按部门、按状态查')
+@section('sub', '{{ $month }} 期间，按人、按部门、按状态查')
 
 @section('content')
     <div class="hr-kpis mb-3">

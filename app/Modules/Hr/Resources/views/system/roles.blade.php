@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '角色权限')
-@section('sub', '华瑞集团（控股）· 5 个角色 × 17 项权限，勾选即生效')
+@section('sub', '5 个角色 × 17 项权限，勾选即生效')
 
 @section('content')
     <div class="hr-card">

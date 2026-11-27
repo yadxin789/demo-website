@@ -15,7 +15,7 @@ use Illuminate\Database\Seeder;
  * 组织主数据（H1 域）：部门树、岗位、编制、班次、岗位薪资结构。
  *
  * HC-M02：部门 D001–D0xx；岗位 P001–P0xx。
- * HC-M04：公司名「华瑞集团（控股）」，人名与 ERP「东莞恒创电子」完全不同。
+ * HC-M04：公司名「演示企业」，人名与 ERP「演示精密电子」完全不同。
  * 可重复执行：全部 updateOrCreate，按业务编码定位。
  */
 class MasterSeeder extends Seeder

@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '编制缺口')
-@section('sub', '华瑞集团（控股）· 部门 × 岗位的编制与在职对照')
+@section('sub', '部门 × 岗位的编制与在职对照')
 
 @section('content')
     <div class="hr-kpis mb-3">

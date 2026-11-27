@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '候选人')
-@section('sub', '华瑞集团（控股）· 五个阶段一张漏斗，点一行就能往下推')
+@section('sub', '五个阶段一张漏斗，点一行就能往下推')
 
 @section('content')
     @php($stages = ['screening' => '#868e96', 'interview' => '#4c6ef5', 'offer' => '#0ca678', 'onboard' => '#5f3dc4', 'reject' => '#d6336c'])

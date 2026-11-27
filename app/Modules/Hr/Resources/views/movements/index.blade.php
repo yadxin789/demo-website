@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '异动记录')
-@section('sub', '华瑞集团（控股）· 入职 / 转正 / 调岗 / 离职流水')
+@section('sub', '入职 / 转正 / 调岗 / 离职流水')
 
 @section('content')
     <div class="hr-card mb-3">

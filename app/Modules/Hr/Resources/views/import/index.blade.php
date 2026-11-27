@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', 'Excel 导入导出')
-@section('sub', '华瑞集团（控股）· 先预览再入库，错误行会在预览表里标红')
+@section('sub', '先预览再入库，错误行会在预览表里标红')
 
 @section('content')
     @php($typeText = ['employee' => '花名册', 'attendance' => '打卡记录'])

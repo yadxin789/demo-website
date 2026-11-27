@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'DDWL-ERP 电子厂管理系统')</title>
+    <title>@yield('title', '电子制造 ERP')</title>
     <link rel="stylesheet" href="{{ asset('assets/erp/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/erp/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/erp/css/v4-shims.min.css') }}">
@@ -22,7 +22,7 @@
     <aside class="sidebar" id="appSidebar">
         <div class="brand">
             <i class="fa-solid fa-industry"></i>
-            <span>DDWL-ERP</span>
+            <span>电子制造 ERP</span>
         </div>
         @include('erp::partials.sidebar')
     </aside>

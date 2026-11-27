@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', '假期余额')
-@section('sub', '华瑞集团（控股）· 每人每年假 / 病假 / 事假 / 调休 的总额与剩余')
+@section('sub', '每人每年假 / 病假 / 事假 / 调休 的总额与剩余')
 
 @section('content')
     <div class="hr-kpis mb-3">

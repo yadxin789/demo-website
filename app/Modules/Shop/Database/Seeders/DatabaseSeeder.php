@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
             SequenceSeeder::class,
             AccountSeeder::class,
             JournalSeeder::class,
+            // 演示站专用：费用单 / 账单明细 / 上架流水 / 支付网关 / AI 会话
+            DemoCoverageSeeder::class,
         ]);
     }
 }

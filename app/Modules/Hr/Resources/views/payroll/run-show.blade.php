@@ -1,7 +1,7 @@
 @extends('hr::layouts.app')
 
 @section('title', $run->payroll_no . ' · 工资明细')
-@section('sub', '华瑞集团（控股）· ' . $run->period . ' 期间，' . ($statusText[$run->status] ?? $run->status))
+@section('sub', '' . $run->period . ' 期间，' . ($statusText[$run->status] ?? $run->status))
 
 @section('content')
     <div class="hr-card mb-3">
