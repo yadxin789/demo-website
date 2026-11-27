@@ -1,4 +1,4 @@
-@extends('system.layout')
+@extends('pm::layouts.app')
 
 @section('title', '聊天记录管理')
 

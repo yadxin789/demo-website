@@ -50,8 +50,10 @@ for p in pm/dashboard pm/project pm/project/my-projects pm/task/my-tasks pm/task
          pm/file/resource-files pm/support/department-files pm/project-template pm/admin/users \
          pm/admin/roles pm/admin/collab-trash; do check pm "$p"; done
 
-echo '== PM 后台'
-for p in pm/admin pm/admin/departments pm/admin/positions pm/admin/ai-guide pm/admin/ops pm/admin/settings; do check pm "$p"; done
+echo '== PM 后台（与参考目录 pm-server-openEuler 对齐）'
+for p in pm/admin pm/admin/users pm/admin/departments pm/admin/roles pm/admin/statuses \
+         pm/admin/task-types pm/admin/operation-logs pm/admin/services pm/admin/collab-trash \
+         pm/admin/users/deleted pm/admin/file-repository; do check pm "$p"; done
 
 echo '== SHOP'
 login shop username admin 123456 shop/login

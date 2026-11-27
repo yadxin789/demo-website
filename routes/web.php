@@ -52,11 +52,14 @@ foreach (config('products.products', []) as $code => $product) {
         'hr' => [],
     ][$code] ?? [];
 
-    Route::middleware(['web', 'module:' . $code, 'product.only:' . $code, 'auth:' . $code])
-        ->prefix($code . '/admin')
-        ->name($code . '.console.')
-        ->group(function () use ($code, $skip) {
-            $c = \App\Http\Controllers\System\SystemConsoleController::class;
+    // PM 与参考目录 pm-server-openEuler 严格对齐：后台只保留模块自身的
+    // /pm/admin（AdminController + layouts.app 皮肤），不再注册统一后台的额外页面。
+    if ($code !== 'pm') {
+        Route::middleware(['web', 'module:' . $code, 'product.only:' . $code, 'auth:' . $code])
+            ->prefix($code . '/admin')
+            ->name($code . '.console.')
+            ->group(function () use ($code, $skip) {
+                $c = \App\Http\Controllers\System\SystemConsoleController::class;
 
             if (! in_array('home', $skip, true)) {
                 Route::get('/', [$c, 'dashboard'])->defaults('product', $code)->name('home');
@@ -89,6 +92,7 @@ foreach (config('products.products', []) as $code => $product) {
             }
 
             Route::get('ops', [$c, 'ops'])->defaults('product', $code)->name('ops');
-            Route::get('settings', [$c, 'settings'])->defaults('product', $code)->name('settings');
-        });
+                Route::get('settings', [$c, 'settings'])->defaults('product', $code)->name('settings');
+            });
+    }
 }
