@@ -60,10 +60,10 @@
         <form method="POST" action="{{ route('erp.login') }}">
             @csrf
             <div class="mb-3">
-                <label class="form-label">账号（用户名或邮箱）</label>
+                <label class="form-label">邮箱或用户名</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" name="account" class="form-control" value="{{ old('account') }}" required autofocus autocomplete="username">
+                    <input type="text" name="account" class="form-control" value="{{ old('account') }}" placeholder="admin 或 admin@erp.demo" required autofocus autocomplete="username">
                 </div>
             </div>
             <div class="mb-3">

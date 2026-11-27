@@ -28,8 +28,8 @@
         <form method="post" action="{{ route('hr.login.submit') }}">
             @csrf
             <div class="mb-3">
-                <label class="form-label" for="account">账号（邮箱或姓名）</label>
-                <input class="form-control" id="account" name="account" value="{{ old('account') }}" autofocus>
+                <label class="form-label" for="account">邮箱或用户名</label>
+                <input class="form-control" id="account" name="account" value="{{ old('account') }}" placeholder="admin 或 admin@hr.demo" autofocus>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="password">密码</label>

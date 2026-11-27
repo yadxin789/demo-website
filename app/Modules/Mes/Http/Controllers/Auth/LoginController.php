@@ -36,7 +36,8 @@ class LoginController extends Controller
             'password' => '密码',
         ]);
 
-        $field = filter_var($data['account'], FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+        // S9：邮箱或用户名均可登录（HC-42）。原实现是"邮箱或姓名"，姓名不是账号，容易误登。
+        $field = filter_var($data['account'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $ok = Auth::guard('mes')->attempt([
             $field => $data['account'],

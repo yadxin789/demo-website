@@ -24,7 +24,7 @@ class DemoAdminSeeder extends Seeder
             ['username' => 'admin'],
             [
                 'name' => '演示管理员',
-                'email' => 'demo@erp.local',
+                'email' => 'admin@erp.demo',   // S9：邮箱也能登录（HC-42）
                 'password' => '123456',
                 'status' => 1,
             ]

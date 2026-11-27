@@ -24,6 +24,7 @@ class UserSeeder extends Seeder
         // 管理员
         User::create([
             'username' => 'admin',
+            'email' => 'admin@pm.demo',   // S9：邮箱也能登录（HC-42）
             'password' => Hash::make('123456'),
             'name' => '林智远',
             'department_id' => $adminDept->id,
@@ -105,6 +106,7 @@ class UserSeeder extends Seeder
             for ($i = 1; $i <= 2; $i++) {
                 User::create([
                     'username' => $dept->code . '_clerk_' . $i,
+                    'email' => strtolower($dept->code . '_clerk_' . $i) . '@pm.demo',
                     'password' => Hash::make('123456'),
                     'name' => "{$dept->name}支援人员{$i}",
                     'department_id' => $dept->id,
@@ -113,5 +115,11 @@ class UserSeeder extends Seeder
                 ]);
             }
         }
+
+        // S9：兜底——凡是没邮箱的账号，按 username 生成 {username}@pm.demo，保证"邮箱或用户名"都能登（HC-42）
+        User::query()
+            ->where(fn ($q) => $q->whereNull('email')->orWhere('email', ''))
+            ->get()
+            ->each(fn (User $u) => $u->update(['email' => strtolower($u->username) . '@pm.demo']));
     }
 }

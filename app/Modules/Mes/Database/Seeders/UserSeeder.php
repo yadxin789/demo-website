@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
  * MES 演示账号（规划书 §5.3）。
  *
  * HC-13：演示密码 123456 只允许出现在 Seeder，业务代码里不得出现。
- * 登录名用 name 字段匹配（LoginController 支持「邮箱或姓名」两种登录方式）。
+ * 登录名：username（S9 起补列）或 email 均可（LoginController 支持「邮箱或用户名」）。
  */
 class UserSeeder extends Seeder
 {
@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
                 ['email' => $email],
                 [
                     'name' => $login === 'admin' ? 'admin' : $displayName,
+                    'username' => $login,   // S9：用户名登录（HC-42）
                     'employee_no' => $employeeNo,
                     'team' => $team,
                     'password' => '123456',

@@ -22,7 +22,11 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $throttleKey = 'login:' . $request->username . '|' . $request->ip();
+        // S9：邮箱或用户名均可登录（HC-42）
+        $login = trim((string) $request->username);
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $throttleKey = 'login:' . $login . '|' . $request->ip();
         $maxAttempts = config('pm.login_max_attempts', 5);
 
         if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
@@ -32,7 +36,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        if (Auth::attempt([$field => $login, 'password' => $request->password])) {
             RateLimiter::clear($throttleKey);
             
             $user = Auth::user();
@@ -54,10 +58,10 @@ class AuthController extends Controller
         }
 
         RateLimiter::hit($throttleKey, config('pm.login_decay_minutes', 15) * 60);
-        OperationLogHelper::log('认证', '登录失败', "用户名「{$request->username}」登录失败");
-        
+        OperationLogHelper::log('认证', '登录失败', "账号「{$login}」登录失败");
+
         return back()->withErrors([
-            'username' => '用户名或密码错误',
+            'username' => '账号或密码错误',
         ]);
     }
 

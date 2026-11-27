@@ -63,10 +63,10 @@
                         <form action="{{ route('pm.login') }}" method="post">
                             @csrf
                             <div class="mb-3">
-                                <label for="username" class="form-label">用户名</label>
+                                <label for="username" class="form-label">邮箱或用户名</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa fa-user"></i></span>
-                                    <input type="text" name="username" id="username" class="form-control" required autofocus>
+                                    <input type="text" name="username" id="username" class="form-control" placeholder="admin 或 admin@pm.demo" required autofocus>
                                 </div>
                             </div>
                             <div class="mb-3">

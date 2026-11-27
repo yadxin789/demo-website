@@ -26,13 +26,13 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label for="username" class="form-label">用户名 / 邮箱</label>
+                    <label for="username" class="form-label">邮箱或用户名</label>
                     <input type="text"
                            id="username"
                            name="username"
                            class="form-control @error('username') is-invalid @enderror"
                            value="{{ old('username') }}"
-                           placeholder="请输入用户名或邮箱"
+                           placeholder="admin 或 admin@shop.demo"
                            autocomplete="username"
                            autocapitalize="none"
                            spellcheck="false"

@@ -110,7 +110,7 @@ class RbacSeeder extends Seeder
             ['username' => 'admin'],
             [
                 'name' => '陈悦家',
-                'email' => 'admin@admin.com',
+                'email' => 'admin@shop.demo',   // S9：邮箱也能登录（HC-42）
                 'phone' => null,
                 'status' => 'active',
                 'password' => Hash::make('123456'),

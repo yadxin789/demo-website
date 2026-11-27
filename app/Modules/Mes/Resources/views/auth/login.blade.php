@@ -28,8 +28,8 @@
         <form method="post" action="{{ route('mes.login') }}">
             @csrf
             <div class="mb-3">
-                <label class="form-label">账号 / 邮箱</label>
-                <input type="text" name="account" class="form-control" value="{{ old('account') }}" required autofocus autocomplete="username">
+                <label class="form-label">邮箱或用户名</label>
+                <input type="text" name="account" class="form-control" value="{{ old('account') }}" placeholder="admin 或 admin@mes.demo" required autofocus autocomplete="username">
             </div>
             <div class="mb-3">
                 <label class="form-label">密码</label>
