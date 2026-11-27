@@ -13,10 +13,12 @@ declare(strict_types=1);
 | 随 H1~H6 逐步替换为真实控制器，保证期间导航不出现 404。
 */
 
+use App\Modules\Hr\Http\Controllers\AttendanceController;
 use App\Modules\Hr\Http\Controllers\Auth\LoginController;
 use App\Modules\Hr\Http\Controllers\ContractController;
 use App\Modules\Hr\Http\Controllers\DashboardController;
 use App\Modules\Hr\Http\Controllers\EmployeeController;
+use App\Modules\Hr\Http\Controllers\LeaveController;
 use App\Modules\Hr\Http\Controllers\MovementController;
 use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
 use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
@@ -82,12 +84,32 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
                 ->whereNumber('employee')->name('employees.leave');
 
             // H3 考勤与假期
-            Route::get('attendance/shifts', [PlaceholderController::class, 'show'])->name('attendance.shifts');
-            Route::get('attendance/records', [PlaceholderController::class, 'show'])->name('attendance.records');
-            Route::get('attendance/exceptions', [PlaceholderController::class, 'show'])->name('attendance.exceptions');
-            Route::get('attendance/overtimes', [PlaceholderController::class, 'show'])->name('attendance.overtimes');
-            Route::get('leaves', [PlaceholderController::class, 'show'])->name('leaves.index');
-            Route::get('leaves/balances', [PlaceholderController::class, 'show'])->name('leaves.balances');
+            Route::get('attendance/shifts', [AttendanceController::class, 'shifts'])->name('attendance.shifts');
+            Route::post('attendance/shifts', [AttendanceController::class, 'shiftStore'])->name('attendance.shifts.store');
+            Route::put('attendance/shifts/{shift}', [AttendanceController::class, 'shiftUpdate'])
+                ->whereNumber('shift')->name('attendance.shifts.update');
+
+            Route::get('attendance/records', [AttendanceController::class, 'records'])->name('attendance.records');
+
+            Route::get('attendance/exceptions', [AttendanceController::class, 'exceptions'])->name('attendance.exceptions');
+            Route::post('attendance/exceptions/{exception}/handle', [AttendanceController::class, 'exceptionHandle'])
+                ->whereNumber('exception')->name('attendance.exceptions.handle');
+
+            Route::get('attendance/overtimes', [AttendanceController::class, 'overtimes'])->name('attendance.overtimes');
+            Route::post('attendance/overtimes', [AttendanceController::class, 'overtimeStore'])->name('attendance.overtimes.store');
+            Route::post('attendance/overtimes/{overtime}/approve', [AttendanceController::class, 'overtimeApprove'])
+                ->whereNumber('overtime')->name('attendance.overtimes.approve');
+            Route::post('attendance/overtimes/{overtime}/reject', [AttendanceController::class, 'overtimeReject'])
+                ->whereNumber('overtime')->name('attendance.overtimes.reject');
+
+            Route::get('leaves', [LeaveController::class, 'index'])->name('leaves.index');
+            Route::get('leaves/create', [LeaveController::class, 'create'])->name('leaves.create');
+            Route::post('leaves', [LeaveController::class, 'store'])->name('leaves.store');
+            Route::post('leaves/{leave}/approve', [LeaveController::class, 'approve'])
+                ->whereNumber('leave')->name('leaves.approve');
+            Route::post('leaves/{leave}/reject', [LeaveController::class, 'reject'])
+                ->whereNumber('leave')->name('leaves.reject');
+            Route::get('leaves/balances', [LeaveController::class, 'balances'])->name('leaves.balances');
 
             // H4 薪资
             Route::get('payroll/structures', [PlaceholderController::class, 'show'])->name('payroll.structures');

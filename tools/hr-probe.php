@@ -73,5 +73,16 @@ if ($cmd === 'cleanup-emp') {
     exit(0);
 }
 
+if ($cmd === 'exec') {
+    // 仅用于验收后复原测试数据（不是业务入口）
+    $sql = $argv[2] ?? '';
+    if (! preg_match('/^\s*(update|delete|insert)\s/i', $sql)) {
+        echo '只接受 update / delete / insert';
+        exit(1);
+    }
+    echo 'affected=' . $db->affectingStatement($sql);
+    exit(0);
+}
+
 echo "unknown command: {$cmd}";
 exit(1);
