@@ -240,13 +240,13 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 
 **详见 `MES-任务清单.md`（M0~M6 共 70 项 / 50d，含 Excel 导入导出 4 项）。** 本文件只列与主项目的衔接任务：
 
-| ID | 任务 | 明细 | 验收 | 工时 |
-|---|---|---|---|---|
-| S5-01 | 预留位激活 | `products.php` 的 `mes` 记录填全（description/features/shots/demo_account）；`enabled` 先保持 false | 记录完整 | 0.5d |
-| S5-02 | 打开路由注册 | `MesServiceProvider` 去掉 enabled 短路（或改为读配置） | `mes.*` 路由可列 | 0.5d |
-| S5-03 | 补登录与工作台 | 按 MES 规划书的设计补（不算"空白入口"，此时已有业务页面） | 能登录进看板 | 0.5d |
-| S5-04 | 三卡回归 | 确认新增 MES 未影响 ERP/PM/Shop（HC-34） | 三卡全链路正常 | 0.5d |
-| S5-05 | 点亮卡片 | `mes.enabled=true`，门户出现第 4 张卡 | 卡片可点进预览页 | 0.5d |
+| ID | 任务 | 明细 | 验收 | 工时 | 状态 |
+|---|---|---|---|---|---|
+| S5-01 | 预留位激活 | `products.php` 的 `mes` 记录填全（description/features/shots/demo_account）；`enabled` 先保持 false | 记录完整 | 0.5d | ✅ `94a19de` |
+| S5-02 | 打开路由注册 | `MesServiceProvider` 去掉 enabled 短路（或改为读配置） | `mes.*` 路由可列 | 0.5d | ✅ `94a19de` |
+| S5-03 | 补登录与工作台 | 按 MES 规划书的设计补（不算"空白入口"，此时已有业务页面） | 能登录进看板 | 0.5d | ✅ `f16e044` |
+| S5-04 | 三卡回归 | 确认新增 MES 未影响 ERP/PM/Shop（HC-34） | 三卡全链路正常 | 0.5d | ✅ 门禁 G-01~G-17 + `check-isolation.php` PASS 20/0 |
+| S5-05 | 点亮卡片 | `mes.enabled=true`，门户出现第 4 张卡 | 卡片可点进预览页 | 0.5d | ✅ `c506d8f` 之后已点亮 |
 
 ---
 
