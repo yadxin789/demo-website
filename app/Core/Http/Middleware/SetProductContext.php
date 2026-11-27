@@ -34,6 +34,11 @@ class SetProductContext
         config(['database.default' => $product['connection']]);
         config(['logging.default' => $code]);
 
+        // spatie 的权限缓存全局只有一份，不分库：门户请求会先在默认库把缓存建起来，
+        // 产品请求再复用这份快照就会把本产品权限判成"没有"（典型症状是权限页全 403）。
+        // 切库后丢弃缓存，让它按本产品库重建。
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
         return $next($request);
     }
 }

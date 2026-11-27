@@ -137,6 +137,9 @@ fi
 # ---- 4. 存储与缓存 ----
 "$PHP_BIN" artisan storage:link >/dev/null 2>&1 || true
 
+log "重置 spatie 权限缓存（重建库后旧权限快照会让权限页全 403）"
+"$PHP_BIN" artisan permission:cache-reset >/dev/null 2>&1 || warn "permission:cache-reset 失败（spatie 未装此命令时忽略）"
+
 log "重建缓存（config / view / event；route 有闭包时跳过）"
 "$PHP_BIN" artisan config:clear
 "$PHP_BIN" artisan view:clear

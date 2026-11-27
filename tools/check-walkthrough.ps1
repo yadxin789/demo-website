@@ -6,7 +6,8 @@
 # 用法：pwsh tools\check-walkthrough.ps1 -Base "http://127.0.0.1:8203"
 
 param(
-    [string]$Base = 'http://127.0.0.1:8203'
+    [string]$Base = 'http://127.0.0.1:8203',
+    [string]$Php = 'C:\tools\php83\php.exe'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -68,6 +69,14 @@ foreach ($p in $products) {
 
 # 3. 登录 + 主页面
 Write-Host "`n[3] 五个登录页与登入后主页面"
+
+# ERP / Shop 登录带 5 次/分钟限流，脚本连续演练会互相撞桶（429 不是功能问题），
+# 演练前先清一次限流缓存，保证结果只反映功能本身。
+$artisan = Join-Path (Split-Path -Parent $PSScriptRoot) 'artisan'
+Push-Location (Split-Path -Parent $PSScriptRoot)
+& $Php $artisan cache:clear 2>&1 | Out-Null
+Pop-Location
+
 foreach ($p in $products) {
     $cookie = Join-Path $temp ($p.Code + '-ck.txt')
     $loginHtml = Join-Path $temp ($p.Code + '-login.html')
