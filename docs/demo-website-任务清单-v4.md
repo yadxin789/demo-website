@@ -641,6 +641,6 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 - [x] S20-B02 冒烟脚本追加 PM 企微 4 条
 - [x] S20-C01 文档 12.19 记录受控差异（通知通道未挂载、日志页补建）
 
-## 待办（PM 企微上线）
-- [ ] S20-D01 部署到线上并执行 PM 迁移（`--path=app/Modules/Pm/Database/Migrations --database=pm --force`）
-- [ ] S20-D02 线上冒烟全绿后提交推送 main
+## S20-D 上线
+- [x] S20-D01 部署到线上并执行 PM 迁移（`--path=app/Modules/Pm/Database/Migrations --database=pm --force`）
+- [x] S20-D02 线上冒烟 133 项全绿（新增 PM 企微 4 条），已推送 main
