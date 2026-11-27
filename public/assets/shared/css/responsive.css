@@ -48,6 +48,132 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
     .pagination { flex-wrap: wrap; }
 }
 
+/* ---------------- 密表 → 手机卡片流 ---------------- */
+/* JS 只在 ≥6 列且无合并单元格时把表格转成 .mcards；桌面端 .mcards 不显示 */
+.mcards { display: none; }
+
+@media (max-width: 767.98px) {
+    table.mcards-on { display: none !important; }
+
+    .mcards { display: block; }
+
+    .mcard {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        margin-block-end: 10px;
+        overflow: hidden;
+    }
+
+    .mcard-head {
+        padding: 10px 12px;
+        font-weight: 600;
+        font-size: .92rem;
+        background: #f8fafc;
+        border-block-end: 1px solid #eef2f7;
+    }
+
+    .mcard-body { padding: 2px 0; }
+
+    .mcard-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 12px;
+        font-size: .85rem;
+        border-block-end: 1px solid #f6f8fa;
+    }
+    .mcard-row:last-child { border-block-end: 0; }
+
+    .mcard-k {
+        flex: 0 0 84px;
+        color: #64748b;
+        font-size: .8rem;
+    }
+
+    .mcard-v {
+        flex: 1;
+        min-width: 0;
+        text-align: end;
+        overflow-wrap: anywhere;
+    }
+
+    .mcard-foot {
+        justify-content: flex-end;
+        background: #fbfcfe;
+    }
+    .mcard-foot .mcard-k { display: none; }
+    .mcard-foot .mcard-v { text-align: end; }
+}
+
+/* ---------------- POS 手机极简收银 ---------------- */
+.pos-mobile-bar { display: none; }
+
+@media (max-width: 767.98px) {
+    .pos-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+        padding: 10px !important;
+    }
+    .pos-panel { min-block-size: 0 !important; }
+
+    .pos-catalog { max-block-size: 46vh; }
+
+    .pos-topbar {
+        position: static;
+        padding: 8px 10px !important;
+        gap: 8px;
+    }
+    .pos-topbar-meta { flex-wrap: wrap; gap: 6px 10px; font-size: .82rem; }
+    .pos-topbar .btn { min-height: 34px; }
+
+    .pos-shift-summary { font-size: .8rem; }
+
+    .pos-cart { overflow-x: auto; }
+    #pos-cart-table { font-size: .82rem; }
+
+    .pos-pay-methods { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .pos-summary { font-size: .88rem; }
+
+    body.pos-mobile { padding-block-end: 72px; }
+
+    .pos-mobile-bar {
+        position: fixed;
+        inset-inline: 0;
+        inset-block-end: 0;
+        z-index: 1060;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, .96);
+        backdrop-filter: blur(8px);
+        border-block-start: 1px solid #e5e7eb;
+        box-shadow: 0 -6px 18px rgba(15, 23, 42, .08);
+    }
+    .pmb-info { display: flex; flex-direction: column; line-height: 1.2; }
+    .pmb-count { font-size: .76rem; color: #64748b; }
+    .pmb-total { font-size: 1.05rem; font-weight: 700; color: #0f172a; }
+    .pmb-actions { display: flex; gap: 8px; }
+    .pmb-actions button {
+        min-height: 40px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        color: #0f172a;
+        font-size: .88rem;
+    }
+    .pmb-actions .pmb-primary {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+        font-weight: 600;
+    }
+}
+
 /* MES / HR 顶栏（标题 + 账户信息）窄屏换行，避免挤成竖排 */
 @media (max-width: 767.98px) {
     .hr-topbar, .mes-topbar {
