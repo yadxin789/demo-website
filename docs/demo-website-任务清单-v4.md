@@ -597,3 +597,23 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 - [x] S17-D01 提交并推送 main
 - [x] S17-D02 线上部署：迁移 + 组织种子 + 配置缓存，reload php-fpm / nginx
 - [x] S17-D03 线上冒烟：五系统登录与后台页面、业务关键页全绿
+
+## S18 前端移动端自适应
+目标：五套系统全部前端页面在手机竖屏（≤991.98px）可用，桌面端零回归。
+
+### A. 适配层
+- [x] S18-A01 新建 `public/assets/shared/css/responsive.css`：断点 991.98px（后台 900px），所有规则只在媒体查询内
+- [x] S18-A02 新建 `public/assets/shared/js/responsive.js`：抽屉开关、遮罩、Esc/点菜单关闭、表格自动包 `.table-responsive`
+- [x] S18-A03 五套布局 + 系统后台皮肤 + 门户四个整页视图 + 五个登录页统一注入适配层
+- [x] S18-A04 侧栏抽屉化：ERP `.sidebar`、Shop `.app-sidebar`、MES `.mes-side`、HR `.hr-side`、后台 `.sys-side`；ERP / Shop 复用自带汉堡按钮，MES / HR / 后台补右下角浮动按钮
+- [x] S18-A05 MES / HR 顶栏窄屏换行，抽屉高度撑满视口；表格（含 MES/HR 自绘 `mes-table`）统一横向滚动
+
+### B. 验证
+- [x] S18-B01 线上 390×844 逐页核对：ERP 首页/后台、Shop 仪表盘/后台/POS、MES、HR、PM、门户均无横向溢出（`scrollWidth = 390`）
+- [x] S18-B02 抽屉实测：ERP、Shop、MES、HR、系统后台点按钮滑出、点遮罩关闭；PM 走自带 offcanvas
+- [x] S18-B03 桌面 1280 宽回归：ERP 侧栏 fixed 240、Shop static 248、MES sticky 232，布局未变
+- [x] S18-B04 线上冒烟 124 项全绿
+
+### C. 交付
+- [x] S18-C01 提交并推送 main
+- [x] S18-C02 线上部署（静态资源 + 视图缓存清理 + reload php-fpm）
