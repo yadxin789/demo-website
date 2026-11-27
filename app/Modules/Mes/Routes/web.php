@@ -31,6 +31,7 @@ use App\Modules\Mes\Http\Controllers\Quality\InspectionController;
 use App\Modules\Mes\Http\Controllers\Quality\InspectionTemplateController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
+use App\Modules\Mes\Http\Controllers\LandingController;
 use App\Modules\Mes\Http\Controllers\Reports\LaborController;
 use App\Modules\Mes\Http\Controllers\Reports\OutputController;
 use App\Modules\Mes\Http\Controllers\Reports\YieldController;
@@ -45,12 +46,8 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
     ->name('mes.')
     ->group(function () {
 
-        // 产品根：已登录进工作台，否则进登录页
-        Route::get('/', function () {
-            return auth('mes')->check()
-                ? redirect()->route('mes.dashboard')
-                : redirect()->route('mes.login');
-        })->name('root');
+        // 产品根（S8）：未登录先看对外首页，已登录进工作台
+        Route::get('/', [LandingController::class, 'show'])->name('root');
 
         // 独立登录（已登录时由控制器自行跳回工作台）
         Route::get('login', [LoginController::class, 'show'])->name('login');

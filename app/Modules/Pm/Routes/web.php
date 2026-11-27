@@ -31,6 +31,7 @@ use App\Modules\Pm\Http\Controllers\SupportController;
 use App\Modules\Pm\Http\Controllers\TaskController;
 use App\Modules\Pm\Http\Controllers\TodoController;
 use App\Modules\Pm\Http\Controllers\WelcomeController;
+use App\Modules\Pm\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:pm', 'product.only:pm'])
@@ -38,12 +39,8 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
     ->name('pm.')
     ->group(function () {
 
-        // 产品根：已登录直接进工作台，否则进登录页
-        Route::get('/', function () {
-            return auth('pm')->check()
-                ? redirect()->route('pm.dashboard')
-                : redirect()->route('pm.login');
-        })->name('root');
+        // 产品根（S8）：未登录先看对外首页，已登录直接进工作台
+        Route::get('/', [LandingController::class, 'show'])->name('root');
 
         Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
 

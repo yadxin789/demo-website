@@ -22,6 +22,7 @@ use App\Modules\Shop\Http\Controllers\Master\TaxController;
 use App\Modules\Shop\Http\Controllers\Master\UnitController;
 use App\Modules\Shop\Http\Controllers\Master\WarehouseController;
 use App\Modules\Shop\Http\Controllers\NotificationController;
+use App\Modules\Shop\Http\Controllers\LandingController;
 use App\Modules\Shop\Http\Controllers\Pos\PosController;
 use App\Modules\Shop\Http\Controllers\Pos\PosOrderController;
 use App\Modules\Shop\Http\Controllers\Pos\PosStationController;
@@ -68,11 +69,8 @@ Route::middleware(['web', 'module:shop', 'product.only:shop', 'shop.audit'])
     ->name('shop.')
     ->group(function () {
 
-    Route::get('/', function () {
-        return auth('shop')->check()
-            ? redirect()->route('shop.dashboard')
-            : redirect()->route('shop.login');
-    })->name('root');
+    // 产品根（S8）：未登录先看对外首页，已登录直接进工作台
+    Route::get('/', [LandingController::class, 'show'])->name('root');
 
     Route::middleware('guest:shop')->group(function () {
         Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

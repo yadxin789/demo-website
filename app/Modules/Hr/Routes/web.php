@@ -13,6 +13,7 @@ declare(strict_types=1);
 */
 
 use App\Modules\Hr\Http\Controllers\AttendanceController;
+use App\Modules\Hr\Http\Controllers\LandingController;
 use App\Modules\Hr\Http\Controllers\Auth\LoginController;
 use App\Modules\Hr\Http\Controllers\ContractController;
 use App\Modules\Hr\Http\Controllers\DashboardController;
@@ -36,11 +37,8 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
     ->group(function () {
 
         // 产品根：已登录进工作台，否则进登录页
-        Route::get('/', function () {
-            return auth('hr')->check()
-                ? redirect()->route('hr.dashboard')
-                : redirect()->route('hr.login');
-        })->name('root');
+        // 产品根（S8）：未登录先看对外首页，已登录进工作台
+        Route::get('/', [LandingController::class, 'show'])->name('root');
 
         // 独立登录（已登录时由控制器自行跳回工作台）
         Route::get('login', [LoginController::class, 'show'])->name('login');

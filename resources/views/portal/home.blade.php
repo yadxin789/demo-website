@@ -4,8 +4,8 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('assets/portal/favicon.svg') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>产品演示中心 · 五套独立系统</title>
-    <meta name="description" content="一个演示站点，五套完全独立的企业管理系统：制造 ERP、研发项目管理、百货零售 POS、车间 MES、人事 HR。独立账号、独立数据库、独立界面。">
+    <title>产品演示中心 · 企业管理系统演示</title>
+    <meta name="description" content="五套企业管理系统演示：制造 ERP、研发项目管理、百货零售 POS、车间 MES、人事 HR。">
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
 </head>
 <body>
@@ -22,11 +22,6 @@
     <main class="p-wrap p-main">
         <section class="p-hero">
             <span class="p-eyebrow">DEMO SUITE</span>
-            <h1>一个站点，<em>{{ count($products) }}</em> 套独立系统</h1>
-            <p>
-                每张卡片背后都是一套完整的企业系统：自己的登录入口、自己的数据库、自己的界面风格。
-                点进卡片先看产品介绍，再决定用哪个身份登进去试。
-            </p>
             <div class="p-stats">
                 <div><b>{{ count($products) }}</b><span>在线产品</span></div>
                 <div><b>{{ 5 - count($products) }}</b><span>预留席位</span></div>
@@ -36,7 +31,7 @@
 
         <div class="p-grid">
             @foreach ($products as $code => $p)
-                <a class="p-card" href="{{ route($code . '.preview') }}" style="--c: {{ $p['theme']['primary'] }}">
+                <a class="p-card" href="{{ route($code . '.root') }}" style="--c: {{ $p['theme']['primary'] }}">
                     <div class="p-card-top">
                         <span class="p-mark p-mark-sm">{{ $p['short'] }}</span>
                         <span class="p-chip">{{ $p['company'] }}</span>

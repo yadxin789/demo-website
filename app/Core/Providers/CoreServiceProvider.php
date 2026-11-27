@@ -23,5 +23,8 @@ class CoreServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadViewsFrom(resource_path('views/portal'), 'portal');
+
+        // 五产品共用视图（S8 对外首页骨架 / S10 共享壳）：只有视图，没有业务
+        $this->loadViewsFrom(resource_path('views/shared'), 'shared');
     }
 }

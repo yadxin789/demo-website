@@ -9,6 +9,7 @@
  *   - 原 "/" 首页改为 "/home"，"/erp" 保留给门户分流（未登录→login，已登录→dashboard）
  */
 use App\Modules\Erp\Http\Controllers\MasterDataController;
+use App\Modules\Erp\Http\Controllers\LandingController;
 use App\Modules\Erp\Http\Controllers\ProjectTemplateController;
 use App\Modules\Erp\Http\Controllers\SupportController;
 use App\Modules\Erp\Http\Controllers\AdminController;
@@ -65,12 +66,8 @@ Route::middleware(['web', 'module:erp', 'product.only:erp', \App\Modules\Erp\Htt
     ->name('erp.')
     ->group(function () {
 
-        // 门户分流：/erp 未登录进登录页，已登录进工作台（HC-10）
-        Route::get('/', function () {
-            return auth('erp')->check()
-                ? redirect()->route('erp.home')
-                : redirect()->route('erp.login');
-        })->name('root');
+        // 门户分流（S8）：/erp 未登录先看对外首页（产品门面），已登录进工作台
+        Route::get('/', [LandingController::class, 'show'])->name('root');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.submit');
