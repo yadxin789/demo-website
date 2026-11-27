@@ -24,7 +24,9 @@ use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
 use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
 use App\Modules\Hr\Http\Controllers\Org\PositionController;
 use App\Modules\Hr\Http\Controllers\PayrollController;
+use App\Modules\Hr\Http\Controllers\PerformanceController;
 use App\Modules\Hr\Http\Controllers\PlaceholderController;
+use App\Modules\Hr\Http\Controllers\RecruitmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:hr', 'product.only:hr'])
@@ -132,12 +134,35 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::get('payroll/my', [PayrollController::class, 'my'])->name('payroll.my');
 
             // H5 招聘与绩效
-            Route::get('recruit/requisitions', [PlaceholderController::class, 'show'])->name('recruit.requisitions');
-            Route::get('recruit/candidates', [PlaceholderController::class, 'show'])->name('recruit.candidates');
-            Route::get('recruit/interviews', [PlaceholderController::class, 'show'])->name('recruit.interviews');
-            Route::get('performance/cycles', [PlaceholderController::class, 'show'])->name('performance.cycles');
-            Route::get('performance/reviews', [PlaceholderController::class, 'show'])->name('performance.reviews');
-            Route::get('performance/results', [PlaceholderController::class, 'show'])->name('performance.results');
+            Route::get('recruit/requisitions', [RecruitmentController::class, 'requisitions'])->name('recruit.requisitions');
+            Route::post('recruit/requisitions', [RecruitmentController::class, 'requisitionStore'])->name('recruit.requisitions.store');
+            Route::post('recruit/requisitions/{requisition}/close', [RecruitmentController::class, 'requisitionClose'])
+                ->whereNumber('requisition')->name('recruit.requisitions.close');
+
+            Route::get('recruit/candidates', [RecruitmentController::class, 'candidates'])->name('recruit.candidates');
+            Route::post('recruit/candidates', [RecruitmentController::class, 'candidateStore'])->name('recruit.candidates.store');
+            Route::post('recruit/candidates/{candidate}/advance', [RecruitmentController::class, 'candidateAdvance'])
+                ->whereNumber('candidate')->name('recruit.candidates.advance');
+            Route::post('recruit/candidates/{candidate}/reject', [RecruitmentController::class, 'candidateReject'])
+                ->whereNumber('candidate')->name('recruit.candidates.reject');
+
+            Route::get('recruit/interviews', [RecruitmentController::class, 'interviews'])->name('recruit.interviews');
+            Route::post('recruit/interviews', [RecruitmentController::class, 'interviewStore'])->name('recruit.interviews.store');
+
+            Route::get('performance/cycles', [PerformanceController::class, 'cycles'])->name('performance.cycles');
+            Route::post('performance/cycles', [PerformanceController::class, 'cycleStore'])->name('performance.cycles.store');
+            Route::post('performance/cycles/{cycle}/indicators', [PerformanceController::class, 'indicatorStore'])
+                ->whereNumber('cycle')->name('performance.indicators.store');
+            Route::post('performance/cycles/{cycle}/close', [PerformanceController::class, 'cycleClose'])
+                ->whereNumber('cycle')->name('performance.cycles.close');
+
+            Route::get('performance/reviews', [PerformanceController::class, 'reviews'])->name('performance.reviews');
+            Route::get('performance/reviews/{employee}', [PerformanceController::class, 'reviewForm'])
+                ->whereNumber('employee')->name('performance.reviews.form');
+            Route::post('performance/reviews/{employee}', [PerformanceController::class, 'reviewSubmit'])
+                ->whereNumber('employee')->name('performance.reviews.submit');
+
+            Route::get('performance/results', [PerformanceController::class, 'results'])->name('performance.results');
 
             // H6 报表与系统
             Route::get('reports/headcount', [PlaceholderController::class, 'show'])->name('reports.headcount');

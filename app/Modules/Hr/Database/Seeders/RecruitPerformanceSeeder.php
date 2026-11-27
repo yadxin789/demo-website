@@ -38,6 +38,16 @@ class RecruitPerformanceSeeder extends Seeder
         $positions = Position::query()->get()->keyBy('code');
         $deptsOfPos = Position::query()->pluck('department_id', 'id');
 
+        // 面试官取自 HR 账号（admin / hr_manager / hr_specialist），避免面试记录里"面试官"空白
+        $interviewers = DB::connection('hr')->table('users')
+            ->whereIn('role_code', ['admin', 'hr_manager', 'hr_specialist'])
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
+        if ($interviewers === []) {
+            $interviewers = [null];
+        }
+
         // 8 个招聘需求
         $reqs = [
             ['P029', 3, 'high', 'open'],
@@ -119,11 +129,11 @@ class RecruitPerformanceSeeder extends Seeder
             $interviews[] = [
                 'candidate_id' => $c->id,
                 'round' => 1,
-                'interviewer_id' => null,
-                'score' => random_int(6, 9),
+                'interviewer_id' => $interviewers[$round % count($interviewers)],
+                'score' => 6 + ($c->id % 4),
                 'result' => $c->stage === 'reject' ? 'fail' : 'pass',
                 'feedback' => $c->stage === 'reject' ? '经验与岗位要求偏差较大' : '表达清晰，专业基础扎实，建议进入下一轮',
-                'interviewed_at' => now()->copy()->subDays(random_int(1, 20)),
+                'interviewed_at' => now()->copy()->subDays(1 + ($c->id % 20)),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -132,11 +142,11 @@ class RecruitPerformanceSeeder extends Seeder
                 $interviews[] = [
                     'candidate_id' => $c->id,
                     'round' => 2,
-                    'interviewer_id' => null,
-                    'score' => random_int(7, 10),
+                    'interviewer_id' => $interviewers[($round + 1) % count($interviewers)],
+                    'score' => 7 + ($c->id % 4),
                     'result' => 'pass',
                     'feedback' => '复面通过，薪资期望在预算内',
-                    'interviewed_at' => now()->copy()->subDays(random_int(1, 8)),
+                    'interviewed_at' => now()->copy()->subDays(1 + ($c->id % 8)),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -198,31 +208,51 @@ class RecruitPerformanceSeeder extends Seeder
 
         DB::connection('hr')->table('performance_indicators')->insert($indRows);
 
-        // 评分：当前周期 × 在职员工 × 5 指标
-        $activeEmps = Employee::query()->where('status', 'active')->get(['id']);
-        $currentCycle = $cycleModels[count($cycleModels) - 1];
-        $indModels = DB::connection('hr')->table('performance_indicators')
-            ->where('cycle_id', $currentCycle->id)
-            ->orderBy('id')
-            ->get();
+        // 评分：两个周期 × 在职员工 × 5 指标
+        // - 2026Q3（已结束）：全员 5 指标都评完，final_score 有值 → 结果页有完整分布
+        // - 2026Q4（进行中）：前 20 人评完，其余 48 人只评了第一个指标 → 评分页有"待评"可继续推进
+        $activeEmps = Employee::query()->where('status', 'active')->orderBy('id')->get(['id']);
+        $doneInCurrent = 20;
 
         $reviews = [];
-        foreach ($activeEmps as $e) {
-            $selfBase = random_int(70, 92);
-            foreach ($indModels as $k => $ind) {
-                $self = min(100, max(50, $selfBase + random_int(-4, 4)));
-                $mgr = min(100, max(50, $self + random_int(-3, 5)));
-                $reviews[] = [
-                    'cycle_id' => $currentCycle->id,
-                    'employee_id' => $e->id,
-                    'indicator_id' => $ind->id,
-                    'self_score' => $self,
-                    'manager_score' => $k === 0 ? $mgr : null,   // 第一个指标演示已评，其余待评
-                    'final_score' => null,
-                    'comment' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+        $completed = [];
+
+        foreach ($cycleModels as $cycle) {
+            $isClosed = $cycle->status === 'closed';
+
+            $indModels = DB::connection('hr')->table('performance_indicators')
+                ->where('cycle_id', $cycle->id)
+                ->orderBy('id')
+                ->get();
+
+            foreach ($activeEmps as $ei => $e) {
+                // 确定性打分（不用随机数），保证每次 seed 出来的分布一致，演示数字稳定
+                $selfBase = 70 + (($e->id * 7) % 23);
+                $empDone = $isClosed || $ei < $doneInCurrent;
+
+                foreach ($indModels as $k => $ind) {
+                    $self = min(100, max(50, $selfBase + ((($e->id + $k * 5) % 9) - 4)));
+                    $mgr = min(100, max(50, $self + ((($e->id + $k * 3) % 8) - 3)));
+
+                    $hasManager = $empDone || $k === 0;
+                    $score = $hasManager ? $mgr : null;
+
+                    $reviews[] = [
+                        'cycle_id' => $cycle->id,
+                        'employee_id' => $e->id,
+                        'indicator_id' => $ind->id,
+                        'self_score' => $self,
+                        'manager_score' => $score,
+                        'final_score' => $score,
+                        'comment' => null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                if ($empDone) {
+                    $completed[$cycle->id] = ($completed[$cycle->id] ?? 0) + 1;
+                }
             }
         }
 
@@ -230,6 +260,10 @@ class RecruitPerformanceSeeder extends Seeder
             DB::connection('hr')->table('performance_reviews')->insert($chunk);
         }
 
-        $this->command?->info('招聘需求 8 / 候选人 ' . count($cands) . ' / 面试 ' . count($interviews) . ' / 绩效指标 ' . count($indRows) . ' / 评分行 ' . count($reviews));
+        $this->command?->info(
+            '招聘需求 8 / 候选人 ' . count($cands) . ' / 面试 ' . count($interviews)
+            . ' / 绩效指标 ' . count($indRows) . ' / 评分行 ' . count($reviews)
+            . ' / 已完成员工 ' . json_encode($completed)
+        );
     }
 }
