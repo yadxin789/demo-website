@@ -16,16 +16,16 @@ return [
     // 站点主体
     'name' => env('PORTAL_NAME', '产品演示中心'),
 
-    // 联系方式（页脚与预约表单旁展示）
+    // 联系方式（页脚与预约表单旁展示；留空即不在页面上出现，电话按主体意愿不公开）
     'contact' => [
-        'email' => env('PORTAL_CONTACT_EMAIL', 'hello@example.com'),
-        'wechat' => env('PORTAL_CONTACT_WECHAT', '待填写'),
-        'phone' => env('PORTAL_CONTACT_PHONE', '待填写'),
+        'email' => env('PORTAL_CONTACT_EMAIL', 'yadxin789@163.com'),
+        'wechat' => env('PORTAL_CONTACT_WECHAT', 'yadxin789'),
+        'phone' => env('PORTAL_CONTACT_PHONE', ''),
         'hours' => env('PORTAL_CONTACT_HOURS', '工作日 9:00–18:00'),
     ],
 
     // 合规信息
-    'icp' => env('PORTAL_ICP', 'ICP 备案号申请中'),
+    'icp' => env('PORTAL_ICP', 'ICP 备案办理中'),
     'police' => env('PORTAL_POLICE', ''),          // 公安备案号（如有）
     'copyright' => env('PORTAL_COPYRIGHT', ''),    // 版权所有者，留空则用 name
     'updated_at' => env('PORTAL_UPDATED_AT', '2026-11-27'),

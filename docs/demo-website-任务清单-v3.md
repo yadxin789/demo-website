@@ -306,7 +306,8 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 | nginx | 新站点 `demo-website`（80 域名 301 → HTTPS、80 IP 兜底、443 SSL 复用 `yad-erp.com` 证书）；`sites-enabled` 只剩它 |
 | 公网验收 | `http://123.207.233.94/` 首页 5 卡；五 preview 200；五 login → 五看板全 200（erp 8.2KB / pm 24KB / shop 61KB / mes 17KB / hr 21KB）；六个 404 品牌全命中；交叉登录均被拒 |
 | 踩坑（已修进脚本） | `deploy.sh` 原把 `database/` 设成 750、库文件 640，FPM（www-data）只读 → 登录报 `attempt to write a readonly database`。已改 770 + 660 + `g+s`，并提交 `c25ca2d` |
-| 待办 | 域名 HTTPS 目前握手被拦（证书 CN/SAN 正常、IP 443 可达），属未备案域名 443 受限；备案下来后再验 `https://yad-erp.com`。门户联系方式与备案号仍是占位值 |
+| 待办 | 域名 HTTPS 目前握手被拦（证书 CN/SAN 正常、IP 443 可达），属未备案域名 443 受限；备案下来后再验 `https://yad-erp.com`。备案号未批复期间页脚显示"ICP 备案办理中"，批复后只改 `.env` 的 `PORTAL_ICP` 即生效 |
+| 门户对外信息 | 邮箱 `yadxin789@163.com`、微信 `yadxin789`（已上线）；**不提供电话**（`PORTAL_CONTACT_PHONE` 留空，模板按空值自动不渲染，避免骚扰） |
 
 ---
 

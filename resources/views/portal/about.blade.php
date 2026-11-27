@@ -60,9 +60,16 @@
         <section class="pv-section">
             <h3>联系方式与备案</h3>
             <ul class="pv-features">
-                <li>邮箱：{{ config('portal.contact.email') }}</li>
-                <li>电话：{{ config('portal.contact.phone') }}（{{ config('portal.contact.hours') }}）</li>
-                <li>微信：{{ config('portal.contact.wechat') }}</li>
+                @if (config('portal.contact.email'))
+                    <li>邮箱：{{ config('portal.contact.email') }}</li>
+                @endif
+                @if (config('portal.contact.wechat'))
+                    <li>微信：{{ config('portal.contact.wechat') }}</li>
+                @endif
+                @if (config('portal.contact.phone'))
+                    <li>电话：{{ config('portal.contact.phone') }}（{{ config('portal.contact.hours') }}）</li>
+                @endif
+                <li>响应时间：{{ config('portal.contact.hours') }}</li>
                 <li>备案：{{ config('portal.icp') }}@if (config('portal.police')) · {{ config('portal.police') }}@endif</li>
                 <li>信息更新日期：{{ config('portal.updated_at') }}</li>
             </ul>

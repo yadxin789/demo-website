@@ -79,9 +79,15 @@
                     我按你的情况直接把最合适的那一套演示环境开给你，不用自己一个个试。
                 </p>
                 <ul class="p-contact-list">
-                    <li><span>邮箱</span>{{ config('portal.contact.email') }}</li>
-                    <li><span>电话</span>{{ config('portal.contact.phone') }}</li>
-                    <li><span>微信</span>{{ config('portal.contact.wechat') }}</li>
+                    @if (config('portal.contact.email'))
+                        <li><span>邮箱</span>{{ config('portal.contact.email') }}</li>
+                    @endif
+                    @if (config('portal.contact.wechat'))
+                        <li><span>微信</span>{{ config('portal.contact.wechat') }}</li>
+                    @endif
+                    @if (config('portal.contact.phone'))
+                        <li><span>电话</span>{{ config('portal.contact.phone') }}</li>
+                    @endif
                     <li><span>时间</span>{{ config('portal.contact.hours') }}</li>
                 </ul>
             </div>
@@ -142,6 +148,7 @@
             <span>
                 数据均为虚构 ·
                 <a href="{{ route('portal.about') }}">关于与合规</a>
+                @if (config('portal.icp')) · {{ config('portal.icp') }}@endif
             </span>
         </div>
     </footer>
