@@ -88,16 +88,15 @@
             sync();
         }
 
-        if (autoBtn) {
-            toggle.addEventListener('click', function () {
-                aside.classList.toggle('is-open');
-                if (aside.classList.contains('sidebar')) aside.classList.toggle('show');
-                sync();
-            });
-        } else {
-            // 产品自带的按钮已在 onclick 里切换状态，点击后同步遮罩即可
+        if (toggle.hasAttribute && toggle.hasAttribute('onclick')) {
+            // ERP 自带 onclick 已切换 .show，点击后只需同步遮罩
             toggle.addEventListener('click', function () {
                 setTimeout(sync, 0);
+            });
+        } else {
+            toggle.addEventListener('click', function () {
+                aside.classList.toggle('is-open');
+                sync();
             });
         }
 
