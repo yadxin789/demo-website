@@ -529,3 +529,38 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 - [ ] 三组重叠话术齐备（§1.3）
 - [ ] 客户走查无"同一系统"感
 
+
+---
+
+## 9.14 S16：全面冒烟与三套对齐复核
+
+### A. 冒烟工具与结果（5 项）
+- [x] S16-A01 `tools/smoke-all.ps1`：登录后遍历各产品全部无参 GET 页面，按 PASS / FAIL / WARN(403) 归类，明细落 `storage/logs/smoke-<product>.txt`
+- [x] S16-A02 线上同口径脚本 `smoke-live.sh`（curl + route:list 解析），排除 login / api / ai / export / download / preview
+- [x] S16-A03 本地结果：ERP 131 / PM 62 / Shop 68 / MES 34 / HR 39 = **334 通过，0 失败**
+- [x] S16-A04 线上结果：与本地完全一致 334 / 0 / 3 WARN
+- [x] S16-A05 3 个 WARN 定性：POS 挂单取单 / 支付方式 / 交班汇总，admin 非当前开班收银员，按设计 403
+
+### B. 本轮修掉的问题（7 项）
+- [x] S16-B01 ERP 侧栏：`NavigationService::resolveRouteName()` 加 `erp.` 前缀兜底 → 3 组 28 项、skipped 0
+- [x] S16-B02 ERP 账号：`PositionRoleSeeder` 按 `positions.role_names` 同步 29 个账号 + 无岗位兜底综合岗
+- [x] S16-B03 ERP 运维页 500：表计数按驱动分支（sqlite / pgsql / mysql）
+- [x] S16-B04 ERP BOM 详情 500：`BomStatus::label()` 静态调用改 `tryFrom()->label()`
+- [x] S16-B05 ERP 业务详情 404：admin 叠加总经理岗（`data_scope=all`），侧栏 31 项
+- [x] S16-B06 PM 9 个 500：8 个 my-tasks 状态页补 `pm::` 视图前缀；支援中心补建 `support/department-files` 视图
+- [x] S16-B07 Shop 2 处：到货单 create 无参回列表；头像接口回落默认头像 + 补齐 5 张 SVG
+
+### C. 三层对齐复核（3 项）
+- [x] S16-C01 路由：ERP 缺 0；PM 缺 72（全排除项）；Shop 缺 12（全 `/api/ai/*`）
+- [x] S16-C02 表：ERP 287 表全齐；Shop 82 表全齐；PM 仅 `users` 缺 4 个 `wecom_*` 列
+- [x] S16-C03 视图引用：ERP 148 齐；Shop 98 齐；PM 2 个 wecom 视图缺引用
+
+### D. 交付（4 项）
+- [x] S16-D01 提交推送 main（`6eaddb4`、`c6e32d2`、`e4ee001`），部署包排除出库
+- [x] S16-D02 线上部署：sudo 解包 → `composer install --no-dev` → 清 `bootstrap/cache` 的 packages/services → seed → config/view/route 缓存 → chown → reload
+- [x] S16-D03 线上 `.env` 从 `local/true` 改回 `production/false`
+- [x] S16-D04 线上按真实 id 验证 BOM 5 / 采购单 3 / 生产单 3 均 200；侧栏 31 项
+
+### E. 遗留（2 项）
+- [ ] S16-E01 含参 125 条详情页未全量自动巡检（参数类型异构，固定 id 会造假 404），本轮抽样 60 条
+- [ ] S16-E02 PM 知识库当前 0 条文档，演示页为空态（功能齐、缺演示数据，待补种子）

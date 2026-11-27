@@ -660,3 +660,51 @@ PM 那 2 条是形式差异：`/admin/departments/{id}`、`/admin/roles/{id}` �
 
 `guard.ps1` 17/0、视觉 45/0、独立性 31/0、走查 17/0；`check-http.ps1` 固定清单再补 2 项（MES `/mes/sop`、HR `/hr/leaves/accrual`），项数 70 → 72。
 
+
+**12.14 S16：五产品全面冒烟与三套对齐复核**
+
+定位前提不变：`电子厂 ERP` ↔ `E:\ddwl-erp\erp`，`研发项目管理 PM` ↔ `E:\my-pm\pm-server-openEuler`，`百货零售 ERP` ↔ `E:\erp-shop`；`智能制造 MES`、`人事管理 HR` 为自建完备系统，无参考目录。
+
+**12.14.1 冒烟方法**
+
+新增 `tools/smoke-all.ps1`（本地）/`smoke-live.sh`（线上）：按产品登录演示 admin，用 `route:list --json` 取出全部**无参 GET** 页面（排除 login / api / ai / export / download / preview / 回调类），逐页请求并归类 —— `200` 通过、`403` 记 WARN（权限或业务拒绝，不是程序错误）、`302→登录页`、`404`、`500` 记失败。含 `{id}` 参数的详情页单独抽样验证。
+
+**12.14.2 冒烟结果（本地与线上一致）**
+
+| 产品 | 无参页通过 | 失败 | 业务拒绝(403) | 含参跳过 |
+| --- | --- | --- | --- | --- |
+| 电子厂 ERP | 131 | 0 | 0 | 38 |
+| 研发项目管理 PM | 62 | 0 | 0 | 36 |
+| 百货零售 ERP | 68 | 0 | 3 | 31 |
+| 智能制造 MES | 34 | 0 | 0 | 13 |
+| 人事管理 HR | 39 | 0 | 0 | 7 |
+| 合计 | **334** | **0** | 3 | 125 |
+
+那 3 个 403 是 POS 的挂单/取单、支付方式、交班汇总三个 AJAX 端点：演示管理员不是当前开班收银员（开班人是 `cashier@shop.demo`），`currentSession()` 按设计拒绝，属业务语义正确。
+
+**12.14.3 本轮修掉的 6 类问题**
+
+1. **ERP 侧栏一项都没有**（用户报的现象）：`config/navigation.php` 里 126 条菜单写的是参考项目的裸路由名（`home`、`office.todos`…），而演示站路由一律带 `erp.` 前缀，`Route::has('home')` 全 false → 28 项全被跳过。`NavigationService` 加 `resolveRouteName()` 做"裸名 → `erp.` 前缀"兜底后，admin 侧栏恢复 3 组 28 项、skipped=0。
+2. **29 / 30 个 ERP 账号没有角色**：演示账号虽填了 `department_id` / `position_id`，但没挂岗位角色，登录后只剩"未绑定岗位"。新增 `PositionRoleSeeder` 按 `positions.role_names`（JSON）同步角色，无岗位的历史账号兜底综合岗；30 个账号全部有菜单。
+3. **ERP 运维页 500**：`DevopsController` 无条件 `DB::select('SHOW TABLES')`，本地 SQLite 直接报错。改为按驱动分支（sqlite → `sqlite_master`、pgsql → `information_schema`、其余 → `SHOW TABLES`）。
+4. **ERP BOM 详情 500**：视图里 `BomStatus::label($bom->status)` 是静态调用实例方法，改 `tryFrom()->label()`。参考项目此处写的是"状态类静态方法"，移植成 enum 后语义不兼容，属移植期埋的坑。
+5. **ERP 业务详情页 404**：`system_admin` 岗位的 `data_scope_type = none`（"系统管理员不参与业务"），客户 / 供应商 / 采购单 / 生产单详情被行级范围过滤成 0 行。给 `username=admin` 叠加总经理岗（`data_scope=all`），演示管理员既做系统配置也能翻全部业务数据，侧栏 28 → 31 项。
+6. **PM 8 个"我的任务"状态页 500 + 支援中心部门资料 500**：`TaskController::myTasksByStatus()` 里视图名写的是 `task.my-tasks-status`（缺 `pm::` 模块前缀，参考项目单模块无需前缀）；`SupportController::departmentFiles()` 引用的视图在参考项目里也不存在。前者补前缀，后者补建 `support/department-files.blade.php`（范围过滤 + 空态 + 下载）。
+
+顺带修掉的两个小瑕疵：Shop 到货单 `create` 无参直开时 `findOrFail(0)` → 404，改为回采购单列表并提示；Shop 头像接口无头像时 404 导致破图，改为回落到内置默认头像，并把参考项目 `public/avatars/defaults` 的 5 张 SVG 补进演示站。
+
+**12.14.4 三套对齐复核（三层对账重跑）**
+
+| 维度 | ERP | PM | Shop |
+| --- | --- | --- | --- |
+| 路由缺失 | 0 | 72（全部落在排除项） | 12（全部 `/api/ai/*`） |
+| 路由多出 | 2（演示站自建 `/home`、`/preview`） | 2 | 1（`/preview`） |
+| 表 / 列缺失 | 0（287 表全齐） | 1 表（`users` 缺 4 个 `wecom_*` 列） | 0（82 表全齐） |
+| 视图路由引用缺失 ≥60% | 0（148 视图齐） | 2（`profile/wecom/index`、`wecom/files/index`） | 0（98 视图齐） |
+
+排除项口径未变：AI 外部 API、企业微信、协同办公、电话会议、注册页。把这些剔掉后，三套系统的**路由 / 表 / 视图引用三层均无功能缺口**；PM 那 72 条拆开是 api/ai 38 + 企微 17 + 协同 13 + 语音会议 6（含 hooks）+ 注册 2，Shop 的 12 条全为 ai。
+
+**12.14.5 遗留**
+
+- 含参详情页只做了抽样（每产品 12 条），未做全量 125 条自动巡检 —— 参数类型五花八门（`{lot_no}`、`{platformKey}`、`{slug}`），用固定 id 替换会造出假 404，暂不自动化。
+- 线上 `.env` 本轮从 `APP_ENV=local / APP_DEBUG=true` 改回 `production / false`（此前排查遗留），`config:cache` 已重建。
