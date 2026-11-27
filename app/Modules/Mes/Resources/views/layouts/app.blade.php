@@ -107,9 +107,15 @@
             @endif
 
             @if ($me?->hasRole('admin'))
-                <div class="grp">系统</div>
+                <div class="grp">系统管理</div>
+                <a class="{{ request()->routeIs('mes.system.departments.*') ? 'on' : '' }}" href="{{ route('mes.system.departments.index') }}">
+                    <i class="fa-solid fa-sitemap"></i> 部门管理
+                </a>
+                <a class="{{ request()->routeIs('mes.system.positions.*') ? 'on' : '' }}" href="{{ route('mes.system.positions.index') }}">
+                    <i class="fa-solid fa-id-badge"></i> 岗位管理
+                </a>
                 <a class="{{ request()->routeIs('mes.system.users.*') ? 'on' : '' }}" href="{{ route('mes.system.users.index') }}">
-                    <i class="fa-solid fa-users"></i> 账号
+                    <i class="fa-solid fa-users"></i> 账号管理
                 </a>
                 <a class="{{ request()->routeIs('mes.system.roles.*') ? 'on' : '' }}" href="{{ route('mes.system.roles.index') }}">
                     <i class="fa-solid fa-user-shield"></i> 角色权限

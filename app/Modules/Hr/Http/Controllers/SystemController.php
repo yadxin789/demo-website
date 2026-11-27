@@ -8,6 +8,7 @@ use App\Modules\Hr\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -49,6 +50,109 @@ class SystemController extends Controller
             'q' => $q,
             'roleText' => self::ROLE_TEXT,
             'roles' => array_keys(self::ROLE_TEXT),
+        ]);
+    }
+
+    public function userCreate(): View
+    {
+        $this->denyUnlessAdmin();
+
+        return view('hr::system.user-form', [
+            'user' => new User(['status' => 'active', 'role_code' => 'employee']),
+            'roleText' => self::ROLE_TEXT,
+            'roles' => array_keys(self::ROLE_TEXT),
+            'mode' => 'create',
+        ]);
+    }
+
+    public function userStore(Request $request): RedirectResponse
+    {
+        $this->denyUnlessAdmin();
+        $data = $this->validateAccount($request);
+
+        $user = User::query()->create([
+            'name' => $data['name'],
+            'username' => $data['username'] ?: null,
+            'email' => $data['email'],
+            'employee_no' => $data['employee_no'] ?: null,
+            'role_code' => $data['role'],
+            'password' => $data['password'],
+            'status' => $data['status'],
+        ]);
+        $user->syncRoles([$data['role']]);
+
+        return redirect()->route('hr.system.users.index')
+            ->with('status', "已新增账号 {$user->name}（{$user->email}），角色：" . self::ROLE_TEXT[$data['role']]);
+    }
+
+    public function userEdit(User $user): View
+    {
+        $this->denyUnlessAdmin();
+
+        return view('hr::system.user-form', [
+            'user' => $user->load('roles:id,name'),
+            'roleText' => self::ROLE_TEXT,
+            'roles' => array_keys(self::ROLE_TEXT),
+            'mode' => 'edit',
+        ]);
+    }
+
+    public function userProfile(Request $request, User $user): RedirectResponse
+    {
+        $this->denyUnlessAdmin();
+        $data = $this->validateAccount($request, $user);
+
+        if ($user->id === (int) auth('hr')->id() && ($data['role'] !== 'admin' || $data['status'] !== 'active')) {
+            return back()->with('error', '不能修改当前登录管理员的角色或停用它，否则会锁死自己。');
+        }
+
+        $payload = [
+            'name' => $data['name'],
+            'username' => $data['username'] ?: null,
+            'email' => $data['email'],
+            'employee_no' => $data['employee_no'] ?: null,
+            'role_code' => $data['role'],
+            'status' => $data['status'],
+        ];
+        if (! empty($data['password'])) {
+            $payload['password'] = $data['password'];
+        }
+
+        $user->update($payload);
+        $user->syncRoles([$data['role']]);
+
+        return redirect()->route('hr.system.users.index')
+            ->with('status', "账号 {$user->name} 已保存" . (empty($data['password']) ? '（密码未改动）' : '（密码已重置）'));
+    }
+
+    public function userDestroy(User $user): RedirectResponse
+    {
+        $this->denyUnlessAdmin();
+
+        if ($user->id === (int) auth('hr')->id()) {
+            return back()->with('error', '不能删除当前登录的账号。');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return redirect()->route('hr.system.users.index')->with('status', "账号 {$name} 已删除。");
+    }
+
+    /** @return array<string, mixed> */
+    private function validateAccount(Request $request, ?User $user = null): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'max:64'],
+            'username' => ['nullable', 'string', 'max:60', 'alpha_dash', Rule::unique('hr.users', 'username')->ignore($user?->id)],
+            'email' => ['required', 'email', 'max:120', Rule::unique('hr.users', 'email')->ignore($user?->id)],
+            'employee_no' => ['nullable', 'string', 'max:40', Rule::unique('hr.users', 'employee_no')->ignore($user?->id)],
+            'role' => ['required', Rule::in(['admin', 'hr_manager', 'hr_specialist', 'dept_manager', 'employee'])],
+            'password' => [$user ? 'nullable' : 'required', 'string', 'min:6', 'max:64'],
+            'status' => ['required', 'in:active,disabled'],
+        ], [], [
+            'name' => '姓名', 'username' => '用户名', 'email' => '邮箱', 'employee_no' => '工号',
+            'role' => '角色', 'password' => '密码', 'status' => '状态',
         ]);
     }
 

@@ -31,13 +31,7 @@
                 <i class="fa-solid fa-gauge-high"></i> 人力看板
             </a>
 
-            <div class="grp">组织与编制</div>
-            <a class="{{ request()->routeIs('hr.org.departments.*') ? 'on' : '' }}" href="{{ route('hr.org.departments.index') }}">
-                <i class="fa-solid fa-sitemap"></i> 部门树
-            </a>
-            <a class="{{ request()->routeIs('hr.org.positions.*') ? 'on' : '' }}" href="{{ route('hr.org.positions.index') }}">
-                <i class="fa-solid fa-id-badge"></i> 岗位
-            </a>
+            <div class="grp">编制</div>
             <a class="{{ request()->routeIs('hr.org.headcounts.*') ? 'on' : '' }}" href="{{ route('hr.org.headcounts.index') }}">
                 <i class="fa-solid fa-users-viewfinder"></i> 编制缺口
             </a>
@@ -119,9 +113,15 @@
             </a>
 
             @if ($me?->hasRole('admin'))
-                <div class="grp">系统</div>
+                <div class="grp">系统管理</div>
+                <a class="{{ request()->routeIs('hr.org.departments.*') ? 'on' : '' }}" href="{{ route('hr.org.departments.index') }}">
+                    <i class="fa-solid fa-sitemap"></i> 部门管理
+                </a>
+                <a class="{{ request()->routeIs('hr.org.positions.*') ? 'on' : '' }}" href="{{ route('hr.org.positions.index') }}">
+                    <i class="fa-solid fa-id-badge"></i> 岗位管理
+                </a>
                 <a class="{{ request()->routeIs('hr.system.users.*') ? 'on' : '' }}" href="{{ route('hr.system.users.index') }}">
-                    <i class="fa-solid fa-users"></i> 账号
+                    <i class="fa-solid fa-users"></i> 账号管理
                 </a>
                 <a class="{{ request()->routeIs('hr.system.roles.*') ? 'on' : '' }}" href="{{ route('hr.system.roles.index') }}">
                     <i class="fa-solid fa-user-shield"></i> 角色权限

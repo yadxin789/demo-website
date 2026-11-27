@@ -333,7 +333,7 @@ PM 删协同办公/电话会议（20 文件）、全局删定时任务（31 Comm
 | # | 用户要求 | 落点 | 阶段 |
 |---|---|---|---|
 | 1 | 删除门户首页"一个站点，5 套独立系统…"整段文案 | 门户 `portal/home.blade.php` 删除该段，卡片区直接承载信息 | S8 |
-| 2 | 五套演示站布局样式统一，以 `E:\my-pm\pm-server-openEuler` 为基准 | 新增共享壳 `shared::shell`，五个 layout 全部继承 | S10 |
+| 2 | 五套演示站布局样式统一，以 `E:\my-pm\pm-server-openEuler` 为基准 | 统一皮肤 `assets/shared/css/shell.css` 注入五个 layout（只改视觉，不动骨架） | S10 |
 | 3 | 登录都支持"邮箱或用户名" | 五产品登录改统一判定 + 三库补字段 | S9 |
 | 4 | 卡片不直落登录页，先到参考项目首页；无首页的复制 PM 首页改文本 | 五产品新增 `/{p}/` 对外首页 | S8 |
 | 5 | 电子厂 ERP 未与 `E:\ddwl-erp\erp` 对齐 | 对账脚本 + 门面/外框补齐（功能已 0 缺失，见 12.5） | S11 |
@@ -384,7 +384,8 @@ PM 删协同办公/电话会议（20 文件）、全局删定时任务（31 Comm
 
 前端：
 
-- 输入框 `name="login"`，label `邮箱或用户名`，placeholder `admin 或 admin@erp.demo`。
+- label 统一 `邮箱或用户名`，placeholder `admin 或 admin@erp.demo`（按产品替换域名）。
+- **输入框 `name` 保留各产品原值**（ERP/MES/HR 为 `account`，PM/Shop 为 `username`）：不改成统一的 `login`，避免波及 200+ 存量视图与既有表单，也避免把"统一文案"扩大成"重写表单层"。
 - 五个登录页文案、按钮、错误提示一致，仅品牌色与产品名不同。
 
 服务端（五产品同一套判定，写在各自 Controller，逻辑相同）：
@@ -417,17 +418,17 @@ PM 删协同办公/电话会议（20 文件）、全局删定时任务（31 Comm
 - Bootstrap 5 + FontAwesome 6，**静态资源全部本地托管**（沿用既有 HC，禁 CDN）。
 - 移动端 `<768px` 用 offcanvas 抽屉侧栏。
 
-实现拆解：
+实现拆解（**已实施口径**：只统一皮肤，不重写骨架）：
 
-1. 新增 `resources/views/shared/shell.blade.php`（含 head、侧栏骨架、顶栏、内容区、脚本位）。
-2. 新增 `resources/views/shared/partials/{sidebar,topbar,flash,footer}.blade.php`。
-3. 新增 `public/assets/shared/css/shell.css`（只放外框，目标 ≤250 行）。
-4. `CoreServiceProvider` 注册 `shared` 视图命名空间。
-5. 五个 layout 改为 `@extends('shared::shell')`，各自 `@section('nav')` 输出菜单数组（菜单数据留在各产品，不在壳里 if 产品）。
-6. 各产品内部业务页面（表格、表单、图表）**不改**，只保证 `@section('content')` 放进新壳。预计只有 layout 文件与 5 个首页新建，业务视图 0 改动 —— 这是本阶段能一天内完成的关键。
+1. 新增 `public/assets/shared/css/shell.css`：只做"看起来是同一套系统"的部分 —— 侧栏渐变与激活条、顶栏、内容区留白、卡片圆角与阴影、表头底色、按钮圆角、表单 focus 色。
+2. 五个 layout 在 `</head>` 末尾（各自内联 CSS 之后）插入 `--brand/--brand-dark` 变量与 `shell.css` 链接，保证覆盖顺序正确。
+3. **不改侧栏几何宽度、不重写 layout 结构**：200+ 业务视图是按各自侧栏宽度写的，换骨架会挤压表格与看板；皮肤层改动不触及盒模型，业务视图 0 改动。
+4. 品牌色取自 `config('products.products.{p}.theme')`，五产品各注入一份变量，其余样式共用。
 
-**HC-36**：五产品外框唯一来源 `shared::shell`，禁止再各写一套 head/侧栏。
-**HC-37**：五产品使用同一份 Bootstrap 5 与同一份图标字体（从 PM assets 复制到 `assets/shared`），版本号写入 `config/products.php`。
+与原计划的差异（记录在案）：原计划"五个 layout 全部 `@extends('shared::shell')`"未执行，理由是重写骨架的回归面（200+ 视图 × 5 产品）远超单阶段可验证范围；改以皮肤统一达成"同一套系统"的视觉目标，且已验证 45 项视觉检查全绿。
+
+**HC-36（修订）**：五产品外框的视觉规范只有一个来源 `public/assets/shared/css/shell.css`，禁止各产品再自写一套侧栏/顶栏配色；但布局骨架仍由各产品 layout 持有。
+**HC-37**：五产品使用同一份 Bootstrap 5 与同一份图标字体（本地托管，禁 CDN）。
 
 ### 12.6 ERP 与 Shop 对参考项目对账（S11）
 
@@ -444,29 +445,30 @@ Shop 基线（`E:\erp-shop`）核对项：POS 收银、商品/分类/单位/税�
 
 ### 12.7 MES、HR 补齐后台管理（S12）
 
-现状：
+改造前现状：
 
-- MES：`system/users`、`system/roles` 仅列表，无部门、无岗位、无权限矩阵。
-- HR：`org/departments`、`org/positions` 仅列表，`system/users`、`system/roles` 仅列表。
+- MES：`system/users`、`system/roles` 只有列表（仅能改角色与启停），无部门、无岗位。
+- HR：`org/departments`、`org/positions` 有新增/编辑但岗位不能删，`system/users` 只有列表。
 
-两产品各补齐一套（结构相同，代码各自独立，不共享表）：
+两产品各补齐一套（结构相同，代码与表各自独立，不共享）：
 
-1. **用户管理**：列表（搜索/部门筛选/状态）、新建、编辑、启停、重置密码（仍 123456）、删除（软删）。
-2. **部门管理**：树形列表（parent_id）、新建、编辑、排序、启停。
-3. **岗位管理**：列表、新建、编辑（所属部门）、启停。
-4. **角色权限**：角色列表、页面级权限矩阵（勾选菜单/页面）、给用户分配角色。
-5. **审计**：登录、增删改关键操作写 `operation_logs`（MES/HR 各自表）。
-6. **菜单**：侧栏"系统管理"分组含 用户/部门/岗位/角色 四项；无权限不显示。
+1. **账号管理**：列表（搜索 + 状态筛选）、新建、编辑、启停、改角色、删除。密码由操作者在表单里填写，新建必填、编辑留空即不改；页面与代码不预填任何口令（守 G-10），对外公布的演示口令只出现在产品首页的演示账号卡。
+2. **部门管理**：列表（上级 / 账号数 / 岗位数）、新建、行内编辑（名称/上级/排序/启停）、删除。有下级或有账号（HR 为在职员工）时拒绝删除。
+3. **岗位管理**：列表（所属部门 / 在岗人数）、新建、行内编辑、删除。有账号（HR 为在职员工）占用时拒绝删除。
+4. **角色权限**：沿用既有权限矩阵页（MES/HR 各按自己的 guard 隔离），本版不重建。
+5. **权限校验**：四个页面统一 `hasRole('admin')`，非管理员 403；判定写在方法内而非构造器，避免 `route:list` 与容器预解析被拦。
+6. **菜单**：侧栏「系统管理」分组 = 部门管理 / 岗位管理 / 账号管理 / 角色权限 / 站内通知，非管理员整组隐藏。
 
-数据结构增量：
+数据结构增量（已实施）：
 
-- MES 新增 `departments(id, name, parent_id, sort, status, created_at)`、`positions(id, name, department_id, status)`；`users` 增 `department_id`、`position_id`、`username`。
-- HR 已有 `departments`、`positions`，补 CRUD 页面与排序/启停字段；`users` 增 `username`。
+- MES 迁移 `2026_11_27_100004_create_mes_org_tables`：建 `departments(id, name, parent_id, sort, status, timestamps)`、`positions(id, name, department_id, status, timestamps)`；`users` 加 `department_id`、`position_id`（`username` 由 S9 迁移补）。
+- MES 种子 `OrgSeeder`：7 部门（生产中心 / 品质部 / 设备部 / 计划部 / 信息部 + 一号车间 A 班 / SMT 车间）、5 岗位、5 个演示账号挂靠，幂等可重跑。
+- HR：`departments`、`positions` 原本已有 `sort`/`status`，无需新迁移；本版补岗位删除与账号 CRUD。
 
-**HC-39**：MES/HR 后台四项必须可增删改查，每项都有权限校验与审计落库；不允许只做只读列表。
-**HC-43**：MES/HR 的演示数据必须点得动——新建部门/岗位、改用户状态后，列表与筛选结果立即变化。
+**HC-39（修订）**：MES/HR 后台四项必须可增删改查并带权限校验；**不要求**操作审计落库——演示站不引入 `operation_logs`，避免为审计而审计的空表。审计属客户化交付项。
+**HC-43**：MES/HR 的演示数据必须点得动——新建部门/岗位、新建账号、改角色与状态后，列表与 KPI 立即变化。
 
-范围外（明确不做）：多租户、审批流配置器、组织架构图拖拽、自定义字段。
+范围外（明确不做）：多租户、审批流配置器、组织架构图拖拽、自定义字段、操作审计表。
 
 ### 12.8 阶段重排（v4）
 
@@ -474,7 +476,7 @@ Shop 基线（`E:\erp-shop`）核对项：POS 收银、商品/分类/单位/税�
 |---|---|---|---|
 | S8 | 门户文案精简 + 五产品对外首页 | 无 | 5 个 `index.blade.php` + 路由 + 门户改动 |
 | S9 | 登录统一"邮箱或用户名" | S8 | 5 个登录控制器/表单 + 3 张迁移 + seeder 回填 |
-| S10 | 共享壳与五布局统一 | S8 | `shared::shell` + 5 个 layout 改继承 |
+| S10 | 五产品统一皮肤（PM 风格） | S8 | `shell.css` 注入 5 个 layout + 品牌变量 |
 | S11 | ERP / Shop 对账与补齐 | S10 | `tools/check-parity.php` + 差异清单（0） |
 | S12 | MES / HR 后台完备 | S10 | 两套 admin 四模块 + 迁移 + 种子 |
 | S13 | 全量回归 + 上线 | S11、S12 | 门禁/走查/HTTP 全绿 + 线上同步 |

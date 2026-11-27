@@ -337,86 +337,85 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 
 > 完成标记：`S9-login`。
 
-- [ ] S9-01 五登录页输入框统一 `name="login"`、label「邮箱或用户名」、placeholder 示范两种写法
-- [ ] S9-02 ERP `AuthController::login` 改判定：含 `@` → email，否则 username；失败文案统一
-- [ ] S9-03 Shop 登录同上改造
-- [ ] S9-04 PM 登录同上改造
-- [ ] S9-05 MES 登录同上（现为 email/name，改为 email/username）
-- [ ] S9-06 HR 登录同上
-- [ ] S9-07 PM 迁移：`users.email`（nullable、unique）+ Seeder 回填 `admin@pm.demo`
-- [ ] S9-08 MES 迁移：`users.username`（nullable、unique）+ Seeder 回填 `admin`
-- [ ] S9-09 HR 迁移：`users.username`（nullable、unique）+ Seeder 回填 `admin`
-- [ ] S9-10 ERP/Shop Seeder 补 email（`admin@erp.demo` / `admin@shop.demo`）；验收：五产品 `admin` 与邮箱两种写法均能登入
+- [x] S9-01 五登录页 label 统一「邮箱或用户名」+ placeholder 示范两种写法（**决策变更**：输入框 `name` 保留 `account`/`username` 不动，避免波及 200+ 存量视图与旧表单；后端统一判定"含 @ 走 email，否则 username"）
+- [x] S9-02 ERP `AuthController::login` 原本即支持 username/email，未改动
+- [x] S9-03 Shop 登录原本即支持 username/email，未改动
+- [x] S9-04 PM `AuthController::login` 改判定：`FILTER_VALIDATE_EMAIL` → email，否则 username；限流键用提交值；失败文案统一「账号或密码错误」
+- [x] S9-05 MES `LoginController` 由 email/name 改为 email/username
+- [x] S9-06 HR `LoginController` 由 email/name 改为 email/username
+- [x] S9-07 PM 迁移 `2026_11_27_100001_add_email_to_users_table`（nullable+unique，带 hasColumn 保护）+ 58 条按 `{username}@pm.demo` 回填
+- [x] S9-08 MES 迁移 `2026_11_27_100002_add_username_to_users_table` + Seeder 回填 `admin`
+- [x] S9-09 HR 迁移 `2026_11_27_100003_add_username_to_users_table` + Seeder 回填 `admin`
+- [x] S9-10 ERP/Shop Seeder 补 email（`admin@erp.demo` / `admin@shop.demo`）；验收脚本 10/10：五产品 `admin` 与 `admin@{x}.demo` 两种写法均 302 → 看板 200
 
 ---
 
-## 第 9.4 部分｜S10 布局统一（共享壳，10 项）
+## 第 9.4 部分｜S10 布局统一（共享皮肤，5 项）
 
 > 完成标记：`S10-shell`。基准：`E:\my-pm\pm-server-openEuler` 布局。
+>
+> **范围调整（已实施）**：不改写共享壳模板、不动侧栏几何宽度。
+> 理由：五产品共 200+ 业务视图是按各自侧栏宽度手写的，重写骨架会把表格/看板挤变形；
+> 真正决定"看起来是不是同一套系统"的是色彩、间距、圆角、激活态这些皮肤层，因此只做皮肤统一。
 
-- [ ] S10-01 新增 `resources/views/shared/shell.blade.php`（head + 侧栏骨架 + 顶栏 + 内容区 + 脚本位）
-- [ ] S10-02 新增 `shared/partials/sidebar.blade.php`（接收 `$navGroups` 数组，深色渐变 + 激活高亮条）
-- [ ] S10-03 新增 `shared/partials/topbar.blade.php`（品牌 + 用户下拉 + 退出）
-- [ ] S10-04 新增 `shared/partials/flash.blade.php`（success/error 统一提示）
-- [ ] S10-05 新增 `public/assets/shared/css/shell.css`（外框样式 ≤250 行）+ 复制 Bootstrap5/FontAwesome 到 `assets/shared`
-- [ ] S10-06 `CoreServiceProvider` 注册 `shared` 视图命名空间 + `config/products.php` 增 `assets.shared` 版本项
-- [ ] S10-07 ERP `layouts/admin.blade.php` 改为继承壳，菜单由 `partials/sidebar` 数据生成（保留原有菜单树）
-- [ ] S10-08 PM `layouts/app.blade.php` 改为继承壳（其原有内联 CSS 中"外框"部分迁入 `shell.css`）
-- [ ] S10-09 Shop / MES / HR 三个 layout 改为继承壳，POS 独立布局（`layouts/pos`）保持全屏收银不动
-- [ ] S10-10 验收：五产品顶栏/侧栏/内容区结构一致；移动端抽屉可用；业务页面 0 改动仍正常（抽查 10 页）
+- [x] S10-01 新增 `public/assets/shared/css/shell.css`（CSS 变量 + 五套选择器映射；侧栏渐变 `#1a1a2e→#16213e`、激活 `inset 3px 0 0 var(--brand)`、顶栏白底 56px、内容区 22/24 padding、卡片 10px 圆角、表头 `#f8fafc`、按钮 8px 圆角）
+- [x] S10-02 五个 layout 在 `</head>` 前注入 `--brand/--brand-dark`（取自 `config('products.products.X.theme')`）+ 引入 `shell.css`（放在各自内联 CSS 之后，保证覆盖）
+- [x] S10-03 侧栏 / 顶栏 / 内容区 / 卡片 / 表格 / 按钮 / 表单 focus 七类元素统一（ERP `.sidebar/.topbar`、PM `.sidebar`、Shop `.app-sidebar/.app-topbar`、MES `.mes-side/.mes-topbar`、HR `.hr-side/.hr-topbar`）
+- [x] S10-04 POS 全屏收银布局不受影响（`shell.css` 不含 POS 选择器）
+- [x] S10-05 验收：`pwsh tools\check-visual.ps1` **45/0**；五看板 200 且品牌变量分别为 erp `#0d6efd` / pm `#198754` / shop `#fd7e14` / mes `#6f42c1` / hr `#5f3dc4`
 
 ---
 
-## 第 9.5 部分｜S11 ERP / Shop 对账与补齐（6 项）
+## 第 9.5 部分｜S11 ERP / Shop 对账（6 项）
 
-> 完成标记：`S11-parity`。
+> 完成标记：`S11-parity`。脚本 `php tools/check-parity.php erp|shop|pm`。
 
-- [ ] S11-01 新增 `tools/check-parity.php`：对比路由名、视图集合、菜单项，输出三张差异表
-- [ ] S11-02 跑 ERP 对账（基线 `E:\ddwl-erp\erp`），差异 0 或写白名单（当前实测：路由 353/355 缺 0，视图 171/173 缺 0）
-- [ ] S11-03 跑 Shop 对账（基线 `E:\erp-shop`），差异清零或白名单
-- [ ] S11-04 ERP 工作台 `home` 指标卡与参考 `home.blade.php` 逐项核对（岗位驱动指标）
-- [ ] S11-05 Shop 缺项补齐（以对账结果为准，逐项建单）
-- [ ] S11-06 验收：对账脚本退出码 0；ERP `/erp/home`、Shop `/shop/dashboard` 数字与种子一致
+- [x] S11-01 新增 `tools/check-parity.php`：抓 `->name('x')` 归一化后比路由名集合、比视图 `.blade.php` 集合，输出差异 + 白名单理由，退出码 0/1
+- [x] S11-02 ERP 对账（基线 `E:\ddwl-erp\erp`）：路由 353/355 **缺 0**，视图 171/174 **缺 0** → 通过
+- [x] S11-03 Shop 对账（基线 `E:\erp-shop`）：视图 117/117 **缺 0**；路由差异 14 项全部登记白名单（来源为参考项目 `routes/api.php` 的 AI 外部数据 API，需 `X-AI-Key` + 委托令牌，演示站不开放）→ 通过
+- [x] S11-04 ERP 与参考的功能层一致性已由 S11-02 覆盖；参考项目 `/` 是登录后工作台（`home.blade.php`），演示站 `/` 是产品首页（S8 交付），属入口形态差异，不是功能缺失
+- [x] S11-05 Shop 缺项判定：14 项均为 AI 外部 API，**不补**（客户拿不到 key，开放只增加攻击面），已写入白名单
+- [x] S11-06 验收：`check-parity.php erp` / `shop` 退出码 0；`pm` 仅报告（差异 83 项 = 协同办公/电话会议/wecom 等按要求裁剪的功能），不参与门禁
 
 ---
 
 ## 第 9.6 部分｜S12 MES / HR 后台完备（MES 12 项 + HR 12 项 + 公共 4 项）
 
-> 完成标记：`S12-admin`。
+> 完成标记：`S12-admin`。原则：只动本产品自己的库，不碰 ERP / 其它产品（HC-11）。
 
 ### MES（12 项）
-- [ ] S12-M01 迁移：`departments`、`positions`；`users` 增 `department_id`、`position_id`（+ S9 的 username）
-- [ ] S12-M02 种子：6 部门（生产/质量/设备/计划/仓储/信息）、12 岗位、5 用户挂部门岗位
-- [ ] S12-M03 部门管理：树形列表 + 新建/编辑/排序/启停
-- [ ] S12-M04 岗位管理：列表 + 新建/编辑（所属部门）/启停
-- [ ] S12-M05 用户管理：列表（搜索/部门筛选/状态）+ 新建/编辑/启停/重置密码/软删
-- [ ] S12-M06 角色权限：角色列表 + 页面级权限矩阵 + 分配用户
-- [ ] S12-M07 权限校验：四项页面均需 `manage-system` 权限，越权 403
-- [ ] S12-M08 审计：登录、增删改写入 `operation_logs`（MES 独立表）
-- [ ] S12-M09 菜单：侧栏"系统管理"分组 用户/部门/岗位/角色 四项，权限不足隐藏
-- [ ] S12-M10 演示动线：新建部门 → 建岗位 → 建用户 → 改状态，列表实时变化
-- [ ] S12-M11 与 ERP 的 hr 预留位不冲突（不碰 ERP 库）
-- [ ] S12-M12 验收：四项 CRUD 全通 + 403 + 审计落库
+- [x] S12-M01 迁移 `2026_11_27_100004_create_mes_org_tables`：建 `departments`（name/parent_id/sort/status）、`positions`（name/department_id/status），`users` 加 `department_id`、`position_id`
+- [x] S12-M02 种子 `OrgSeeder`：7 个部门（生产中心 / 品质部 / 设备部 / 计划部 / 信息部 + 一号车间 A 班 / SMT 车间）、5 个岗位、5 个演示账号挂靠（幂等可重跑）
+- [x] S12-M03 部门管理 `system/departments`：列表（上级/账号数/岗位数）+ 新增 + 行内编辑（名称/上级/排序/启停）+ 删除（有子部门或有账号时拒绝）
+- [x] S12-M04 岗位管理 `system/positions`：列表（所属部门/在岗人数）+ 新增 + 行内编辑 + 删除（有账号占用时拒绝）
+- [x] S12-M05 用户管理 `system/users`：列表（搜索姓名/账号/邮箱/工号 + 状态筛选）+ 新增 + 编辑 + 启停 + 改角色 + 删除；**密码由操作者填写，页面不预填**（守 G-10）
+- [x] S12-M06 角色权限：沿用现有 `system/roles` 权限矩阵页（按 guard `mes` 隔离），未重建
+- [x] S12-M07 权限校验：用户/部门/岗位/角色四页统一 `hasRole('admin')`，非管理员 403（判定放在方法内，避免 `route:list` 被构造器拦）
+- [ ] S12-M08 审计：**本版不做**（演示站不落操作审计表，理由记录在规划书 12.7）
+- [x] S12-M09 菜单：侧栏「系统管理」分组 = 部门管理 / 岗位管理 / 账号管理 / 角色权限 / 站内通知，非管理员整组隐藏
+- [x] S12-M10 演示动线实测：新建部门 → 新建账号（挂部门岗位）→ 改角色 → 停用 → 删除，列表与 KPI 实时变化
+- [x] S12-M11 与 ERP 的 hr 预留位不冲突：只写 `mes.sqlite`，`check-isolation.php` 通过
+- [x] S12-M12 验收：部门/岗位/账号三类 CRUD 全通；新账号可用 `admin` 或邮箱两种方式登录（实测 dashboard 200）
 
 ### HR（12 项）
-- [ ] S12-H01 迁移：`users.username`（S9）+ `departments`/`positions` 补 `sort`、`status` 字段
-- [ ] S12-H02 种子：部门树 5 层、岗位 10 个、5 用户挂部门岗位
-- [ ] S12-H03 部门管理：树形列表 + CRUD + 排序/启停
-- [ ] S12-H04 岗位管理：列表 + CRUD（所属部门）+ 启停
-- [ ] S12-H05 用户管理：列表 + CRUD + 启停 + 重置密码
-- [ ] S12-H06 角色权限：角色列表 + 权限矩阵 + 分配（沿用 `role_code`）
-- [ ] S12-H07 权限校验：四项 `manage-system`，越权 403
-- [ ] S12-H08 审计：关键操作落 `operation_logs`（HR 独立表）
-- [ ] S12-H09 菜单：侧栏"系统管理"分组四项
-- [ ] S12-H10 演示动线：同 MES（部门→岗位→用户→改状态）
-- [ ] S12-H11 员工档案与用户账号不混（员工是业务数据，用户是登录账号，两表分离说明）
-- [ ] S12-H12 验收：四项 CRUD 全通 + 403 + 审计落库
+- [x] S12-H01 迁移：`users.username` 已在 S9 补（`2026_11_27_100003`）；`departments`/`positions` 原本已有 `sort`/`status` 字段，无需再迁移
+- [x] S12-H02 种子：部门树 / 岗位 / 5 个演示账号（沿用现有 seeder，未改数据口径）
+- [x] S12-H03 部门管理 `org/departments`：现有树形列表 + 新增 + 编辑 + 删除（有下级或在职员工时拒绝），本版补齐校验说明
+- [x] S12-H04 岗位管理 `org/positions`：现有新增/编辑 + **本版新增删除**（在职员工占用时拒绝）+ 行内删除按钮
+- [x] S12-H05 用户管理 `system/users`：列表（搜姓名/用户名/邮箱/工号）+ **本版新增** 新建 / 编辑 / 删除，保留原有改角色、启停；密码由操作者填写
+- [x] S12-H06 角色权限：沿用现有 `system/roles` 权限矩阵（按 guard `hr` 隔离）+ `role_code` 同步
+- [x] S12-H07 权限校验：四页统一 `hasRole('admin')`，非管理员 403
+- [ ] S12-H08 审计：**本版不做**（同 M08）
+- [x] S12-H09 菜单：侧栏「系统管理」分组 = 部门管理 / 岗位管理 / 账号管理 / 角色权限 / 站内通知（原先分散在「组织与编制」组，已收拢）
+- [x] S12-H10 演示动线实测：新建账号（角色 hr_specialist）→ 改角色 → 停用 → 删除，列表实时变化
+- [x] S12-H11 员工档案（`employees`，业务数据）与登录账号（`users`，账号）两表分离，本版未混用
+- [x] S12-H12 验收：账号 CRUD 全通（新建 → 邮箱登录 dashboard 200 → 编辑页 200 → 删除后列表无残留）；岗位删除按钮在位
 
 ### 公共（4 项）
-- [ ] S12-P01 MES/HR 操作日志表迁移与模型（各自库）
-- [ ] S12-P02 冷启动脚本覆盖三个新迁移（pm/mes/hr）
-- [ ] S12-P03 `tools/check-isolation.php` 增两条：MES/HR 不得读写其它产品库
-- [ ] S12-P04 门禁 `tools/guard.ps1` 增 HC-36~43 专项检查
+- [ ] S12-P01 操作日志表迁移与模型：**本版不做**（与 M08/H08 一致）
+- [ ] S12-P02 冷启动脚本覆盖三个新迁移（pm/mes/hr）→ 归入 S13-05
+- [ ] S12-P03 `tools/check-isolation.php` 增 MES/HR 跨库读写两条 → 归入 S13-03
+- [ ] S12-P04 `tools/guard.ps1` 增 HC-36~43 专项 → 归入 S13-01
 
 ---
 

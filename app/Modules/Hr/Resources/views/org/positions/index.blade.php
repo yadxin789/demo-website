@@ -57,9 +57,17 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="modal"
-                                data-bs-target="#posModal"
-                                onclick='openPos({{ json_encode(["id" => $p->id, "code" => $p->code, "name" => $p->name, "department_id" => $p->department_id, "grade" => $p->grade, "status" => $p->status], JSON_UNESCAPED_UNICODE) }})'>编辑</button>
+                        <div class="d-flex gap-2 align-items-center">
+                            <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#posModal"
+                                    onclick='openPos({{ json_encode(["id" => $p->id, "code" => $p->code, "name" => $p->name, "department_id" => $p->department_id, "grade" => $p->grade, "status" => $p->status], JSON_UNESCAPED_UNICODE) }})'>编辑</button>
+                            <form method="post" action="{{ route('hr.org.positions.destroy', $p->id) }}" style="margin:0"
+                                  onsubmit="return confirm('删除岗位 {{ $p->code }} {{ $p->name }}？')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-link p-0 text-danger" type="submit">删除</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty

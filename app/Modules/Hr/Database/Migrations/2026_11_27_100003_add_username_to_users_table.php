@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\Schema;
  */
 return new class extends Migration
 {
+    protected $connection = 'hr';
+
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            if (! Schema::hasColumn('users', 'username')) {
+        Schema::connection('hr')->table('users', function (Blueprint $table): void {
+            if (! Schema::connection('hr')->hasColumn('users', 'username')) {
                 $table->string('username', 60)->nullable()->unique();
             }
         });
@@ -24,8 +26,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            if (Schema::hasColumn('users', 'username')) {
+        Schema::connection('hr')->table('users', function (Blueprint $table): void {
+            if (Schema::connection('hr')->hasColumn('users', 'username')) {
                 $table->dropColumn('username');
             }
         });

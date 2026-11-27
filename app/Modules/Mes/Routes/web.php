@@ -35,7 +35,9 @@ use App\Modules\Mes\Http\Controllers\LandingController;
 use App\Modules\Mes\Http\Controllers\Reports\LaborController;
 use App\Modules\Mes\Http\Controllers\Reports\OutputController;
 use App\Modules\Mes\Http\Controllers\Reports\YieldController;
+use App\Modules\Mes\Http\Controllers\System\DepartmentController as SystemDepartmentController;
 use App\Modules\Mes\Http\Controllers\System\NotificationController as SystemNotificationController;
+use App\Modules\Mes\Http\Controllers\System\PositionController as SystemPositionController;
 use App\Modules\Mes\Http\Controllers\System\RoleController as SystemRoleController;
 use App\Modules\Mes\Http\Controllers\System\UserController as SystemUserController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
@@ -198,9 +200,34 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
 
             // 系统（M6-04）：账号 / 角色权限 / 站内通知
             Route::prefix('system')->name('system.')->group(function () {
+                // 账号：查看 / 新建 / 编辑 / 改角色启停 / 删除（S12-M05）
                 Route::get('users', [SystemUserController::class, 'index'])->name('users.index');
+                Route::get('users/create', [SystemUserController::class, 'create'])->name('users.create');
+                Route::post('users', [SystemUserController::class, 'store'])->name('users.store');
+                Route::get('users/{user}/edit', [SystemUserController::class, 'edit'])
+                    ->whereNumber('user')->name('users.edit');
+                Route::put('users/{user}/profile', [SystemUserController::class, 'profile'])
+                    ->whereNumber('user')->name('users.profile');
                 Route::put('users/{user}', [SystemUserController::class, 'update'])
                     ->whereNumber('user')->name('users.update');
+                Route::delete('users/{user}', [SystemUserController::class, 'destroy'])
+                    ->whereNumber('user')->name('users.destroy');
+
+                // 部门 / 岗位（S12-M03、S12-M04）
+                Route::get('departments', [SystemDepartmentController::class, 'index'])->name('departments.index');
+                Route::post('departments', [SystemDepartmentController::class, 'store'])->name('departments.store');
+                Route::put('departments/{department}', [SystemDepartmentController::class, 'update'])
+                    ->whereNumber('department')->name('departments.update');
+                Route::delete('departments/{department}', [SystemDepartmentController::class, 'destroy'])
+                    ->whereNumber('department')->name('departments.destroy');
+
+                Route::get('positions', [SystemPositionController::class, 'index'])->name('positions.index');
+                Route::post('positions', [SystemPositionController::class, 'store'])->name('positions.store');
+                Route::put('positions/{position}', [SystemPositionController::class, 'update'])
+                    ->whereNumber('position')->name('positions.update');
+                Route::delete('positions/{position}', [SystemPositionController::class, 'destroy'])
+                    ->whereNumber('position')->name('positions.destroy');
+
                 Route::get('roles', [SystemRoleController::class, 'index'])->name('roles.index');
                 Route::put('roles/{role}', [SystemRoleController::class, 'update'])->name('roles.update');
                 Route::get('notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');

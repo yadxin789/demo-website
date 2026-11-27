@@ -60,6 +60,8 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::post('org/positions', [PositionController::class, 'store'])->name('org.positions.store');
             Route::put('org/positions/{position}', [PositionController::class, 'update'])
                 ->whereNumber('position')->name('org.positions.update');
+            Route::delete('org/positions/{position}', [PositionController::class, 'destroy'])
+                ->whereNumber('position')->name('org.positions.destroy');
 
             Route::get('org/headcounts', [HeadcountController::class, 'index'])->name('org.headcounts.index');
             Route::post('org/headcounts', [HeadcountController::class, 'store'])->name('org.headcounts.store');
@@ -176,6 +178,17 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::get('import/export/attendance', [ImportController::class, 'exportAttendance'])->name('import.export.attendance');
 
             Route::get('system/users', [SystemController::class, 'users'])->name('system.users.index');
+
+            // 账号 CRUD（S12-H05）：新建 / 编辑 / 删除，密码由操作者填写，页面不预填
+            Route::get('system/users/create', [SystemController::class, 'userCreate'])->name('system.users.create');
+            Route::post('system/users', [SystemController::class, 'userStore'])->name('system.users.store');
+            Route::get('system/users/{user}/edit', [SystemController::class, 'userEdit'])
+                ->whereNumber('user')->name('system.users.edit');
+            Route::put('system/users/{user}/profile', [SystemController::class, 'userProfile'])
+                ->whereNumber('user')->name('system.users.profile');
+            Route::delete('system/users/{user}', [SystemController::class, 'userDestroy'])
+                ->whereNumber('user')->name('system.users.destroy');
+
             Route::post('system/users/{user}/role', [SystemController::class, 'userRole'])
                 ->whereNumber('user')->name('system.users.role');
             Route::post('system/users/{user}/toggle', [SystemController::class, 'userToggle'])

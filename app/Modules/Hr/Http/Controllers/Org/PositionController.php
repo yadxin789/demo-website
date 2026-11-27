@@ -73,6 +73,19 @@ class PositionController extends Controller
             ->with('status', "岗位 {$data['code']} {$data['name']} 已新增。");
     }
 
+    public function destroy(Position $position): RedirectResponse
+    {
+        if (Employee::query()->where('position_id', $position->id)->where('status', '!=', 'left')->exists()) {
+            return back()->with('error', '这个岗位还有在职员工，先调岗再删除。');
+        }
+
+        $code = $position->code;
+        $position->delete();
+
+        return redirect()->route('hr.org.positions.index')
+            ->with('status', "岗位 {$code} 已删除。");
+    }
+
     public function update(Request $request, Position $position): RedirectResponse
     {
         $data = $this->validated($request, $position);
