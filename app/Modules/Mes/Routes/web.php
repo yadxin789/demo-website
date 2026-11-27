@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
+use App\Modules\Mes\Http\Controllers\EquipmentController;
 use App\Modules\Mes\Http\Controllers\ImportController;
 use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
@@ -158,8 +159,18 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                     ->whereNumber('defect')->name('defects.rework');
             });
 
-            // 设备（M5 替换）
-            Route::get('equipment', [PlaceholderController::class, 'show'])->name('equipment.index');
+            // 设备（M5：台账 / 点检 / 报修）
+            Route::get('equipment', [EquipmentController::class, 'index'])->name('equipment.index');
+            Route::get('equipment/{equipment}', [EquipmentController::class, 'show'])
+                ->whereNumber('equipment')->name('equipment.show');
+            Route::put('equipment/{equipment}', [EquipmentController::class, 'update'])
+                ->whereNumber('equipment')->name('equipment.update');
+            Route::post('equipment/{equipment}/checks', [EquipmentController::class, 'check'])
+                ->whereNumber('equipment')->name('equipment.checks.store');
+            Route::post('equipment/{equipment}/repairs', [EquipmentController::class, 'repair'])
+                ->whereNumber('equipment')->name('equipment.repairs.store');
+            Route::put('equipment/repairs/{repair}', [EquipmentController::class, 'repairUpdate'])
+                ->whereNumber('repair')->name('equipment.repairs.update');
 
             // 导入（M1-11~M1-14：模板下载 / 上传校验 / 预览 / 确认入库）
             Route::prefix('import')->name('import.')->group(function () {

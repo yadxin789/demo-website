@@ -8,6 +8,7 @@ use App\Modules\Mes\Models\ApsSchedule;
 use App\Modules\Mes\Models\Defect;
 use App\Modules\Mes\Models\Equipment;
 use App\Modules\Mes\Models\EquipmentCheck;
+use App\Modules\Mes\Models\EquipmentRepair;
 use App\Modules\Mes\Models\Inspection;
 use App\Modules\Mes\Models\InspectionResult;
 use App\Modules\Mes\Models\InspectionTemplate;
@@ -140,6 +141,8 @@ class DemoSeeder extends Seeder
     private function seedEquipments(): void
     {
         $centers = WorkCenter::query()->get()->keyBy('code');
+        $admin = User::query()->where('email', 'admin@mes.demo')->first();
+        $eqUser = User::query()->where('email', 'eq@mes.demo')->first() ?: $admin;
 
         $defs = [
             ['EQ-SMT-01', 'SMT 贴片机 YAMAHA', 'WC-SMT', 'running'],
@@ -150,6 +153,10 @@ class DemoSeeder extends Seeder
             ['EQ-TST-01', '在线功能测试台 FCT-1', 'WC-TST', 'running'],
             ['EQ-TST-02', '老化测试柜', 'WC-TST', 'idle'],
             ['EQ-TST-03', '自动包装线', 'WC-TST', 'running'],
+            ['EQ-SMT-03', '全自动锡膏印刷机', 'WC-SMT', 'repairing'],
+            ['EQ-THT-02', '选择性波峰焊', 'WC-THT', 'running'],
+            ['EQ-ASM-03', '精密点胶机', 'WC-ASM', 'running'],
+            ['EQ-TST-04', 'X-Ray 检测机', 'WC-TST', 'running'],
         ];
 
         foreach ($defs as [$code, $name, $wcCode, $status]) {
@@ -165,11 +172,48 @@ class DemoSeeder extends Seeder
                 ]
             );
 
-            // 每台设备一条最近点检记录
-            EquipmentCheck::query()->firstOrCreate(
-                ['equipment_id' => $eq->id, 'checked_at' => now()->subDays(3)->startOfDay()],
-                ['result' => $code === 'EQ-ASM-02' ? 'ng' : 'ok', 'remark' => $code === 'EQ-ASM-02' ? '气压偏低，已报修' : '正常']
-            );
+            // 每台设备近 5 天各一条点检（共 60 条），异常记录留给有故障的机台
+            for ($d = 4; $d >= 0; $d--) {
+                EquipmentCheck::query()->create([
+                    'equipment_id' => $eq->id,
+                    'checked_at' => now()->subDays($d)->setTime(8, 30),
+                    'checker_id' => $eqUser?->id,
+                    'result' => ($code === 'EQ-ASM-02' && $d === 0) ? 'ng' : 'ok',
+                    'remark' => ($code === 'EQ-ASM-02' && $d === 0)
+                        ? '气压偏低，压装不到位，已报修'
+                        : '气压 / 油位 / 温度 / 异响 四项正常',
+                ]);
+            }
+
+            $eq->update(['last_check_at' => now()->setTime(8, 30)]);
+        }
+
+        // 5 张报修：2 张未闭环（对应两台维修中设备），其余已修复或关单
+        $repairs = [
+            ['EQ-SMT-01', '吸嘴真空不足，抛料率偏高', 'fixed', 45],
+            ['EQ-ASM-02', '气压偏低，压装不到位', 'handling', 120],
+            ['EQ-SMT-03', '刮刀磨损，印刷厚度不均', 'handling', 0],
+            ['EQ-THT-01', '预热区加热管损坏，整机停机', 'closed', 320],
+            ['EQ-TST-02', '测试治具接触不良，误判率高', 'fixed', 60],
+        ];
+
+        foreach ($repairs as [$code, $desc, $repairStatus, $down]) {
+            $eq = Equipment::query()->where('code', $code)->first();
+            if (! $eq) {
+                continue;
+            }
+
+            $closed = in_array($repairStatus, ['fixed', 'closed'], true);
+
+            EquipmentRepair::query()->create([
+                'equipment_id' => $eq->id,
+                'fault_desc' => $desc,
+                'reported_by' => $admin?->id,
+                'handler_id' => $eqUser?->id,
+                'down_minutes' => $down,
+                'status' => $repairStatus,
+                'fixed_at' => $closed ? now()->subDays(1) : null,
+            ]);
         }
     }
 
