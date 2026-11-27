@@ -23,7 +23,7 @@ $products = @(
     @{ Code = 'pm';   Field = 'username'; Protected = 'pm/dashboard';   Account = 'admin@hr.demo' },
     @{ Code = 'shop'; Field = 'username'; Protected = 'shop/dashboard'; Account = 'admin@hr.demo' },
     @{ Code = 'mes';  Field = 'account';  Protected = 'mes/dashboard';  Account = 'admin@hr.demo' },
-    @{ Code = 'hr';   Field = 'account';  Protected = 'hr/dashboard';   Account = 'admin' }
+    @{ Code = 'hr';   Field = 'account';  Protected = 'hr/dashboard';   Account = 'admin@erp.demo' }
 )
 
 $temp = Join-Path $env:TEMP ('cross-' + [guid]::NewGuid().ToString('N').Substring(0, 8))

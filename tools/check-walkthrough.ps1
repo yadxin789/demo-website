@@ -45,8 +45,9 @@ $cardCount = ([regex]::Matches($text, 'class="p-card"')).Count
 if ($cardCount -eq 5) { Pass '首页 5 张产品卡' } else { Fail "首页卡片数量 $cardCount（应为 5）" }
 
 foreach ($p in $products) {
-    if ($text -match ('/' + $p.Code + '/preview')) { Pass ("{0,-5} 卡片链到 /{0}/preview" -f $p.Code) }
-    else { Fail ("{0,-5} 首页没有链到 preview" -f $p.Code) }
+    # S8 起：门户卡片直接进产品对外首页（route('{code}.root')，通常不带尾斜杠）
+    if ($text -match ('href="[^"]*/' + $p.Code + '"')) { Pass ("{0,-5} 卡片链到 /{0} 产品首页" -f $p.Code) }
+    else { Fail ("{0,-5} 首页没有链到产品首页 /{0}" -f $p.Code) }
 }
 
 # 2. 产品介绍页

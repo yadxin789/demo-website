@@ -26,7 +26,8 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Department::create($dept);
+            // 幂等：deploy 可重复执行（code 是唯一键，重复跑不再撞 UNIQUE）
+            Department::updateOrCreate(['code' => $dept['code']], $dept);
         }
     }
 }

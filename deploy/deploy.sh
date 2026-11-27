@@ -112,12 +112,17 @@ for p in "${PRODUCTS[@]}"; do
     --force --no-interaction
 done
 
-# ---- 3. 种子 ----
+# ---- 3. 种子（幂等保护：库已初始化则跳过，避免重复跑撞 UNIQUE）----
 for p in "${PRODUCTS[@]}"; do
-  log "种子 ${p}（角色 / 权限 / 演示账号 / 基线数据）"
-  "$PHP_BIN" artisan db:seed \
-    --class="App\\Modules\\${TITLE[$p]}\\Database\\Seeders\\DatabaseSeeder" \
-    --database="$p" --force --no-interaction
+  cnt=$("$PHP_BIN" artisan tinker --execute="echo \App\Modules\\${TITLE[$p]}\Models\User::query()->count();" 2>/dev/null | tr -dc '0-9')
+  if [ -z "$cnt" ] || [ "$cnt" -eq 0 ]; then
+    log "种子 ${p}（角色 / 权限 / 演示账号 / 基线数据）"
+    "$PHP_BIN" artisan db:seed \
+      --class="App\\Modules\\${TITLE[$p]}\\Database\\Seeders\\DatabaseSeeder" \
+      --database="$p" --force --no-interaction
+  else
+    warn "${p} 库已有 ${cnt} 个账号，跳过种子（要重灌先清库；增量数据用单独 seeder 跑）"
+  fi
 done
 
 if [ "$MODE" = "demo" ]; then

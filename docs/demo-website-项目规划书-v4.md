@@ -497,16 +497,45 @@ Shop 基线（`E:\erp-shop`）核对项：POS 收银、商品/分类/单位/税�
 ### 12.10 目录增量（相对 v3）
 
 ```
-resources/views/shared/                        # 新增：五产品共用外框
-  shell.blade.php
-  partials/{sidebar,topbar,flash,footer}.blade.php
-public/assets/shared/css/shell.css             # 新增：外框样式
-app/Modules/{Erp,Pm,Shop,Mes,Hr}/Resources/views/{p}/index.blade.php   # 新增：五产品对外首页
-app/Modules/Mes/{Models,Http/Controllers/Admin}/                       # 新增：用户/部门/岗位/角色
-app/Modules/Hr/Http/Controllers/Org/                                   # 补齐：部门/岗位 CRUD
-app/Modules/Mes/Database/Migrations/*_add_username_position_to_users.php
-app/Modules/Hr/Database/Migrations/*_add_username_to_users.php
-app/Modules/Pm/Database/Migrations/*_add_email_to_users.php
-tools/check-parity.php                         # 新增：参考项目对账
+resources/views/shared/
+  landing.blade.php                             # 新增：五产品共用对外首页骨架
+public/assets/shared/css/landing.css            # 新增：首页皮肤
+public/assets/shared/css/shell.css              # 新增：五产品统一外框皮肤
+app/Modules/{Erp,Pm,Shop,Mes,Hr}/Resources/views/landing.blade.php      # 新增：五产品对外首页
+app/Modules/{Erp,Pm,Shop,Mes,Hr}/Http/Controllers/LandingController.php # 新增：首页入口
+app/Modules/Mes/Models/{Department,Position}.php                        # 新增
+app/Modules/Mes/Http/Controllers/System/{Department,Position}Controller.php  # 新增
+app/Modules/Mes/Resources/views/system/{departments,positions}/         # 新增
+app/Modules/Mes/Database/Migrations/*_create_mes_org_tables.php         # 新增
+app/Modules/Mes/Database/Seeders/OrgSeeder.php                          # 新增
+app/Modules/Hr/Resources/views/system/user-form.blade.php               # 新增
+app/Modules/{Pm,Mes,Hr}/Database/Migrations/*_add_{email,username}_to_users.php  # 新增
+tools/check-parity.php                          # 新增：参考项目对账
+tools/smoke-{mes,hr}-system.ps1                 # 新增：后台 CRUD 冒烟
+tools/smoke-online{,-login,-admin}.ps1          # 新增：线上验收
 ```
+
+### 12.11 上线记录与两个必须记住的坑（2026-11-27）
+
+部署方式：本地 `tar` 打包 → `scp` 到 `/tmp` → 服务器解包覆盖 → `bash deploy/deploy.sh demo`。
+
+**坑 1（严重）：打包必须排除 `.env`。**
+首次打包未排除 `.env`，线上 `.env` 被本地同名文件覆盖，`APP_KEY` 随之改变；ERP 库里用旧 key 加密的 `platform_instances.credentials_json` 解不开，seeder 在 `EcomDemoSeeder` 处抛出 `The MAC is invalid`。旧 `.env` 与旧站一起被删，密钥不可恢复。
+处置：清空该加密列（1 条记录）后由 seeder 用当前 key 重建；其余加密列（`ecom_platforms` / `ai_providers` / `wecom_configs` / `users.mfa_secret` / Shop 支付密钥）线上均无密文，无需处理。
+结论：**打包命令必须带 `--exclude '.env' --exclude '.env.*'`；`.env` 只能由服务器本地维护。**
+
+**坑 2：`deploy.sh` 的全量 seed 不幂等。**
+库已初始化时再跑 `db:seed DatabaseSeeder` 会在 `Pm\DepartmentSeeder`（`departments.code` 唯一键）撞 `UNIQUE constraint failed`。已改为：先数 `users` 表行数，>0 就跳过种子并提示"要重灌先清库"；增量数据用单独 seeder 跑（本次 MES 的 `OrgSeeder` 就是单独执行的）。
+
+**坑 3：新加的登录列必须回填，否则"用户名登录"看似失效。**
+S9 的三张迁移只加列不回填 —— 线上历史账号 `email`/`username` 为空，表现为"用邮箱登录被弹回登录页、用户名登录却正常"。回填规则：`email` 空 → `{username}@{产品}.demo`；`username` 空 → email 前缀（重名加序号）。回填后五产品 10 种组合（用户名/邮箱 × 5）全部落点正确、看板 200。
+
+线上验收结果（`tools/smoke-online*.ps1`）：
+
+- 门户 `/`：200，命中五张产品卡、邮箱、微信、备案位；不含"一个站点"、不含"电话"。
+- 五个对外首页 `/erp/ /pm/ /shop/ /mes/ /hr/`：各 200，标题与产品一致。
+- 五个登录页：都含「邮箱或用户名」。
+- 登录 10 种组合：全部 302 → 对应看板 200。
+- MES 后台：`system/departments`、`system/positions`、`system/users`、`users/create`、`system/roles` 全 200。
+- HR 后台：`system/users`、`users/create`、`system/roles`、`org/departments`、`org/positions` 全 200。
 
