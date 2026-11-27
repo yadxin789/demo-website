@@ -30,6 +30,9 @@
             <a class="{{ request()->routeIs('mes.reports.*') ? 'on' : '' }}" href="{{ route('mes.reports.index') }}">
                 <i class="fa-solid fa-clock-rotate-left"></i> 报工记录
             </a>
+            <a class="{{ request()->routeIs('mes.issues.*') ? 'on' : '' }}" href="{{ route('mes.issues.index') }}">
+                <i class="fa-solid fa-boxes-stacked"></i> 领料发料
+            </a>
             <a class="{{ request()->routeIs('mes.kanban') ? 'on' : '' }}" href="{{ route('mes.kanban') }}">
                 <i class="fa-solid fa-tv"></i> 车间看板
             </a>

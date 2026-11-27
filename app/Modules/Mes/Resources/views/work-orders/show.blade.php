@@ -80,6 +80,16 @@
             @if (! in_array($order->status, ['completed', 'closed'], true))
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal">修改数量 / 日期</button>
             @endif
+            @if ($order->issues->isNotEmpty())
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('mes.issues.show', $order->issues->first()) }}">
+                    领料单 {{ $order->issues->first()->issue_no }}
+                </a>
+            @elseif ($order->bom && ! in_array($order->status, ['draft', 'closed'], true))
+                <form method="post" action="{{ route('mes.work-orders.issues.store', $order) }}">
+                    @csrf
+                    <button class="btn btn-sm btn-outline-secondary">生成领料单</button>
+                </form>
+            @endif
             <a class="btn btn-sm btn-outline-secondary" href="{{ route('mes.kanban') }}">去车间看板</a>
         </div>
     </div>
@@ -102,6 +112,23 @@
         <div class="mes-card" style="margin-bottom:14px; border-left:4px solid #2f9e44; padding:12px 16px">
             <span class="mes-badge b-done">齐套</span>
             <span style="font-size:13px; color:#4a5568; margin-left:8px">按 BOM 核算，这张单要的料现有库存都够。</span>
+        </div>
+    @endif
+
+    @php $issue = $order->issues->first(); @endphp
+    @if ($issue && $issue->status !== 'issued')
+        @php
+            $ireq = (float) $issue->lines->sum('required_qty');
+            $igot = (float) $issue->lines->sum('issued_qty');
+            $irate = $ireq > 0 ? (int) round($igot / $ireq * 100) : 0;
+        @endphp
+        <div class="mes-card" style="margin-bottom:14px; border-left:4px solid #f08c00; padding:12px 16px">
+            <span class="mes-badge b-progress">领料未发齐</span>
+            <span style="font-size:13px; color:#4a5568; margin-left:8px">
+                领料单
+                <a href="{{ route('mes.issues.show', $issue) }}" style="color:#16233f; font-weight:600">{{ $issue->issue_no }}</a>
+                只发了 {{ $irate }}%，产线这道单在等料，发齐才能连续生产。
+            </span>
         </div>
     @endif
 

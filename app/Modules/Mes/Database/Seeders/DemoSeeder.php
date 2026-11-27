@@ -283,8 +283,9 @@ class DemoSeeder extends Seeder
         }
 
         // ---- 领料（除草稿外都要领料；0011 故意只发一半，制造缺料停线）----
+        // 0004/0005 两张已下达的单故意不建领料单，留给演示"工单详情一键生成领料单"
         $wo->issues()->delete();
-        if ($status !== 'draft' && $bom) {
+        if ($status !== 'draft' && $bom && ! in_array($seq, [4, 5], true)) {
             /** @var MaterialIssue $issue */
             $issue = MaterialIssue::query()->create([
                 'issue_no' => 'MI-'.substr($orderNo, 3),

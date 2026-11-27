@@ -21,6 +21,7 @@ use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
 use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
 use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
+use App\Modules\Mes\Http\Controllers\MaterialIssueController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
@@ -64,6 +65,15 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                 ->whereNumber('workOrder')->whereNumber('operation')->name('work-orders.operations.dispatch');
             Route::post('work-orders/{workOrder}/operations/{operation}/report', [WorkOrderController::class, 'report'])
                 ->whereNumber('workOrder')->whereNumber('operation')->name('work-orders.operations.report');
+            Route::post('work-orders/{workOrder}/issues', [MaterialIssueController::class, 'store'])
+                ->whereNumber('workOrder')->name('work-orders.issues.store');
+
+            // 领料发料（M3）
+            Route::get('issues', [MaterialIssueController::class, 'index'])->name('issues.index');
+            Route::get('issues/{issue}', [MaterialIssueController::class, 'show'])
+                ->whereNumber('issue')->name('issues.show');
+            Route::post('issues/{issue}/issue', [MaterialIssueController::class, 'issue'])
+                ->whereNumber('issue')->name('issues.issue');
 
             // 报工流水（M3）
             Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
