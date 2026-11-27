@@ -615,6 +615,11 @@ PM 那 2 条是形式差异：`/admin/departments/{id}`、`/admin/roles/{id}` �
 
 **12.12.6 回归结果**
 
-`guard.ps1` 17/0（G-13 全量 1583 个文件 `php -l` 通过）、视觉 45/0、独立性 31/0、人设 10/0、交叉登录 5/0、走查 17/0；`check-http.ps1` 新增 10 项固定清单（MES 5 + HR 5），项数 60 → 70。
+`guard.ps1` 17/0（G-13 全量 1583 个文件 `php -l` 通过）、视觉 45/0、独立性 31/0、人设 10/0、交叉登录 5/0、走查 17/0；`check-http.ps1` 新增 10 项固定清单（MES 5 + HR 5），项数 60 → 70，实测 **70/0**。
+
+**12.12.7 上线（2026-11-27 16:50）**
+
+`c7a971b` 打包（排除 `.env` 与 `database/*.sqlite`）→ `scp` → 服务器解包 → `deploy.sh demo`。两套新迁移在线上均为 `Ran`；库已有账号，种子按设计跳过，增量数据单独执行 `CompletionSeeder` 与 `TrainingSkillSeeder` 后：`lots=16 / plans=6 / courses=6 / roster=150`。线上 10 个新页面（MES 完工入库、保养计划、保养单、批次追溯、OEE；HR 培训、技能矩阵、证书台账、排班表、我的自助）全部 200。
+
 
 
