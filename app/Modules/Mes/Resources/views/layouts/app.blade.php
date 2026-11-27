@@ -88,10 +88,18 @@
                 <i class="fa-solid fa-file-import"></i> Excel 导入
             </a>
 
-            <div class="grp">系统</div>
-            <a class="{{ request()->routeIs('mes.system.users.*') ? 'on' : '' }}" href="{{ route('mes.system.users.index') }}">
-                <i class="fa-solid fa-users"></i> 账号
-            </a>
+            @if (auth('mes')->user()?->hasRole('admin'))
+                <div class="grp">系统</div>
+                <a class="{{ request()->routeIs('mes.system.users.*') ? 'on' : '' }}" href="{{ route('mes.system.users.index') }}">
+                    <i class="fa-solid fa-users"></i> 账号
+                </a>
+                <a class="{{ request()->routeIs('mes.system.roles.*') ? 'on' : '' }}" href="{{ route('mes.system.roles.index') }}">
+                    <i class="fa-solid fa-user-shield"></i> 角色权限
+                </a>
+                <a class="{{ request()->routeIs('mes.system.notifications.*') ? 'on' : '' }}" href="{{ route('mes.system.notifications.index') }}">
+                    <i class="fa-solid fa-bell"></i> 站内通知
+                </a>
+            @endif
         </nav>
     </aside>
 

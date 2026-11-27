@@ -33,6 +33,9 @@ use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\Reports\LaborController;
 use App\Modules\Mes\Http\Controllers\Reports\OutputController;
 use App\Modules\Mes\Http\Controllers\Reports\YieldController;
+use App\Modules\Mes\Http\Controllers\System\NotificationController as SystemNotificationController;
+use App\Modules\Mes\Http\Controllers\System\RoleController as SystemRoleController;
+use App\Modules\Mes\Http\Controllers\System\UserController as SystemUserController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -191,7 +194,14 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
                 Route::delete('{type}/preview', [ImportController::class, 'discard'])->name('discard');
             });
 
-            // 系统（M6 替换）
-            Route::get('system/users', [PlaceholderController::class, 'show'])->name('system.users.index');
+            // 系统（M6-04）：账号 / 角色权限 / 站内通知
+            Route::prefix('system')->name('system.')->group(function () {
+                Route::get('users', [SystemUserController::class, 'index'])->name('users.index');
+                Route::put('users/{user}', [SystemUserController::class, 'update'])
+                    ->whereNumber('user')->name('users.update');
+                Route::get('roles', [SystemRoleController::class, 'index'])->name('roles.index');
+                Route::put('roles/{role}', [SystemRoleController::class, 'update'])->name('roles.update');
+                Route::get('notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');
+            });
         });
     });
