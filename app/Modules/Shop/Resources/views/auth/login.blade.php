@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset(config('shop.assets.bootstrap.css')) }}">
     <link rel="stylesheet" href="{{ asset(config('shop.assets.fontawesome.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/shop/css/shop.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
 </head>
 <body>
     <main class="d-flex align-items-center justify-content-center" style="min-block-size:100vh;" role="main">

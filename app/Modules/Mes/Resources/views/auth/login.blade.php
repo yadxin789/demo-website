@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('assets/mes/vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/mes/vendor/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/mes/mes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
 </head>
 <body class="mes-body">
 <div class="mes-login-wrap">

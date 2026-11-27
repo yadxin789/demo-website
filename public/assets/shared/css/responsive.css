@@ -48,6 +48,13 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
     .pagination { flex-wrap: wrap; }
 }
 
+/* 登录卡片（窄屏留白，避免贴边） */
+@media (max-width: 575.98px) {
+    .login-card, .auth-card { max-width: calc(100vw - 24px) !important; margin: 12px; }
+    .login-card .card-body, .auth-card .card-body { padding: 1.25rem 1rem; }
+    .demo-accounts { font-size: .75rem; }
+}
+
 /* ---------------- ERP（.sidebar 固定列） ---------------- */
 @media (max-width: 991.98px) {
     .app-wrapper .sidebar {

@@ -39,6 +39,7 @@
             color: #667eea !important;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
 </head>
 <body>
     <div class="container login-container">

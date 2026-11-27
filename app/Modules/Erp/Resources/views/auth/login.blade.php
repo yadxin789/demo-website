@@ -37,6 +37,7 @@
             font-size: .8rem; color: #64748b;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
 </head>
 <body>
 <div class="card login-card">

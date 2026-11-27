@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('assets/hr/vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/hr/vendor/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/hr/hr.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
 </head>
 <body>
 <div class="hr-login-wrap">
