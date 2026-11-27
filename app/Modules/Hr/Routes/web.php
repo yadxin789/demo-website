@@ -23,6 +23,7 @@ use App\Modules\Hr\Http\Controllers\MovementController;
 use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
 use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
 use App\Modules\Hr\Http\Controllers\Org\PositionController;
+use App\Modules\Hr\Http\Controllers\PayrollController;
 use App\Modules\Hr\Http\Controllers\PlaceholderController;
 use Illuminate\Support\Facades\Route;
 
@@ -112,9 +113,23 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::get('leaves/balances', [LeaveController::class, 'balances'])->name('leaves.balances');
 
             // H4 薪资
-            Route::get('payroll/structures', [PlaceholderController::class, 'show'])->name('payroll.structures');
-            Route::get('payroll/runs', [PlaceholderController::class, 'show'])->name('payroll.runs.index');
-            Route::get('payroll/my', [PlaceholderController::class, 'show'])->name('payroll.my');
+            Route::get('payroll/structures', [PayrollController::class, 'structures'])->name('payroll.structures');
+            Route::post('payroll/structures', [PayrollController::class, 'structureStore'])->name('payroll.structures.store');
+            Route::put('payroll/structures/{structure}', [PayrollController::class, 'structureUpdate'])
+                ->whereNumber('structure')->name('payroll.structures.update');
+
+            Route::get('payroll/runs', [PayrollController::class, 'runs'])->name('payroll.runs.index');
+            Route::post('payroll/runs/generate', [PayrollController::class, 'generate'])->name('payroll.runs.generate');
+            Route::get('payroll/runs/{run}', [PayrollController::class, 'runShow'])
+                ->whereNumber('run')->name('payroll.runs.show');
+            Route::get('payroll/runs/{run}/export', [PayrollController::class, 'runExport'])
+                ->whereNumber('run')->name('payroll.runs.export');
+            Route::post('payroll/runs/{run}/confirm', [PayrollController::class, 'runConfirm'])
+                ->whereNumber('run')->name('payroll.runs.confirm');
+            Route::post('payroll/runs/{run}/pay', [PayrollController::class, 'runPay'])
+                ->whereNumber('run')->name('payroll.runs.pay');
+
+            Route::get('payroll/my', [PayrollController::class, 'my'])->name('payroll.my');
 
             // H5 招聘与绩效
             Route::get('recruit/requisitions', [PlaceholderController::class, 'show'])->name('recruit.requisitions');
