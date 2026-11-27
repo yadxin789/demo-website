@@ -1,4 +1,4 @@
-@extends('erp::layouts.admin')
+@extends('system.layout')
 
 @section('title', '研发任务类型维护')
 

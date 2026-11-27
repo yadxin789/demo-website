@@ -564,3 +564,36 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 ### E. 遗留（2 项）
 - [ ] S16-E01 含参 125 条详情页未全量自动巡检（参数类型异构，固定 id 会造假 404），本轮抽样 60 条
 - [ ] S16-E02 PM 知识库当前 0 条文档，演示页为空态（功能齐、缺演示数据，待补种子）
+
+---
+
+## S17 演示数据覆盖 + 五系统管理后台统一
+
+目标：演示数据达到"每个岗位都有账号、每类单据都有链路"；五套系统的 `/{产品}/admin` 后台只做系统管理、不带任何业务入口。
+
+### A. 演示数据覆盖（6 项）
+- [x] S17-A01 统一口径写入规划书 12.15：用户覆盖岗位、数据覆盖场景、允许虚拟企业名、幂等、可复跑
+- [x] S17-A02 页面静态文案去真实公司名：49 个文件 59 处，另把 11 行库内企业名快照改为"演示××"虚构名（`tools/purge-real-company-names.php`）
+- [x] S17-A03 ERP 覆盖种子三批（`DemoCoverageSeeder` / `DemoCoverageExtraSeeder` / `DemoCoverageFinalSeeder`），空列表 94 → 25
+- [x] S17-A04 PM 覆盖种子（`DemoCoverageSeeder` 12 个方法），空列表 38 → 24
+- [x] S17-A05 Shop 覆盖种子（`DemoCoverageSeeder` 7 个方法，含 POS 开班），空列表 20 → 19
+- [x] S17-A06 状态枚举归一（`tools/normalize-demo-status.php`）+ 审批代批人（`tools/patch-approval-delegates.php`），本地与线上各跑一次
+
+### B. 管理后台统一（7 项）
+- [x] S17-B01 统一皮肤 `resources/views/system/layout.blade.php`：深色侧栏、固定 8 项后台菜单、扩展维护组、返回门户与退出
+- [x] S17-B02 统一控制器 `SystemConsoleController` + 适配层 `SystemConsole`（探测五库的用户 / 部门 / 岗位 / 角色列名并归一化）
+- [x] S17-B03 统一路由：`/{产品}/admin`（首页 / 用户 / 部门 / 岗位 / 角色 / AI 导入引导 / 运维监控 / 系统设置），已被模块占用的路径沿用原页面
+- [x] S17-B04 41 个原后台视图 `@extends` 切到 `system.layout`，后台侧栏不再混入前台业务菜单
+- [x] S17-B05 Shop 新建 `departments` / `positions` 并给 `users` 加归属列；PM 新建 `positions` 并加 `position_id`（迁移 + `OrgDemoSeeder`）
+- [x] S17-B06 后台菜单补齐：ERP 新增用户 / 角色 / 运维 / 设置；PM 新增岗位 / AI 引导 / 运维 / 设置；Shop 从 0 建全套；MES / HR 新增 AI 引导 / 运维 / 设置
+- [x] S17-B07 访问控制：仅 admin 或角色含 admin/super/sys 可进后台，其余 403
+
+### C. 验证（3 项）
+- [x] S17-C01 本地探测 46 个后台页面全 200（`tools/probe-admin-all.ps1`）
+- [x] S17-C02 侧栏核对：五系统均 8 项固定菜单 + 各自扩展项（ERP 11 / PM 12 / Shop 11 / MES 9 / HR 9）
+- [x] S17-C03 后台页面无业务入口链接（扫描渲染 HTML 中的 `/erp/sales`、`/pm/project`、`/shop/pos`、`/mes/work-orders`、`/hr/employees` 等）
+
+### D. 交付
+- [x] S17-D01 提交并推送 main
+- [x] S17-D02 线上部署：迁移 + 组织种子 + 配置缓存，reload php-fpm / nginx
+- [x] S17-D03 线上冒烟：五系统登录与后台页面、业务关键页全绿

@@ -1,4 +1,4 @@
-@extends('hr::layouts.app')
+@extends('system.layout')
 
 @section('title', '站内通知')
 @section('sub', '通知只发给本产品账号，不跨产品')

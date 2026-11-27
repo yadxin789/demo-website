@@ -1,4 +1,4 @@
-@extends('pm::layouts.app')
+@extends('system.layout')
 
 @section('title', '已删除用户')
 

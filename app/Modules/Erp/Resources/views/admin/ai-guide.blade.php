@@ -1,4 +1,4 @@
-@extends('erp::layouts.admin')
+@extends('system.layout')
 
 @section('title', 'AI 开通与设置')
 

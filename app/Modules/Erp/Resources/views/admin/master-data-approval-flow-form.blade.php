@@ -1,4 +1,4 @@
-@extends('erp::layouts.admin')
+@extends('system.layout')
 
 @section('title', $flow ? '编辑审批流程' : '新增审批流程')
 

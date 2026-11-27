@@ -1,4 +1,4 @@
-@extends('erp::layouts.admin')
+@extends('system.layout')
 
 @section('title', '单据编号规则')
 

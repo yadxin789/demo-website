@@ -1,4 +1,4 @@
-@extends('hr::layouts.app')
+@extends('system.layout')
 
 @section('title', '账号管理')
 @section('sub', '账号的新建、编辑、角色与启停；角色按 guard「hr」隔离')

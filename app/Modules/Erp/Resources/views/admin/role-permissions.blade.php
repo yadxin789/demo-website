@@ -1,4 +1,4 @@
-@extends('erp::layouts.admin')
+@extends('system.layout')
 
 @section('title', '角色授权 · ' . \App\Modules\Erp\Support\DisplayText::role($role->name))
 

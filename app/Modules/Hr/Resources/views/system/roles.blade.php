@@ -1,4 +1,4 @@
-@extends('hr::layouts.app')
+@extends('system.layout')
 
 @section('title', '角色权限')
 @section('sub', '5 个角色 × 17 项权限，勾选即生效')

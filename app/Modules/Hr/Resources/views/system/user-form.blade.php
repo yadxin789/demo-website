@@ -1,4 +1,4 @@
-@extends('hr::layouts.app')
+@extends('system.layout')
 
 @php
     $isEdit = $mode === 'edit';
