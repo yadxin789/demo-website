@@ -1,0 +1,154 @@
+/* 移动端适配层（S19）
+   目标：≤991.98px（手机 / 竖屏平板）下
+   1) 侧栏从"占一列"改为抽屉，点按钮滑出、点遮罩关闭；
+   2) 表格统一横向滚动，不撑破页面；
+   3) 顶栏、卡片、表单留白收紧，触摸目标放大。
+   桌面端（≥992px）不受影响：所有规则都在媒体查询内。 */
+
+/* ---------------- 基础 ---------------- */
+html { -webkit-text-size-adjust: 100%; }
+img, svg, video, canvas { max-width: 100%; height: auto; }
+
+@media (max-width: 991.98px) {
+    body.nav-open { overflow: hidden; }
+
+    .nav-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, .45);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .2s ease;
+        z-index: 1050;
+    }
+    .nav-backdrop.show { opacity: 1; visibility: visible; }
+
+    /* 卡片与内容区留白收紧 */
+    .content { padding: 14px !important; }
+    .app-main { padding: 12px !important; }
+    .mes-main, .hr-main { padding: 12px !important; }
+
+    /* 顶栏按钮与标题压缩 */
+    .topbar { padding-inline: 12px !important; min-height: 56px; }
+    .topbar .page-title { font-size: 15px; }
+    .topbar-actions .topbar-icon span.d-none { display: none !important; }
+
+    /* 表格：未包 table-responsive 的自动包裹（JS 兜底），已有的直接滚动 */
+    .table-responsive { -webkit-overflow-scrolling: touch; }
+    table.table { white-space: nowrap; }
+
+    /* 按钮组、工具栏允许换行 */
+    .d-flex.gap-2:has(> .btn) { flex-wrap: wrap; }
+
+    /* 表单控件触摸高度 */
+    .form-control, .form-select, .btn { min-height: 38px; }
+    .btn-sm { min-height: 32px; }
+
+    /* 分页、筛选行 */
+    .pagination { flex-wrap: wrap; }
+}
+
+/* ---------------- ERP（.sidebar 固定列） ---------------- */
+@media (max-width: 991.98px) {
+    .app-wrapper .sidebar {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(282px, 86vw) !important;
+        margin-left: 0 !important;
+        transform: translateX(-104%);
+        transition: transform .22s ease;
+        z-index: 1055;
+        overflow-y: auto;
+        box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
+    }
+    .app-wrapper .sidebar.show { transform: none; }
+    .main-content { margin-left: 0 !important; width: 100%; }
+}
+
+/* ---------------- Shop（grid 两列） ---------------- */
+@media (max-width: 991.98px) {
+    .app-shell { display: block !important; }
+    .app-sidebar {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(270px, 86vw) !important;
+        transform: translateX(-104%);
+        transition: transform .22s ease;
+        z-index: 1055;
+        overflow-y: auto;
+        box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
+    }
+    .app-sidebar.is-open { transform: none; }
+    #app-sidebar, .app-sidebar { display: block; }
+}
+
+/* ---------------- MES / HR（flex 两列） ---------------- */
+@media (max-width: 991.98px) {
+    .mes-shell, .hr-shell { flex-direction: row !important; }
+    .mes-side, .hr-side {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(270px, 86vw) !important;
+        height: auto !important;
+        flex: none;
+        transform: translateX(-104%);
+        transition: transform .22s ease;
+        z-index: 1055;
+        overflow-y: auto;
+        box-shadow: 12px 0 32px rgba(0, 0, 0, .28);
+        padding-bottom: 24px;
+    }
+    .mes-side.is-open, .hr-side.is-open { transform: none; }
+    .mes-nav, .hr-nav { display: flex !important; flex-direction: column; gap: 2px; }
+    .mes-nav .grp, .hr-nav .grp { grid-column: auto; }
+    .mes-main, .hr-main { width: 100%; min-width: 0; }
+}
+
+/* ---------------- 系统管理后台（.sys-side） ---------------- */
+@media (max-width: 900px) {
+    .sys-side {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        width: min(260px, 86vw) !important;
+        transform: translateX(-104%);
+        transition: transform .22s ease;
+        z-index: 1055;
+        overflow-y: auto;
+    }
+    .sys-side.is-open { transform: none; }
+    .sys-main { margin-left: 0 !important; }
+    .sys-top { padding: 10px 14px !important; }
+    .sys-top .s { display: none; }
+    .sys-body { padding: 14px !important; }
+}
+
+/* ---------------- 移动端抽屉按钮 ---------------- */
+.mobile-nav-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1060;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid rgba(15, 23, 42, .12);
+    background: #fff;
+    color: #1f2937;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, .12);
+}
+@media (max-width: 991.98px) {
+    .mobile-nav-toggle.is-needed { display: inline-flex; }
+    /* 抽屉按钮占位，避免压住标题 */
+    body.has-mobile-toggle .topbar,
+    body.has-mobile-toggle .mes-main-head { padding-left: 56px; }
+}

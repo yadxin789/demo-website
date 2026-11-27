@@ -7,6 +7,9 @@
     <title>关于与合规 · {{ config('portal.name') }}</title>
     <meta name="description" content="本站是一个企业管理系统演示站：五套独立系统并列展示，全部数据为虚构。这里是站点主体信息、隐私说明与备案信息。">
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body class="pv-body">
     <header class="p-header">

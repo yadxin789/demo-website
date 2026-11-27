@@ -7,6 +7,9 @@
     <title>产品演示中心 · 企业管理系统演示</title>
     <meta name="description" content="五套企业管理系统演示：制造 ERP、研发项目管理、百货零售 POS、车间 MES、人事 HR。">
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body>
     <header class="p-header">

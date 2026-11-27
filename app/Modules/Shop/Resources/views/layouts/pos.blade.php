@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ asset(config('shop.assets.fontawesome.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/shop/css/shop.css') }}">
     @stack('styles')
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body class="pos-body">
     <a href="#pos-main" class="skip-link">跳转到收银台</a>

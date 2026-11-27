@@ -62,6 +62,9 @@
         @media (max-width: 900px) { .sys-side { position: static; width: auto; } .sys-main { margin-left: 0; } }
     </style>
     @stack('styles')
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body>
 <aside class="sys-side">

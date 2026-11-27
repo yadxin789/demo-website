@@ -12,6 +12,9 @@
     {{-- 五产品统一外框皮肤（S10）：放在最后加载，覆盖本产品自带样式 --}}
     <style>:root { --brand: {{ config('products.products.hr.theme.primary') }}; --brand-dark: {{ config('products.products.hr.theme.accent') }}; }</style>
     <link rel="stylesheet" href="{{ asset('assets/shared/css/shell.css') }}">
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body class="hr-body">
 <div class="hr-shell">

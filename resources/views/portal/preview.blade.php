@@ -7,6 +7,9 @@
     <title>{{ $p['label'] }} · 产品介绍</title>
     <meta name="description" content="{{ $p['short'] }} — {{ $p['tagline'] }}。独立登录入口、独立数据库、独立界面，演示账号密码 123456。">
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body class="pv-body" style="--c: {{ $p['theme']['primary'] }}">
     <header class="p-header">

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>页面不存在</title>
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
+    {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
+    <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body>
     <main class="p-wrap p-main" style="text-align:center; padding-top:96px;">
