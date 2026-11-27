@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Core\Http\Controllers\LeadController;
 use App\Core\Http\Controllers\PortalController;
 use App\Core\Http\Controllers\PreviewController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [PortalController::class, 'home'])->name('portal.home');
+
+// 线索捕获（S7-12）：只写 portal.sqlite 的 leads 表
+Route::post('lead', [LeadController::class, 'store'])
+    ->middleware('throttle:5,10')
+    ->name('portal.lead.store');
+
+// 关于与合规（S7-13）：备案信息、隐私说明、联系方式
+Route::get('about', [PortalController::class, 'about'])->name('portal.about');
 
 foreach (config('products.products', []) as $code => $product) {
     if (($product['enabled'] ?? false) !== true) {

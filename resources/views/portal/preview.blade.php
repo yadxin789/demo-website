@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/portal/favicon.svg') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $p['label'] }} · 产品介绍</title>
@@ -30,6 +31,16 @@
             <section class="pv-section">
                 <h3>这是什么</h3>
                 <p class="pv-desc">{{ $p['description'] }}</p>
+            </section>
+        @endif
+
+        @if (! empty($p['suited']))
+            <section class="pv-section">
+                <h3>适合谁</h3>
+                <p class="pv-desc">{{ $p['suited'] }}</p>
+                @if (! empty($p['crosssell']))
+                    <p class="pv-desc pv-cross">{{ $p['crosssell'] }}</p>
+                @endif
             </section>
         @endif
 
@@ -72,3 +83,4 @@
     </footer>
 </body>
 </html>
+

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/pm/favicon.svg') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>研发全生命周期管理系统 - 登录</title>
@@ -94,3 +95,4 @@
     <script src="{{ asset('assets/pm/js/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>
+

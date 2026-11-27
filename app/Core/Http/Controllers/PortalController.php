@@ -7,13 +7,20 @@ namespace App\Core\Http\Controllers;
 use App\Core\Support\Product;
 
 /**
- * 门户首页：只列 enabled=true 的产品，不碰任何产品库（HC-14）。
+ * 门户首页与"关于/合规"页：只列 enabled=true 的产品，不碰任何产品库（HC-14）。
  */
 class PortalController
 {
     public function home()
     {
         return view('portal::home', [
+            'products' => Product::enabled(),
+        ]);
+    }
+
+    public function about()
+    {
+        return view('portal::about', [
             'products' => Product::enabled(),
         ]);
     }

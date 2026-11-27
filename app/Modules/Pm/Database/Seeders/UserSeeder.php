@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         User::create([
             'username' => 'admin',
             'password' => Hash::make('123456'),
-            'name' => '系统管理员',
+            'name' => '林智远',
             'department_id' => $adminDept->id,
             'role_id' => $adminRole->id,
             'is_active' => true,

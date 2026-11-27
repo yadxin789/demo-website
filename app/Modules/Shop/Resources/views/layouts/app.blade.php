@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/shop/favicon.svg') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -49,3 +50,4 @@
     @stack('scripts')
 </body>
 </html>
+

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/mes/favicon.svg') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', '工作台') · 智能制造 MES</title>
@@ -150,3 +151,4 @@
 @stack('scripts')
 </body>
 </html>
+

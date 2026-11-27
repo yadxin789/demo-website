@@ -109,7 +109,7 @@ class RbacSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['username' => 'admin'],
             [
-                'name' => '系统管理员',
+                'name' => '陈悦家',
                 'email' => 'admin@admin.com',
                 'phone' => null,
                 'status' => 'active',
@@ -119,3 +119,4 @@ class RbacSeeder extends Seeder
         $admin->roles()->sync([Role::where('code', 'super-admin')->value('id')]);
     }
 }
+

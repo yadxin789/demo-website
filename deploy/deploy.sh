@@ -5,7 +5,7 @@
 #  适用：Ubuntu 22.04/24.04 + Nginx + PHP 8.3-FPM，SQLite（无 MySQL/Redis 依赖）
 #
 #  用法（在服务器项目目录）：
-#    ./deploy/deploy.sh             常规部署：装依赖、三库迁移、种子、缓存、权限、reload
+#    ./deploy/deploy.sh             常规部署：装依赖、六库迁移、种子、缓存、权限、reload
 #    ./deploy/deploy.sh demo        同上，并在空库里补灌 Shop 演示业务数据
 #    ./deploy/deploy.sh check       只做健康检查（不写库、不改权限）
 #    ./deploy/deploy.sh help        帮助
@@ -22,9 +22,9 @@ WEB_USER="${WEB_USER:-www-data}"
 WEB_GROUP="${WEB_GROUP:-www-data}"
 FPM_SERVICE="${FPM_SERVICE:-php8.3-fpm}"
 
-# 已上线的三个产品；MES / HR 开发完成前不参与部署（HC-29）
-PRODUCTS=(erp pm shop)
-declare -A TITLE=( [erp]=Erp [pm]=Pm [shop]=Shop )
+# 五个产品：S5(MES)、S6(HR) 完成后全部参与部署
+PRODUCTS=(erp pm shop mes hr)
+declare -A TITLE=( [erp]=Erp [pm]=Pm [shop]=Shop [mes]=Mes [hr]=Hr )
 
 MODE="${1:-deploy}"
 SUDO="$([ "$(id -u)" -eq 0 ] && echo "" || echo "sudo")"
@@ -73,8 +73,8 @@ if [ "$MODE" = "check" ]; then
   log "路由总数"
   "$PHP_BIN" artisan route:list --json --except-vendor 2>/dev/null | "$PHP_BIN" -r '$j=json_decode(stream_get_contents(STDIN),true); echo count($j);' || warn "route:list 失败"
   echo
-  log "门户与三产品登录页可达性"
-  for u in / /erp/login /pm/login /shop/login; do
+  log "门户与五产品登录页可达性"
+  for u in / /about /erp/login /pm/login /shop/login /mes/login /hr/login; do
     code=$(curl -s -o /dev/null -w '%{http_code}' -m 8 "http://127.0.0.1${u}" || echo 'ERR')
     printf '  %-14s %s\n' "$u" "$code"
   done
@@ -97,7 +97,13 @@ fi
 log "安装 Composer 依赖（--no-dev，生产优化）"
 "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction --no-progress
 
-# ---- 2. 三库迁移 ----
+# ---- 2. 六库迁移（五产品 + 门户）----
+log "迁移 portal 库（leads 线索表，app/Core/Database/Migrations）"
+"$PHP_BIN" artisan migrate \
+  --database=portal \
+  --path="app/Core/Database/Migrations" \
+  --force --no-interaction
+
 for p in "${PRODUCTS[@]}"; do
   log "迁移 ${p} 库（app/Modules/${TITLE[$p]}/Database/Migrations）"
   "$PHP_BIN" artisan migrate \
@@ -159,3 +165,4 @@ $SUDO systemctl reload nginx 2>/dev/null || warn "nginx reload 失败，请手�
 
 ok "部署完成 → $("$PHP_BIN" artisan tinker --execute="echo config('app.url');" 2>/dev/null)"
 log "自检：./deploy/deploy.sh check"
+
