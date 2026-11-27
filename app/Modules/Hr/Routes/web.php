@@ -14,7 +14,13 @@ declare(strict_types=1);
 */
 
 use App\Modules\Hr\Http\Controllers\Auth\LoginController;
+use App\Modules\Hr\Http\Controllers\ContractController;
 use App\Modules\Hr\Http\Controllers\DashboardController;
+use App\Modules\Hr\Http\Controllers\EmployeeController;
+use App\Modules\Hr\Http\Controllers\MovementController;
+use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
+use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
+use App\Modules\Hr\Http\Controllers\Org\PositionController;
 use App\Modules\Hr\Http\Controllers\PlaceholderController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,14 +45,41 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
             // H1 组织与编制
-            Route::get('org/departments', [PlaceholderController::class, 'show'])->name('org.departments.index');
-            Route::get('org/positions', [PlaceholderController::class, 'show'])->name('org.positions.index');
-            Route::get('org/headcounts', [PlaceholderController::class, 'show'])->name('org.headcounts.index');
+            Route::get('org/departments', [DepartmentController::class, 'index'])->name('org.departments.index');
+            Route::post('org/departments', [DepartmentController::class, 'store'])->name('org.departments.store');
+            Route::put('org/departments/{department}', [DepartmentController::class, 'update'])
+                ->whereNumber('department')->name('org.departments.update');
+            Route::delete('org/departments/{department}', [DepartmentController::class, 'destroy'])
+                ->whereNumber('department')->name('org.departments.destroy');
+
+            Route::get('org/positions', [PositionController::class, 'index'])->name('org.positions.index');
+            Route::post('org/positions', [PositionController::class, 'store'])->name('org.positions.store');
+            Route::put('org/positions/{position}', [PositionController::class, 'update'])
+                ->whereNumber('position')->name('org.positions.update');
+
+            Route::get('org/headcounts', [HeadcountController::class, 'index'])->name('org.headcounts.index');
+            Route::post('org/headcounts', [HeadcountController::class, 'store'])->name('org.headcounts.store');
+            Route::put('org/headcounts/{headcount}', [HeadcountController::class, 'update'])
+                ->whereNumber('headcount')->name('org.headcounts.update');
 
             // H2 员工与异动
-            Route::get('employees', [PlaceholderController::class, 'show'])->name('employees.index');
-            Route::get('employees/contracts', [PlaceholderController::class, 'show'])->name('employees.contracts');
-            Route::get('employees/movements', [PlaceholderController::class, 'show'])->name('employees.movements');
+            Route::get('employees', [EmployeeController::class, 'index'])->name('employees.index');
+            Route::get('employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+            Route::post('employees', [EmployeeController::class, 'store'])->name('employees.store');
+            Route::get('employees/contracts', [ContractController::class, 'index'])->name('employees.contracts');
+            Route::post('employees/contracts', [ContractController::class, 'store'])->name('employees.contracts.store');
+            Route::get('employees/movements', [MovementController::class, 'index'])->name('employees.movements');
+            Route::post('employees/movements', [MovementController::class, 'store'])->name('employees.movements.store');
+            Route::get('employees/{employee}', [EmployeeController::class, 'show'])
+                ->whereNumber('employee')->name('employees.show');
+            Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])
+                ->whereNumber('employee')->name('employees.edit');
+            Route::put('employees/{employee}', [EmployeeController::class, 'update'])
+                ->whereNumber('employee')->name('employees.update');
+            Route::post('employees/{employee}/regularize', [EmployeeController::class, 'regularize'])
+                ->whereNumber('employee')->name('employees.regularize');
+            Route::post('employees/{employee}/leave', [EmployeeController::class, 'leave'])
+                ->whereNumber('employee')->name('employees.leave');
 
             // H3 考勤与假期
             Route::get('attendance/shifts', [PlaceholderController::class, 'show'])->name('attendance.shifts');

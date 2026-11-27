@@ -23,6 +23,7 @@ $app = require $root . '/bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Modules\Erp\Models\User as ErpUser;
+use App\Modules\Hr\Models\User as HrUser;
 use App\Modules\Mes\Models\User as MesUser;
 use App\Modules\Pm\Models\User as PmUser;
 use App\Modules\Shop\Models\Product as ShopProduct;
@@ -88,16 +89,17 @@ function scan(string $dir, string $pattern): array
 fwrite(STDOUT, "==== 五产品独立性回归 ====\n\n");
 
 // ---- 1. User 模型连接 ----
-fwrite(STDOUT, "[1] 四份 User 模型的连接与表\n");
+fwrite(STDOUT, "[1] 五份 User 模型的连接与表\n");
 check('ERP User → erp.users', (new ErpUser())->getConnectionName() === 'erp' && (new ErpUser())->getTable() === 'users');
 check('PM  User → pm.users', (new PmUser())->getConnectionName() === 'pm' && (new PmUser())->getTable() === 'users');
 check('Shop User → shop.users', (new ShopUser())->getConnectionName() === 'shop' && (new ShopUser())->getTable() === 'users');
 check('Mes User → mes.users', (new MesUser())->getConnectionName() === 'mes' && (new MesUser())->getTable() === 'users');
+check('Hr  User → hr.users', (new HrUser())->getConnectionName() === 'hr' && (new HrUser())->getTable() === 'users');
 check('Shop Product → shop.products', (new ShopProduct())->getConnectionName() === 'shop' && (new ShopProduct())->getTable() === 'products');
 
 // ---- 2. guard 独立性 ----
-fwrite(STDOUT, "\n[2] 四个 guard 的 provider 与用户表\n");
-foreach (['erp', 'pm', 'shop', 'mes'] as $guard) {
+fwrite(STDOUT, "\n[2] 五个 guard 的 provider 与用户表\n");
+foreach (['erp', 'pm', 'shop', 'mes', 'hr'] as $guard) {
     $provider = config("auth.guards.{$guard}.provider");
     $model = config("auth.providers.{$provider}.model");
     check("guard {$guard} 指向自己的模型", is_string($model) && str_contains($model, '\\Modules\\' . ucfirst($guard)), (string) $model);
@@ -110,6 +112,7 @@ $probe = [
     'pm' => ['users', 'projects', 'tasks'],
     'shop' => ['users', 'products', 'customers', 'pos_orders'],
     'mes' => ['users', 'work_orders', 'production_reports', 'equipments'],
+    'hr' => ['users', 'employees', 'departments', 'payroll_items'],
 ];
 $before = counts($probe);
 
@@ -143,6 +146,25 @@ try {
 }
 
 $after = counts($probe);
+
+// HR 侧：事务里插一条用户，取完计数立即回滚
+$hrWrote = false;
+DB::connection('hr')->beginTransaction();
+try {
+    DB::connection('hr')->table('users')->insert([
+        'name' => '隔离自检账号',
+        'email' => 'iso.' . date('mdHi') . '@hr.demo',
+        'password' => bcrypt('x'),
+        'status' => 'active',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $hrWrote = true;
+} catch (Throwable $e) {
+    fwrite(STDOUT, "  （HR 写入跳过：{$e->getMessage()}）\n");
+}
+
+$afterHr = counts($probe);
 
 $erpChanged = [];
 $pmChanged = [];
@@ -182,6 +204,29 @@ if ($mesWrote) {
     check('MES 事务回滚后 users 复原', $mesAfter === $before['mes.users'], "users = {$mesAfter}");
 }
 
+// ---- 3b. HR 写隔离：只动 hr.users，别的四库零变化 ----
+$hrChanged = [];
+$crossChanged = [];
+foreach ($after as $key => $v) {
+    if ($v === $afterHr[$key]) {
+        continue;
+    }
+    if (str_starts_with($key, 'hr.')) {
+        $hrChanged[] = "{$key}: {$v} → {$afterHr[$key]}";
+        continue;
+    }
+    $crossChanged[] = "{$key}: {$v} → {$afterHr[$key]}";
+}
+
+check('HR 写入后 ERP / PM / Shop / MES 四库零变化', $crossChanged === [], implode('; ', $crossChanged));
+check('HR 写入只落在 hr.users', ! $hrWrote || $hrChanged === ["hr.users: {$after['hr.users']} → {$afterHr['hr.users']}"], implode('; ', $hrChanged));
+
+DB::connection('hr')->rollBack();
+if ($hrWrote) {
+    $hrAfter = DB::connection('hr')->table('users')->count();
+    check('HR 事务回滚后 users 复原', $hrAfter === $before['hr.users'], "users = {$hrAfter}");
+}
+
 // ---- 4. 清理 ----
 if ($created !== null) {
     try {
@@ -193,7 +238,7 @@ if ($created !== null) {
 
 // ---- 5. 各库迁移互不重叠 ----
 fwrite(STDOUT, "\n[4] 各库迁移互不重叠\n");
-foreach (['erp', 'pm', 'shop', 'mes'] as $conn) {
+foreach (['erp', 'pm', 'shop', 'mes', 'hr'] as $conn) {
     $n = DB::connection($conn)->table('migrations')->count();
     fwrite(STDOUT, "  {$conn}.migrations = {$n}\n");
 }
@@ -201,14 +246,20 @@ foreach (['erp', 'pm', 'shop', 'mes'] as $conn) {
 // ---- 6. 静态零引用 ----
 fwrite(STDOUT, "\n[5] 静态零引用（跨产品命名空间 / 跨库连接名）\n");
 
-foreach (['mes' => ['Erp', 'Pm', 'Shop']] as $self => $others) {
+foreach (['mes' => ['Erp', 'Pm', 'Shop', 'Hr'], 'hr' => ['Erp', 'Pm', 'Shop', 'Mes']] as $self => $others) {
     $dir = $root . '/app/Modules/' . ucfirst($self);
     $pat = 'App\\\\Modules\\\\(?:' . implode('|', $others) . ')\\\\';
     $hits = scan($dir, '/' . $pat . '/');
     check(ucfirst($self) . ' 代码不引用其它产品命名空间', $hits === [], implode(', ', array_slice($hits, 0, 5)));
 
-    $hits2 = scan($dir, '/connection\s*\(\s*(\'|")(erp|pm|shop)(\'|")/');
+    $connPat = 'connection\s*\(\s*(\'|")(?:' . implode('|', array_diff(['erp', 'pm', 'shop', 'mes', 'hr'], [$self])) . ')(\'|")';
+    $hits2 = scan($dir, '/' . $connPat . '/');
     check(ucfirst($self) . ' 代码不指定别产品连接', $hits2 === [], implode(', ', array_slice($hits2, 0, 5)));
+}
+
+foreach (['erp', 'pm', 'shop', 'mes'] as $self) {
+    $hits = scan($root . '/app/Modules/' . ucfirst($self), '/App\\\\Modules\\\\Hr\\\\/');
+    check(ucfirst($self) . ' 不反向依赖 HR', $hits === [], implode(', ', array_slice($hits, 0, 5)));
 }
 
 foreach (['erp', 'pm', 'shop'] as $self) {

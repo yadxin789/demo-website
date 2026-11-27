@@ -206,3 +206,18 @@ body.hr-body {
     .hr-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
     .hr-nav .grp { grid-column: 1 / -1; }
 }
+
+/* ---------- 员工档案头像（H1-05 详情页用） ---------- */
+.hr-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--hr-purple) 0%, #9b7ff0 100%);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}

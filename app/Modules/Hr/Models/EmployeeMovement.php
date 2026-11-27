@@ -40,4 +40,25 @@ class EmployeeMovement extends BaseModel
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
-    }}
+    }
+
+    public function fromDepartment(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'from_dept');
+    }
+
+    public function toDepartment(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'to_dept');
+    }
+
+    public function fromPosition(): BelongsTo
+    {
+        return $this->belongsTo(Position::class, 'from_position');
+    }
+
+    public function toPosition(): BelongsTo
+    {
+        return $this->belongsTo(Position::class, 'to_position');
+    }
+}
