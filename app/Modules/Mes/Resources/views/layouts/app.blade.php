@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('assets/mes/vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/mes/vendor/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/mes/mes.css') }}">
+    @stack('styles')
 </head>
 <body class="mes-body">
 <div class="mes-shell">
@@ -23,6 +24,9 @@
             <div class="grp">现场</div>
             <a class="{{ request()->routeIs('mes.dashboard') ? 'on' : '' }}" href="{{ route('mes.dashboard') }}">
                 <i class="fa-solid fa-gauge-high"></i> 工作台
+            </a>
+            <a class="{{ request()->routeIs('mes.my-tasks.*') ? 'on' : '' }}" href="{{ route('mes.my-tasks.index') }}">
+                <i class="fa-solid fa-person-digging"></i> 我的任务
             </a>
             <a class="{{ request()->routeIs('mes.work-orders.*') ? 'on' : '' }}" href="{{ route('mes.work-orders.index') }}">
                 <i class="fa-solid fa-clipboard-list"></i> 工单

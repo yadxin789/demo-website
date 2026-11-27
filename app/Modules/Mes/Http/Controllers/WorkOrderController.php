@@ -221,17 +221,22 @@ class WorkOrderController extends Controller
 
         $fmt = fn ($v) => rtrim(rtrim(number_format((float) $v, 3), '0'), '.');
 
-        return redirect()
-            ->route('mes.work-orders.show', $workOrder)
-            ->with('status', sprintf(
-                '工序 %s %s 已报工：合格 %s，不良 %s，工时 %s 分钟。工单完成 %s / %s。',
-                $operation->op_no,
-                $operation->op_name,
-                $fmt($report->ok_qty),
-                $fmt($report->defect_qty),
-                $report->minutes,
-                $fmt($workOrder->done_qty),
-                $fmt($workOrder->plan_qty)
-            ));
+        $msg = sprintf(
+            '工序 %s %s 已报工：合格 %s，不良 %s，工时 %s 分钟。工单完成 %s / %s。',
+            $operation->op_no,
+            $operation->op_name,
+            $fmt($report->ok_qty),
+            $fmt($report->defect_qty),
+            $report->minutes,
+            $fmt($workOrder->done_qty),
+            $fmt($workOrder->plan_qty)
+        );
+
+        // 从「我的任务」发起的报工，回到任务列表继续干下一道
+        $to = $request->input('from') === 'my'
+            ? route('mes.my-tasks.index')
+            : route('mes.work-orders.show', $workOrder);
+
+        return redirect()->to($to)->with('status', $msg);
     }
 }

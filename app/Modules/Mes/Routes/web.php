@@ -22,6 +22,7 @@ use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
 use App\Modules\Mes\Http\Controllers\MasterData\ShiftController;
 use App\Modules\Mes\Http\Controllers\MasterData\WorkCenterController;
 use App\Modules\Mes\Http\Controllers\MaterialIssueController;
+use App\Modules\Mes\Http\Controllers\MyTaskController;
 use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\WorkOrderController;
@@ -49,6 +50,11 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
 
             // 现场
             Route::get('kanban', [PlaceholderController::class, 'show'])->name('kanban');
+
+            // 我的任务（M3-07，操作工视角；报工页移动优先）
+            Route::get('my-tasks', [MyTaskController::class, 'index'])->name('my-tasks.index');
+            Route::get('my-tasks/{operation}', [MyTaskController::class, 'report'])
+                ->whereNumber('operation')->name('my-tasks.report');
 
             // 工单（M2：列表 / 详情 / 建单 / 下达 / 派工）
             Route::get('work-orders', [WorkOrderController::class, 'index'])->name('work-orders.index');
