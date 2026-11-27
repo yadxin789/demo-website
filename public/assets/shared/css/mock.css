@@ -1,0 +1,130 @@
+/* 免登录页通用「界面示意图」——纯 CSS/SVG，无图片依赖 */
+.ui-mock {
+    --m: #4f46e5;
+    position: relative;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    transform: rotate(-1.6deg);
+    box-shadow:
+        0 30px 70px rgba(2, 6, 23, .45),
+        0 0 0 1px rgba(255, 255, 255, .10);
+    font-size: 0;
+}
+
+.ui-mock-bar {
+    height: 24px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    background: #0f172a;
+}
+
+.ui-mock-bar span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255, 255, 255, .28);
+}
+
+.ui-mock-bar span:first-child { background: #f87171; }
+.ui-mock-bar span:nth-child(2) { background: #fbbf24; }
+.ui-mock-bar span:nth-child(3) { background: #34d399; }
+
+.ui-mock-bar em {
+    flex: 1; height: 9px; margin-left: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .08);
+}
+
+.ui-mock-body { display: flex; min-height: 220px; }
+
+.ui-mock-side {
+    width: 46px;
+    padding: 10px 8px;
+    background: #f1f5f9;
+    display: flex; flex-direction: column; gap: 8px;
+}
+
+.ui-mock-side i {
+    height: 8px; border-radius: 3px;
+    background: #dbe2ea;
+}
+
+.ui-mock-side i.on { background: var(--m); opacity: .55; }
+
+.ui-mock-main { flex: 1; padding: 12px 14px 14px; }
+
+.ui-mock-head { display: flex; gap: 8px; margin-bottom: 10px; }
+.ui-mock-head b { height: 8px; border-radius: 3px; background: #e6ebf1; }
+.ui-mock-head b:first-child { width: 78px; }
+.ui-mock-head b:last-child { width: 40px; margin-left: auto; }
+
+.ui-mock-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+.ui-mock-kpis > div {
+    border: 1px solid #eef1f5;
+    border-radius: 8px;
+    padding: 7px 8px;
+    background: #fff;
+}
+
+.ui-mock-kpis small {
+    display: block; height: 7px; width: 60%;
+    border-radius: 3px; background: #edf1f5; margin-bottom: 6px;
+}
+
+.ui-mock-kpis strong {
+    display: block;
+    font-size: 13px; line-height: 1.2;
+    color: #0f172a; letter-spacing: -.3px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.ui-mock-kpis span { font-size: 9px; }
+.ui-mock-kpis .up { color: #16a34a; }
+.ui-mock-kpis .down { color: #dc2626; }
+
+.ui-mock-chart {
+    margin-top: 10px;
+    border: 1px solid #eef1f5;
+    border-radius: 8px;
+    padding: 8px 6px 4px;
+    height: 108px;
+}
+
+.ui-mock-chart svg { width: 100%; height: 100%; display: block; }
+
+.ui-mock-foot {
+    display: flex; align-items: center; gap: 14px;
+    margin-top: 10px;
+}
+
+.ui-mock-donut {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: conic-gradient(
+        var(--m) 0 42%,
+        color-mix(in srgb, var(--m) 55%, #fff) 42% 68%,
+        #cbd5e1 68% 86%,
+        #e2e8f0 86% 100%
+    );
+    -webkit-mask: radial-gradient(circle at center, transparent 52%, #000 53%);
+            mask: radial-gradient(circle at center, transparent 52%, #000 53%);
+}
+
+.ui-mock-bars {
+    flex: 1; height: 46px;
+    display: flex; align-items: flex-end; gap: 6px;
+}
+
+.ui-mock-bars i {
+    flex: 1; border-radius: 3px 3px 0 0;
+    background: color-mix(in srgb, var(--m) 40%, #eef1f5);
+}
+
+@media (max-width: 640px) {
+    .ui-mock { transform: rotate(-1deg); }
+    .ui-mock-body { min-height: 168px; }
+    .ui-mock-side { display: none; }
+    .ui-mock-chart { height: 78px; }
+}

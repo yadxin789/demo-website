@@ -1,5 +1,6 @@
 {{-- 五产品对外首页骨架（S8）：免登录可看，只读 config，不查任何产品库（HC-41）
-     用法：@include('shared::landing', ['product' => config('products.products.mes'), 'meta' => [...]]) --}}
+     用法：@include('shared::landing', ['product' => config('products.products.mes'), 'meta' => [...]])
+     S22 视觉改版（方案A）：深色渐变 hero + 界面示意图 + 白卡能力区 --}}
 @php
     $code = $product['code'];
     $theme = $product['theme'] ?? ['primary' => '#0d6efd', 'accent' => '#0b5ed7'];
@@ -18,8 +19,9 @@
     <title>{{ $product['label'] }} · {{ $product['company'] }}</title>
     <meta name="description" content="{{ $product['tagline'] }}。{{ \Illuminate\Support\Str::limit($product['description'], 110) }}">
     <link rel="stylesheet" href="{{ asset('assets/shared/css/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/mock.css') }}">
 </head>
-<body style="--c: {{ $theme['primary'] }}; --c-dark: {{ $theme['accent'] }};">
+<body class="l-body" style="--c: {{ $theme['primary'] }}; --c-dark: {{ $theme['accent'] }};">
 
 <header class="l-header">
     <div class="l-wrap l-header-inner">
@@ -36,23 +38,30 @@
 
 <main>
     <section class="l-hero">
-        <div class="l-wrap">
-            <span class="l-eyebrow">{{ $product['company'] }}</span>
-            <h1>{{ $meta['headline'] ?? $product['label'] }}</h1>
-            <p class="l-lead">{{ $meta['intro'] ?? $product['description'] }}</p>
-            <div class="l-hero-actions">
-                <a class="l-btn l-btn-primary" href="{{ route($code . '.login') }}">进入演示登录 →</a>
-                <a class="l-btn l-btn-ghost" href="#capability">看看能做什么</a>
+        <div class="l-wrap l-hero-grid">
+            <div class="l-hero-copy">
+                <span class="l-eyebrow">{{ $product['company'] }}</span>
+                <h1>{{ $meta['headline'] ?? $product['label'] }}</h1>
+                <p class="l-lead">{{ $meta['intro'] ?? $product['description'] }}</p>
+                <div class="l-hero-actions">
+                    <a class="l-btn l-btn-primary" href="{{ route($code . '.login') }}">进入演示登录 →</a>
+                    <a class="l-btn l-btn-ghost" href="#capability">看看能做什么</a>
+                </div>
+
+                @if ($stats)
+                    <div class="l-stats">
+                        @foreach ($stats as $s)
+                            <div><b>{{ $s['n'] }}</b><span>{{ $s['t'] }}</span></div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
-            @if ($stats)
-                <div class="l-stats">
-                    @foreach ($stats as $s)
-                        <div><b>{{ $s['n'] }}</b><span>{{ $s['t'] }}</span></div>
-                    @endforeach
-                </div>
-            @endif
+            <div class="l-hero-visual">
+                @include('shared::ui-mock', ['tone' => $theme['primary']])
+            </div>
         </div>
+        <span class="l-hero-curve" aria-hidden="true"></span>
     </section>
 
     <section class="l-section" id="capability">

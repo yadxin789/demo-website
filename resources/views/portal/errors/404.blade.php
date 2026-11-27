@@ -10,10 +10,14 @@
     <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
 <body>
-    <main class="p-wrap p-main" style="text-align:center; padding-top:96px;">
-        <h1 style="font-size:40px; margin:0 0 8px;">404</h1>
-        <p style="color:#6b7280; margin:0 0 24px;">这个页面不存在，或者该产品尚未开放。</p>
-        <a class="pv-btn" href="{{ route('portal.home') }}">返回产品列表</a>
+    <main class="p-wrap p-main e-404">
+        <span class="e-404-code">404</span>
+        <h1>这个页面不存在</h1>
+        <p>可能链接已经过期，或者这套产品还没有开放演示。</p>
+        <div class="e-404-actions">
+            <a class="pv-btn" href="{{ route('portal.home') }}">返回产品列表</a>
+            <a class="pv-btn pv-btn-light" href="{{ route('portal.about') }}">关于与合规</a>
+        </div>
     </main>
 </body>
 </html>

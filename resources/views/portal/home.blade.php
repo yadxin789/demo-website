@@ -7,11 +7,12 @@
     <title>产品演示中心 · 企业管理系统演示</title>
     <meta name="description" content="五套企业管理系统演示：制造 ERP、研发项目管理、百货零售 POS、车间 MES、人事 HR。">
     <link rel="stylesheet" href="{{ asset('assets/portal/portal.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/shared/css/mock.css') }}">
     {{-- 移动端适配（S19）：抽屉式侧栏 + 表格横向滚动 --}}
     <link rel="stylesheet" href="{{ asset('assets/shared/css/responsive.css') }}">
     <script defer src="{{ asset('assets/shared/js/responsive.js') }}"></script>
 </head>
-<body>
+<body class="p-home">
     <header class="p-header">
         <div class="p-wrap p-header-inner">
             <div class="p-brand">
@@ -22,17 +23,35 @@
         </div>
     </header>
 
-    <main class="p-wrap p-main">
-        <section class="p-hero">
-            <span class="p-eyebrow">DEMO SUITE</span>
-            <div class="p-stats">
-                <div><b>{{ count($products) }}</b><span>在线产品</span></div>
-                <div><b>{{ 5 - count($products) }}</b><span>预留席位</span></div>
-                <div><b>123456</b><span>统一演示密码</span></div>
+    <main class="p-main">
+        <section class="p-hero-band">
+            <div class="p-wrap p-hero-grid">
+                <div class="p-hero-copy">
+                    <span class="p-eyebrow">DEMO SUITE · 五套系统</span>
+                    <h1>五套企业管理系统<br><em>一个入口，全部点得动</em></h1>
+                    <p class="p-hero-lead">
+                        制造 ERP、研发项目管理、百货零售 POS、车间 MES、人事 HR。
+                        每套系统独立账号、独立数据库、独立界面 —— 登录后看到的是能真实操作的界面，不是截图。
+                    </p>
+                    <div class="p-stats">
+                        <div><b>{{ count($products) }}</b><span>在线产品</span></div>
+                        <div><b>{{ 5 - count($products) }}</b><span>预留席位</span></div>
+                        <div><b>123456</b><span>统一演示密码</span></div>
+                    </div>
+                    <div class="p-hero-actions">
+                        <a class="p-btn p-btn-light" href="#suite">先看五套系统</a>
+                        <a class="p-btn p-btn-ghost" href="#contact">预约演示</a>
+                    </div>
+                </div>
+                <div class="p-hero-visual">
+                    @include('shared::ui-mock', ['tone' => '#818CF8'])
+                </div>
             </div>
+            <span class="p-hero-curve" aria-hidden="true"></span>
         </section>
 
-        <div class="p-grid">
+        <div class="p-wrap p-content">
+        <div class="p-grid" id="suite">
             @foreach ($products as $code => $p)
                 <a class="p-card" href="{{ route($code . '.root') }}" style="--c: {{ $p['theme']['primary'] }}">
                     <div class="p-card-top">
@@ -138,7 +157,13 @@
                 </p>
             </form>
         </section>
+        </div>
     </main>
+
+    <div class="p-mobile-cta">
+        <span>演示密码 <b>123456</b></span>
+        <a href="#contact">预约演示</a>
+    </div>
 
     <footer class="p-footer">
         <div class="p-wrap p-footer-inner">
