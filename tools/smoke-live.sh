@@ -55,6 +55,9 @@ for p in pm/admin pm/admin/users pm/admin/departments pm/admin/roles pm/admin/st
          pm/admin/task-types pm/admin/operation-logs pm/admin/services pm/admin/collab-trash \
          pm/admin/users/deleted pm/admin/file-repository; do check pm "$p"; done
 
+echo '== PM 企业微信（与参考目录对齐）'
+for p in pm/admin/wecom/settings pm/admin/wecom/message-logs pm/profile/wecom pm/wecom-file; do check pm "$p"; done
+
 echo '== SHOP'
 login shop username admin 123456 shop/login
 for p in shop/dashboard shop/products shop/purchase-orders shop/sales-returns shop/profit-stock \

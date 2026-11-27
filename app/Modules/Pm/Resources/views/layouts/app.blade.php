@@ -309,6 +309,11 @@
                                 <i class="fa fa-server me-2"></i> 后台服务
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.admin.wecom.*') ? 'active' : '' }}" href="{{ route('pm.admin.wecom.settings') }}">
+                                <i class="fab fa-weixin me-2"></i> 企业微信
+                            </a>
+                        </li>
                         @endif
                         
                         <!-- 项目经理菜单（项目发起人） -->
@@ -354,6 +359,16 @@
                                 <i class="fa fa-bell me-2"></i> 通知中心
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.profile.wecom.*') ? 'active' : '' }}" href="{{ route('pm.profile.wecom.index') }}">
+                                <i class="fab fa-weixin me-2"></i> 企业微信绑定
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.wecom.file.*') ? 'active' : '' }}" href="{{ route('pm.wecom.file.index') }}">
+                                <i class="fa fa-inbox me-2"></i> 企微文件收件箱
+                            </a>
+                        </li>
                         @endif
                         
                         <!-- 项目总经理菜单（只读监督 + 消息通知） -->
@@ -382,6 +397,16 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('notification.index') ? 'active' : '' }}" href="{{ route('pm.notification.index') }}">
                                 <i class="fa fa-bell me-2"></i> 通知中心
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.profile.wecom.*') ? 'active' : '' }}" href="{{ route('pm.profile.wecom.index') }}">
+                                <i class="fab fa-weixin me-2"></i> 企业微信绑定
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.wecom.file.*') ? 'active' : '' }}" href="{{ route('pm.wecom.file.index') }}">
+                                <i class="fa fa-inbox me-2"></i> 企微文件收件箱
                             </a>
                         </li>
                         <li class="nav-item">
@@ -454,6 +479,16 @@
                                 <i class="fa fa-bell me-2"></i> 通知中心
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.profile.wecom.*') ? 'active' : '' }}" href="{{ route('pm.profile.wecom.index') }}">
+                                <i class="fab fa-weixin me-2"></i> 企业微信绑定
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.wecom.file.*') ? 'active' : '' }}" href="{{ route('pm.wecom.file.index') }}">
+                                <i class="fa fa-inbox me-2"></i> 企微文件收件箱
+                            </a>
+                        </li>
                         @endif
                         
                         <!-- 支援人员菜单（非任务参与人员） -->
@@ -471,6 +506,16 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('notification.index') ? 'active' : '' }}" href="{{ route('pm.notification.index') }}">
                                 <i class="fa fa-bell me-2"></i> 通知中心
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.profile.wecom.*') ? 'active' : '' }}" href="{{ route('pm.profile.wecom.index') }}">
+                                <i class="fab fa-weixin me-2"></i> 企业微信绑定
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('pm.wecom.file.*') ? 'active' : '' }}" href="{{ route('pm.wecom.file.index') }}">
+                                <i class="fa fa-inbox me-2"></i> 企微文件收件箱
                             </a>
                         </li>
                         <li class="nav-item">
@@ -620,6 +665,7 @@
                 @if($isAdmin)
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('pm.admin.users') }}" style="color: #fff;"><i class="fa fa-users me-2"></i> 用户管理</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.departments') ? 'active' : '' }}" href="{{ route('pm.admin.departments') }}" style="color: #fff;"><i class="fa fa-building me-2"></i> 部门管理</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('pm.admin.wecom.*') ? 'active' : '' }}" href="{{ route('pm.admin.wecom.settings') }}" style="color: #fff;"><i class="fab fa-weixin me-2"></i> 企业微信</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('project.my-projects*') ? 'active' : '' }}" href="{{ route('pm.project.my-projects') }}" style="color: #fff;"><i class="fa fa-folder-open me-2"></i> 我的项目列表</a></li>
                 @endif
                 @if($isExecutor || $isDeptManager)
@@ -632,6 +678,8 @@
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('task.my-audit-tasks.pending-audit') ? 'active' : '' }}" href="{{ route('pm.task.my-audit-tasks.pending-audit') }}" style="color: #fff;"><i class="fa fa-tasks me-2"></i> 待审核任务</a></li>
                 @endif
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('notification.index') ? 'active' : '' }}" href="{{ route('pm.notification.index') }}" style="color: #fff;"><i class="fa fa-bell me-2"></i> 通知中心</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('pm.profile.wecom.*') ? 'active' : '' }}" href="{{ route('pm.profile.wecom.index') }}" style="color: #fff;"><i class="fab fa-weixin me-2"></i> 企业微信绑定</a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->routeIs('pm.wecom.file.*') ? 'active' : '' }}" href="{{ route('pm.wecom.file.index') }}" style="color: #fff;"><i class="fa fa-inbox me-2"></i> 企微文件收件箱</a></li>
                 <li class="nav-item">
                     <form method="POST" action="{{ route('pm.logout') }}" style="display: inline;">
                         @csrf

@@ -629,3 +629,18 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 - [x] S19-A03 线上核对：`/pm/admin`、`/pm/admin/users` 等 11 页 200；侧栏 22 项与参考对齐；无"系统管理后台 / 返回门户"残留
 - [x] S19-A04 冒烟脚本 PM 后台清单改为参考页面，线上 129 项全绿
 - [x] S19-A05 移动端资源保持注入，页面正文与菜单未改
+
+## S20 PM 企业微信模块移植（严格对齐参考目录）
+- [x] S20-A01 移植 5 控制器 / 4 模型 / 2 服务 / 1 通知通道，命名空间改为 `App\Modules\Pm\*`，模型统一 `$connection = 'pm'`
+- [x] S20-A02 移植 3 视图（settings / profile.wecom / wecom.files）+ 补建参考缺失的 `admin/wecom/message-logs` 日志页
+- [x] S20-A03 `config/wecom.php` 与 `filesystems.wecom_files` 本地盘
+- [x] S20-A04 5 个迁移（表名与参考一致；`users` 补 4 个企微字段，带 hasColumn 守卫）
+- [x] S20-A05 路由：公开 3 条、管理员 4 条、个人 3 条、文件 7 条，名称 `pm.wecom.*` / `pm.admin.wecom.*` / `pm.profile.wecom.*` / `pm.wecom.file.*`
+- [x] S20-A06 菜单：后台侧栏"企业微信"、角色侧栏"企业微信绑定 / 企微文件收件箱"、移动端 offcanvas 同步
+- [x] S20-B01 本地实测 4 页 200，配置页回调地址为 `/pm/wecom/callback/event`，未配置提示可见
+- [x] S20-B02 冒烟脚本追加 PM 企微 4 条
+- [x] S20-C01 文档 12.19 记录受控差异（通知通道未挂载、日志页补建）
+
+## 待办（PM 企微上线）
+- [ ] S20-D01 部署到线上并执行 PM 迁移（`--path=app/Modules/Pm/Database/Migrations --database=pm --force`）
+- [ ] S20-D02 线上冒烟全绿后提交推送 main

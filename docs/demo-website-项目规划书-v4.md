@@ -747,5 +747,26 @@ PM 那 2 条是形式差异：`/admin/departments/{id}`、`/admin/roles/{id}` �
 2. **后台结构**：PM 后台只保留参考项目自身的 `/pm/admin`（`AdminController` + `admin/*` 视图，24 个页面），视图一律 `@extends('pm::layouts.app')`，侧栏与顶栏由 `layouts.app` 统一渲染，菜单项、分组、角色可见性均与参考一致。
 3. **下线项**：PM 不再注册统一后台的额外页面（`/pm/admin/positions`、`ai-guide`、`ops`、`settings`），这些地址返回 404，避免出现参考目录里没有的菜单或页面。
 4. **移动端**：适配层只注入 `responsive.css` / `responsive.js`（新增 link/script），不改动任何视图正文、菜单文案或菜单结构；移动端交互沿用 PM 自带 offcanvas。
-5. **已知唯一差异**：参考目录的"企业微信 / 企业微信绑定 / 企微文件收件箱"三项依赖企业微信集成，演示站未部署该集成（无路由），因此 PM 侧栏缺这三项；如要补齐需先移植 wecom 模块或提供占位页。
+5. **已知唯一差异**：参考目录的"企业微信 / 企业微信绑定 / 企微文件收件箱"三项依赖企业微信集成，演示站未部署该集成（无路由），因此 PM 侧栏缺这三项；如要补齐需先移植 wecom 模块或提供占位页。（2026-11-27 已按 12.19 完成移植，该差异已消除）
 6. **验收**：PM 后台 11 个页面线上 200；侧栏项目与参考一一对应（首页、AI 设置/智能助手、AI 授权中心、用户/部门/角色、状态管理、任务类型、聊天记录、文件仓库、回收站、知识库、操作日志、发送通知、后台服务）；页面不再出现"系统管理后台 / AI 导入引导 / 返回门户"等统一后台元素。
+
+**12.19 PM 企业微信模块移植（补齐 12.18 第 5 条的唯一差异）**
+
+1. **范围**：把参考目录 `E:\my-pm\pm-server-openEuler` 的 wecom 模块整体移植进 `app/Modules/Pm`，落点与参考一一对应：
+   - 控制器 5 个：`WecomAuthController`（OAuth 跳转/回调）、`WecomCallbackController`（回调事件与素材入库）、`WecomSettingsController`（集成配置/连通性测试/消息日志）、`UserWecomController`（个人绑定/解绑/通知偏好）、`WecomFileController`（企微文件收件箱）；
+   - 模型 4 个：`WecomConfig`、`WecomFile`（软删除）、`WecomMessageLog`、`WecomOauthState`，均显式 `$connection = 'pm'`；
+   - 服务 2 个：`WecomService`（access_token、发消息、OAuth、素材下载、回调验签）、`WecomNotificationService`；
+   - 通知通道 `Notifications/Channels/WecomChannel`；配置 `config/wecom.php`；`config/filesystems.php` 增 `wecom_files` 本地盘（`storage/app/wecom-files`，不对外暴露）；
+   - 视图 3 个 + 消息日志页：`admin/wecom/settings`、`profile/wecom/index`、`wecom/files/index`、`admin/wecom/message-logs`；全部 `@extends('pm::layouts.app')`。
+2. **路由**（与参考路径同名同义，统一加 `/pm` 前缀与 `pm.` 名字空间）：
+   - 公开：`GET /pm/wecom/auth`、`GET /pm/wecom/callback`、`POST /pm/wecom/callback/event`；
+   - 管理员：`GET|POST /pm/admin/wecom/settings`、`GET /pm/admin/wecom/test`、`GET /pm/admin/wecom/message-logs`；
+   - 个人：`GET /pm/profile/wecom`、`POST /pm/profile/wecom/unbind`、`POST /pm/profile/wecom/settings`；
+   - 文件：`GET /pm/wecom-file`、`/{file}/preview|download`、`POST /{file}/archive`、`DELETE /{file}`、`POST /send-to-wecom`、`GET /api/bound-users`。
+3. **菜单**（`pm::layouts.app`，位置与参考一致）：管理员组"后台服务"之后加"企业微信"；各角色"通知中心"之后加"企业微信绑定""企微文件收件箱"；移动端 offcanvas 同步补齐。
+4. **数据**：5 个迁移在 `app/Modules/Pm/Database/Migrations`，表名与参考同名（`wecom_configs` / `wecom_message_logs` / `wecom_oauth_states` / `wecom_files`），`users` 表补 `wecom_userid` / `wecom_bound_at` / `wecom_notify_enabled` / `wecom_notify_settings`（均带 `hasColumn` 守卫，可重复执行）。
+5. **未配置态**：演示站无企业微信凭据，配置页与个人绑定页显示"未配置"提示；测试连接会如实返回失败原因，不伪造成功。
+6. **两处与参考的受控差异**（参考自身缺陷，照搬会 500 或影响全站）：
+   - 参考 `WecomSettingsController::messageLogs()` 指向不存在的视图 `admin.wecom.message-logs`；演示站补建了同结构日志页（表格 + 分页 + 空态提示），路由保持与参考一致。
+   - 参考未见 `wecom` 通知通道注册，而演示站全站通知走 `database` 通道；为避免未配置企微的环境在发通知时抛 `Driver [wecom] not supported`，`pm\Notifications\BaseNotification::via()` 暂不追加 `wecom`，通道类已就位，具备凭据后可一行开启。
+7. **验收**：本地 `/pm/admin/wecom/settings`、`/pm/admin/wecom/message-logs`、`/pm/profile/wecom`、`/pm/wecom-file` 均 200；配置页回调地址渲染为 `/pm/wecom/callback/event`；后台侧栏出现"企业微信"，角色侧栏出现"企业微信绑定""企微文件收件箱"；线上冒烟补充 4 条 PM 企微页面。

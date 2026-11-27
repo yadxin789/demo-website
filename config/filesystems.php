@@ -30,6 +30,14 @@ return [
 
     'disks' => [
 
+        // PM 企业微信（企微文件收件箱）落本地，不对外暴露
+        'wecom_files' => [
+            'driver' => 'local',
+            'root' => storage_path('app/wecom-files'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

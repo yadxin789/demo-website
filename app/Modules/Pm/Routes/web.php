@@ -32,6 +32,11 @@ use App\Modules\Pm\Http\Controllers\TaskController;
 use App\Modules\Pm\Http\Controllers\TodoController;
 use App\Modules\Pm\Http\Controllers\WelcomeController;
 use App\Modules\Pm\Http\Controllers\LandingController;
+use App\Modules\Pm\Http\Controllers\UserWecomController;
+use App\Modules\Pm\Http\Controllers\WecomAuthController;
+use App\Modules\Pm\Http\Controllers\WecomCallbackController;
+use App\Modules\Pm\Http\Controllers\WecomFileController;
+use App\Modules\Pm\Http\Controllers\WecomSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:pm', 'product.only:pm'])
@@ -48,6 +53,13 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
         Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+        // ---------- 企业微信集成：OAuth 授权与回调（公开访问，与参考目录一致） ----------
+        Route::prefix('wecom')->name('wecom.')->group(function () {
+            Route::get('/auth', [WecomAuthController::class, 'redirect'])->name('auth');
+            Route::get('/callback', [WecomAuthController::class, 'callback'])->name('callback');
+            Route::post('/callback/event', [WecomCallbackController::class, 'handle'])->name('event-callback');
+        });
 
         Route::middleware('auth:pm')->group(function () {
 
@@ -150,6 +162,15 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
                 Route::post('/send-notification', [AdminController::class, 'postNotification'])->name('notification.post');
                 Route::get('/services', [AdminController::class, 'services'])->name('services');
                 Route::post('/backup', [AdminController::class, 'backupDatabase'])->name('backup');
+
+                // ---------- 企业微信集成配置（管理员，与参考目录一致） ----------
+                Route::prefix('wecom')->name('wecom.')->group(function () {
+                    Route::get('/settings', [WecomSettingsController::class, 'index'])->name('settings');
+                    Route::post('/settings', [WecomSettingsController::class, 'save'])->name('settings.save');
+                    Route::get('/test', [WecomSettingsController::class, 'testConnection'])->name('test');
+                    Route::get('/message-logs', [WecomSettingsController::class, 'messageLogs'])->name('message-logs');
+                });
+
                 Route::get('/todos', [AdminController::class, 'todos'])->name('todos');
 
                 Route::get('/chat-messages', [AdminController::class, 'chatMessages'])->name('chat-messages');
@@ -210,6 +231,24 @@ Route::middleware(['web', 'module:pm', 'product.only:pm'])
             Route::post('profile/update', [ProfileController::class, 'updatePersonal'])->name('profile.update');
             Route::get('profile/password', [ProfileController::class, 'editPassword'])->name('profile.password.edit');
             Route::post('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+            // ---------- 企业微信绑定（个人中心，与参考目录一致） ----------
+            Route::prefix('profile/wecom')->name('profile.wecom.')->group(function () {
+                Route::get('/', [UserWecomController::class, 'index'])->name('index');
+                Route::post('/unbind', [UserWecomController::class, 'unbind'])->name('unbind');
+                Route::post('/settings', [UserWecomController::class, 'updateSettings'])->name('settings.update');
+            });
+
+            // ---------- 企微文件收件箱（与参考目录一致） ----------
+            Route::prefix('wecom-file')->name('wecom.file.')->group(function () {
+                Route::get('/', [WecomFileController::class, 'index'])->name('index');
+                Route::get('/api/bound-users', [WecomFileController::class, 'boundUsers'])->name('bound-users');
+                Route::post('/send-to-wecom', [WecomFileController::class, 'sendToWecom'])->name('send');
+                Route::get('/{file}/preview', [WecomFileController::class, 'preview'])->name('preview');
+                Route::get('/{file}/download', [WecomFileController::class, 'download'])->name('download');
+                Route::post('/{file}/archive', [WecomFileController::class, 'archive'])->name('archive');
+                Route::delete('/{file}', [WecomFileController::class, 'destroy'])->name('destroy');
+            });
 
             // ---------- 任务 ----------
             Route::prefix('task')->name('task.')->group(function () {
