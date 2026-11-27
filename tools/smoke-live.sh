@@ -39,6 +39,10 @@ for p in erp/home erp/sales/quotes erp/sales/orders erp/purchase/orders erp/prod
          erp/announcements erp/notifications erp/todos erp/ai/chat erp/wecom erp/support \
          erp/ecom/platforms erp/product/brands erp/production/routings erp/knowledge erp/reports; do check erp "$p"; done
 
+echo '== ERP 后台'
+for p in erp/admin erp/admin/users erp/admin/roles erp/admin/ops erp/admin/settings \
+         erp/admin/departments erp/admin/positions erp/admin/ai-guide erp/admin/master-data; do check erp "$p"; done
+
 echo '== PM'
 login pm username admin 123456 pm/login
 for p in pm/dashboard pm/project pm/project/my-projects pm/task/my-tasks pm/task/my-audit-tasks \
@@ -46,11 +50,18 @@ for p in pm/dashboard pm/project pm/project/my-projects pm/task/my-tasks pm/task
          pm/file/resource-files pm/support/department-files pm/project-template pm/admin/users \
          pm/admin/roles pm/admin/collab-trash; do check pm "$p"; done
 
+echo '== PM 后台'
+for p in pm/admin pm/admin/departments pm/admin/positions pm/admin/ai-guide pm/admin/ops pm/admin/settings; do check pm "$p"; done
+
 echo '== SHOP'
 login shop username admin 123456 shop/login
 for p in shop/dashboard shop/products shop/purchase-orders shop/sales-returns shop/profit-stock \
          shop/receipts shop/putaway shop/pos shop/expenses shop/payment-gateways shop/financial-reports \
          shop/reconciliations shop/customers shop/suppliers shop/warehouses shop/categories; do check shop "$p"; done
+
+echo '== SHOP 后台'
+for p in shop/admin shop/admin/users shop/admin/departments shop/admin/positions \
+         shop/admin/roles shop/admin/ai-guide shop/admin/ops shop/admin/settings; do check shop "$p"; done
 
 echo '== MES'
 login mes account admin 123456 mes/login
@@ -58,10 +69,18 @@ for p in mes/dashboard mes/work-orders mes/kanban mes/quality/inspections mes/qu
          mes/equipment mes/maintenance/plans mes/master/materials mes/master/boms mes/master/routings \
          mes/my-tasks mes/trace mes/reports mes/system/users mes/system/roles; do check mes "$p"; done
 
+echo '== MES 后台'
+for p in mes/admin mes/admin/users mes/admin/departments mes/admin/positions \
+         mes/admin/roles mes/admin/ai-guide mes/admin/ops mes/admin/settings; do check mes "$p"; done
+
 echo '== HR'
 login hr account admin 123456 hr/login
 for p in hr/dashboard hr/employees hr/org/departments hr/org/positions hr/attendance/records \
          hr/leaves hr/payroll/runs hr/performance/reviews hr/recruit/requisitions hr/system/users hr/system/roles; do check hr "$p"; done
+
+echo '== HR 后台'
+for p in hr/admin hr/admin/users hr/admin/departments hr/admin/positions \
+         hr/admin/roles hr/admin/ai-guide hr/admin/ops hr/admin/settings; do check hr "$p"; done
 
 echo
 echo "通过 $pass 项，失败 $fail 项"

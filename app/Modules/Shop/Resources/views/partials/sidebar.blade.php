@@ -329,6 +329,11 @@
                             <i class="fa-solid fa-database sidebar-menu-icon"></i>本地备份
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/shop/admin">
+                            <i class="fa-solid fa-user-shield sidebar-menu-icon"></i>系统管理后台
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
