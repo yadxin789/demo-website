@@ -80,6 +80,28 @@
             @if (! in_array($order->status, ['completed', 'closed'], true))
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal">修改数量 / 日期</button>
             @endif
+            @php
+                $receivedQty = (float) \App\Modules\Mes\Models\FinishedReceipt::query()->where('work_order_id', $order->id)->sum('qty');
+                $remainQty = max(0, round((float) $order->plan_qty - $receivedQty, 3));
+            @endphp
+            @if (in_array($order->status, ['released', 'in_progress'], true) && $remainQty > 0)
+                <form method="post" action="{{ route('mes.work-orders.receipts.store', $order) }}" style="display:flex; gap:6px">
+                    @csrf
+                    <input type="number" step="0.001" min="0.001" max="{{ $remainQty }}" name="qty" value="{{ $remainQty }}"
+                           class="form-control form-control-sm" style="width:110px" title="最多还能入库 {{ $remainQty }}">
+                    <input type="text" name="lot_no" class="form-control form-control-sm" style="width:130px" placeholder="批次号（可空）">
+                    <button class="btn btn-sm btn-primary">完工入库</button>
+                </form>
+            @endif
+            @if ($order->status === 'completed')
+                <form method="post" action="{{ route('mes.work-orders.close', $order) }}">
+                    @csrf
+                    <button class="btn btn-sm btn-outline-secondary">关单</button>
+                </form>
+            @endif
+            @if ($receivedQty > 0)
+                <span class="mini" style="align-self:center">已入库 {{ number_format($receivedQty, 0) }} / 计划 {{ $qty($order->plan_qty) }}</span>
+            @endif
             @if ($order->issues->isNotEmpty())
                 <a class="btn btn-sm btn-outline-secondary" href="{{ route('mes.issues.show', $order->issues->first()) }}">
                     领料单 {{ $order->issues->first()->issue_no }}
@@ -388,4 +410,5 @@ function fillDispatch(opId, opNo, opName, assigneeId, team) {
 }
 </script>
 @endpush
+
 

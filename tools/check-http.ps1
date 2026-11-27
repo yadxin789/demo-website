@@ -110,6 +110,26 @@ foreach ($p in $sessions.Keys) {
 }
 
 Write-Output ""
+Write-Output "[3b] MES 闭环与 HR 增补页（固定清单）"
+foreach ($x in @(
+        @{p = 'mes'; u = '/mes/receipts' },
+        @{p = 'mes'; u = '/mes/maintenance/plans' },
+        @{p = 'mes'; u = '/mes/maintenance/orders' },
+        @{p = 'mes'; u = '/mes/trace' },
+        @{p = 'mes'; u = '/mes/reports/oee' },
+        @{p = 'hr'; u = '/hr/training' },
+        @{p = 'hr'; u = '/hr/skills' },
+        @{p = 'hr'; u = '/hr/skills/certificates' },
+        @{p = 'hr'; u = '/hr/attendance/roster' },
+        @{p = 'hr'; u = '/hr/me' })) {
+    $sess = $sessions[$x.p]
+    if ($sess -is [array]) { $sess = $sess[0] }
+    if (-not $sess) { No ("  {0,-30}" -f $x.u) '无可用会话'; continue }
+    $r = Invoke-WebRequest ($base + $x.u) -WebSession $sess -UseBasicParsing -SkipHttpErrorCheck -TimeoutSec 15
+    if ($r.StatusCode -eq 200) { Ok ("  {0,-30} 200" -f $x.u) } else { No ("  {0,-30}" -f $x.u) "code=$($r.StatusCode)" }
+}
+
+Write-Output ""
 Write-Output "[4] guard 交叉（shop 会话不得进入 erp）"
 if ($sessions.ContainsKey('shop')) {
     $r = Invoke-WebRequest ($base + '/erp/home') -WebSession $sessions['shop'] -UseBasicParsing -MaximumRedirection 5 -SkipHttpErrorCheck -TimeoutSec 15

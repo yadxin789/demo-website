@@ -30,6 +30,9 @@
             <a class="{{ request()->routeIs('hr.dashboard') ? 'on' : '' }}" href="{{ route('hr.dashboard') }}">
                 <i class="fa-solid fa-gauge-high"></i> 人力看板
             </a>
+            <a class="{{ request()->routeIs('hr.me') ? 'on' : '' }}" href="{{ route('hr.me') }}">
+                <i class="fa-solid fa-user-check"></i> 我的自助
+            </a>
 
             <div class="grp">编制</div>
             <a class="{{ request()->routeIs('hr.org.headcounts.*') ? 'on' : '' }}" href="{{ route('hr.org.headcounts.index') }}">
@@ -47,6 +50,17 @@
                 <i class="fa-solid fa-right-left"></i> 异动记录
             </a>
 
+            <div class="grp">培训与技能</div>
+            <a class="{{ request()->routeIs('hr.training.*') ? 'on' : '' }}" href="{{ route('hr.training.index') }}">
+                <i class="fa-solid fa-chalkboard-user"></i> 培训管理
+            </a>
+            <a class="{{ request()->routeIs('hr.skills.index') ? 'on' : '' }}" href="{{ route('hr.skills.index') }}">
+                <i class="fa-solid fa-layer-group"></i> 技能矩阵
+            </a>
+            <a class="{{ request()->routeIs('hr.skills.certificates*') ? 'on' : '' }}" href="{{ route('hr.skills.certificates') }}">
+                <i class="fa-solid fa-certificate"></i> 证书台账
+            </a>
+
             <div class="grp">考勤与假期</div>
             <a class="{{ request()->routeIs('hr.attendance.records*') ? 'on' : '' }}" href="{{ route('hr.attendance.records') }}">
                 <i class="fa-solid fa-clock"></i> 打卡记录
@@ -59,6 +73,9 @@
             </a>
             <a class="{{ request()->routeIs('hr.attendance.shifts*') ? 'on' : '' }}" href="{{ route('hr.attendance.shifts') }}">
                 <i class="fa-solid fa-calendar-day"></i> 班次
+            </a>
+            <a class="{{ request()->routeIs('hr.attendance.roster*') ? 'on' : '' }}" href="{{ route('hr.attendance.roster') }}">
+                <i class="fa-solid fa-table-cells"></i> 排班表
             </a>
             <a class="{{ request()->routeIs('hr.leaves.index') || request()->routeIs('hr.leaves.create') ? 'on' : '' }}" href="{{ route('hr.leaves.index') }}">
                 <i class="fa-solid fa-calendar-check"></i> 请假审批

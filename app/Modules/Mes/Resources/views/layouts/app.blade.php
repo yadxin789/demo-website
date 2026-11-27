@@ -45,6 +45,12 @@
             <a class="{{ request()->routeIs('mes.issues.*') ? 'on' : '' }}" href="{{ route('mes.issues.index') }}">
                 <i class="fa-solid fa-boxes-stacked"></i> 领料发料
             </a>
+            <a class="{{ request()->routeIs('mes.receipts.*', 'mes.work-orders.receipts.*') ? 'on' : '' }}" href="{{ route('mes.receipts.index') }}">
+                <i class="fa-solid fa-warehouse"></i> 完工入库
+            </a>
+            <a class="{{ request()->routeIs('mes.trace.*') ? 'on' : '' }}" href="{{ route('mes.trace.index') }}">
+                <i class="fa-solid fa-barcode"></i> 批次追溯
+            </a>
             <a class="{{ request()->routeIs('mes.kanban') ? 'on' : '' }}" href="{{ route('mes.kanban') }}">
                 <i class="fa-solid fa-tv"></i> 车间看板
             </a>
@@ -58,6 +64,9 @@
             </a>
             <a class="{{ request()->routeIs('mes.reports.labor') ? 'on' : '' }}" href="{{ route('mes.reports.labor') }}">
                 <i class="fa-solid fa-gauge-simple-high"></i> 工时效率
+            </a>
+            <a class="{{ request()->routeIs('mes.reports.oee') ? 'on' : '' }}" href="{{ route('mes.reports.oee') }}">
+                <i class="fa-solid fa-gauge"></i> OEE
             </a>
 
             @if ($me?->hasAnyPermission(['master.view', 'master.manage']))
@@ -96,6 +105,9 @@
             @if ($me?->hasAnyPermission(['equipment.view', 'equipment.manage']))
                 <a class="{{ request()->routeIs('mes.equipment.*') ? 'on' : '' }}" href="{{ route('mes.equipment.index') }}">
                     <i class="fa-solid fa-screwdriver-wrench"></i> 设备
+                </a>
+                <a class="{{ request()->routeIs('mes.maintenance.*') ? 'on' : '' }}" href="{{ route('mes.maintenance.plans') }}">
+                    <i class="fa-solid fa-calendar-check"></i> 保养计划
                 </a>
             @endif
 

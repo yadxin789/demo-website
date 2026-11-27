@@ -539,3 +539,82 @@ S9 的三张迁移只加列不回填 —— 线上历史账号 `email`/`username
 - MES 后台：`system/departments`、`system/positions`、`system/users`、`users/create`、`system/roles` 全 200。
 - HR 后台：`system/users`、`users/create`、`system/roles`、`org/departments`、`org/positions` 全 200。
 
+### 12.12 三类定位落地：对齐审计 + MES/HR 完备补全（2026-11-27，v4 终版口径）
+
+**产品定位（本节起为最终口径，后续不得再混）**
+
+| 卡片 | 类型 | 参考基线 |
+| --- | --- | --- |
+| 电子厂 ERP | 对齐型 | `E:\ddwl-erp\erp` |
+| 研发项目管理 PM | 对齐型 | `E:\my-pm\pm-server-openEuler` |
+| 百货零售 ERP | 对齐型 | `E:\erp-shop` |
+| 智能制造 MES | 新增型（独立完备） | 无参考目录，对标 Odoo Manufacturing / ERPNext |
+| 人事管理 HR | 新增型（独立完备） | 无参考目录，对标 OrangeHRM / Odoo HR |
+
+「协同办公」「电话会议」**不在对齐范围**（PM 基线里保留的部分视为参考项目自有功能，演示站不复刻）。
+
+**12.12.1 对齐验收口径（三层对账）**
+
+不看代码相似度，只看三件事能否对上：
+
+1. **路由层**：HTTP 方法 + URI（去产品前缀、`{id}` 统一成 `{*}`）+ `Controller@method` 三维比对，输出缺失 / 多余 / 同路径换方法三类清单。
+2. **数据层**：双方 migrations 的表集合与列集合比对，判「缺表 / 缺列」。
+3. **视图层**：同名视图里 `route('x.y')` 引用集合比对（路由名去前缀归一化），引用缺失 60% 以上判为空壳。
+
+脚本常驻 `tools/compare-{routes,schema,views}.php`，基线 JSON 与明细文本落在 `tools/baseline/`，任何时候可重跑复现。
+
+**12.12.2 审计结论**
+
+| 产品 | 路由（参考/演示） | 表（参考/演示） | 视图（参考/演示） | 差异归属 |
+| --- | --- | --- | --- | --- |
+| ERP | 353 / 355，缺 0 | 287 / 287，缺表 0 缺列 0 | 171 / 174，缺 0 空壳 0 | 仅根路由换成产品首页（S8 设计） |
+| Shop | 235 / 224，缺 12 | 82 / 82，缺 0 缺列 0 | 117 / 117，缺 0 空壳 0 | 12 条全为 `/api/ai/*` 外部数据 API |
+| PM | 268 / 196，缺 74 | 49 / 41，缺 8 | 102 / 97，缺 5 空壳 3 | api 38 + 企业微信 17 + 协同办公 11 + 注册 2 + 2 条 PATCH |
+
+PM 那 2 条是形式差异：`/admin/departments/{id}`、`/admin/roles/{id}` 参考项目用单一 `AdminController@update` 同时接 `PATCH|PUT`，演示站拆成 `updateDepartment` / `updateRole` 且只注册 `PUT`；功能完全等价。
+
+对外表述统一为：**三层对账下，三套对齐系统的差异全部集中在 AI 外部 API、企业微信、协同办公、电话会议、注册页这五类已知不开放项；除此之外 ERP 与 Shop 零差异，PM 仅剩两条 HTTP 方法的形式差异。**
+
+**12.12.3 MES 补全（四块闭环）**
+
+原 MES 有能力但没闭环：有工单、工序、报工、领料、质检、返工、设备点检报修、APS 与四张报表，**但报工之后没有下文**。补的是 Odoo「MO → Produce → Finished goods receipt」这一段：
+
+- **完工入库**：`finished_receipts` 表 + `CompletionService`。可分批入库、超计划量直接拒绝、入库即累加成品 `materials.stock_qty`；入满计划量自动转 `completed`；关单要求所有工序 done，否则拦截并提示还差几道。
+- **批次追溯**：`lots` 表 + `TraceController`。批次号 `LOT-{Ymd}-{seq}`，父批次自动取领料量最大的那个物料在生产批次之外的最新批次；`Lot` 用 `getRouteKeyName()=lot_no` 做路由绑定，追溯页可按批次看「上游原料 → 本批生产 → 下游入库」。
+- **计划保养**：`maintenance_plans` / `maintenance_orders` + `MaintenanceService`。到期计划一键生成保养单；同计划已有未完成单则跳过，避免重复派单；完成后回写 `last_done_at` 与 `next_due_at`。
+- **OEE**：`Reports\OeeController` 按工作中心聚合，A = 运行/(运行+停机)，P = 理论工时/运行工时（封顶 100%），Q = 合格/(合格+不良)。
+
+菜单新增 4 项（现场组：完工入库、批次追溯；质量与设备组：保养计划；报表组：OEE），工单详情页加「完工入库（数量 + 批次号）」「关单」「已入库 x / 计划 y」。
+
+实测：WO9 先入 200、再入 600，累计 800 = 计划量 → 自动 completed；WO17 关单成功；WO9 关单被 6 道未完成工序拦下；到期计划重复生成被正确跳过。
+
+**12.12.4 HR 补全（四块）**
+
+原 HR 已有员工档案、合同、异动、转正离职、组织岗位编制、考勤班次加班异常、请假与余额、薪资结构与批次发放、绩效、招聘、报表、导入、系统管理。对标 OrangeHRM 与 Odoo HR 后补四块：
+
+- **培训管理**：课程库（编号/类别/课时/提供方）+ 培训场次（起止/地点/讲师/容量/状态）+ 报名与结果（pass / fail / pending + 分数），页面给通过率与下一期。
+- **技能矩阵**：`skills`（分类 + 最高等级）× 员工，形成矩阵视图，可挂等级、可评估日期；证书单独成台账，60 天内到期高亮、已过期标红。
+- **排班表**：周网格（人 × 日），支持「一批人 × 日期区间 × 一个班次」批量排班，按「人 + 日」唯一键 `updateOrCreate` 避免重复；点格子可在 planned → actual → leave → absent 之间切换。
+- **员工自助**：`MeController` 按登录账号的 `employee_no` 关联员工档案，聚合本月考勤、假期余额、本周排班、培训记录、证书、最新工资条与合同；未绑定档案时给降级提示而不是报错。
+
+数据 7 张表、5 个视图、4 个控制器、8 组路由、5 个菜单项；种子造了 6 门课 / 5 期场次 / 50 条记录 / 8 项技能 / 120 条员工技能 / 20 张证书 / 150 条本周排班。
+
+**12.12.5 本轮第三个必须记住的坑：Blade 单行 `@php(...)` 里带命名空间会 500**
+
+写法 `@php($received = (float) \App\Modules\Mes\Models\FinishedReceipt::query()->sum('qty'))` 会让 Blade 编译出 `PHP Parse error: Syntax error, unexpected T_NS_SEPARATOR`，表现为**整页 500 且日志只有编译错误**。12 张工单详情页同时 500、`git checkout` 还原视图立刻恢复 200，就是靠这个现象定位的。
+
+正确做法：这类逻辑一律写成多行块
+
+```
+@php
+    $receivedQty = (float) \App\Modules\Mes\Models\FinishedReceipt::query()->sum('qty');
+@endphp
+```
+
+并且变量名要避开模板里已有的同名变量（本例原来叫 `$received`，改成 `$receivedQty` / `$remainQty`）。
+
+**12.12.6 回归结果**
+
+`guard.ps1` 17/0（G-13 全量 1583 个文件 `php -l` 通过）、视觉 45/0、独立性 31/0、人设 10/0、交叉登录 5/0、走查 17/0；`check-http.ps1` 新增 10 项固定清单（MES 5 + HR 5），项数 60 → 70。
+
+

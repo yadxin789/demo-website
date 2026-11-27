@@ -86,6 +86,24 @@ class Employee extends BaseModel
         return $this->hasMany(Overtime::class);
     }
 
+    /** 技能等级（M7 增补） */
+    public function skills(): HasMany
+    {
+        return $this->hasMany(EmployeeSkill::class);
+    }
+
+    /** 证书与资质（M7 增补） */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    /** 培训记录（M7 增补） */
+    public function trainingRecords(): HasMany
+    {
+        return $this->hasMany(TrainingRecord::class);
+    }
+
     public function payrollItems(): HasMany
     {
         return $this->hasMany(PayrollItem::class);

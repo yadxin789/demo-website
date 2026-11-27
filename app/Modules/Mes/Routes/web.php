@@ -17,8 +17,11 @@ use App\Modules\Mes\Http\Controllers\ApsController;
 use App\Modules\Mes\Http\Controllers\Auth\LoginController;
 use App\Modules\Mes\Http\Controllers\DashboardController;
 use App\Modules\Mes\Http\Controllers\EquipmentController;
+use App\Modules\Mes\Http\Controllers\FinishedReceiptController;
 use App\Modules\Mes\Http\Controllers\ImportController;
 use App\Modules\Mes\Http\Controllers\KanbanController;
+use App\Modules\Mes\Http\Controllers\MaintenanceController;
+use App\Modules\Mes\Http\Controllers\TraceController;
 use App\Modules\Mes\Http\Controllers\MasterData\BomController;
 use App\Modules\Mes\Http\Controllers\MasterData\MaterialController;
 use App\Modules\Mes\Http\Controllers\MasterData\RoutingController;
@@ -33,6 +36,7 @@ use App\Modules\Mes\Http\Controllers\PlaceholderController;
 use App\Modules\Mes\Http\Controllers\ReportController;
 use App\Modules\Mes\Http\Controllers\LandingController;
 use App\Modules\Mes\Http\Controllers\Reports\LaborController;
+use App\Modules\Mes\Http\Controllers\Reports\OeeController;
 use App\Modules\Mes\Http\Controllers\Reports\OutputController;
 use App\Modules\Mes\Http\Controllers\Reports\YieldController;
 use App\Modules\Mes\Http\Controllers\System\DepartmentController as SystemDepartmentController;
@@ -92,6 +96,30 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             Route::post('issues/{issue}/issue', [MaterialIssueController::class, 'issue'])
                 ->whereNumber('issue')->name('issues.issue');
 
+            // 完工入库与关单（M7 增补）
+            Route::get('receipts', [FinishedReceiptController::class, 'index'])->name('receipts.index');
+            Route::post('work-orders/{workOrder}/receipts', [FinishedReceiptController::class, 'store'])
+                ->whereNumber('workOrder')->name('work-orders.receipts.store');
+            Route::post('work-orders/{workOrder}/close', [FinishedReceiptController::class, 'close'])
+                ->whereNumber('workOrder')->name('work-orders.close');
+
+            // 批次追溯（M7 增补）
+            Route::get('trace', [TraceController::class, 'index'])->name('trace.index');
+            Route::get('trace/{lot}', [TraceController::class, 'show'])
+                ->where('lot', '[A-Za-z0-9\-]+')->name('trace.show');
+
+            // 设备保养（M7 增补：计划 / 到期生成 / 保养与维修单）
+            Route::prefix('maintenance')->name('maintenance.')->group(function () {
+                Route::get('plans', [MaintenanceController::class, 'plans'])->name('plans');
+                Route::post('plans', [MaintenanceController::class, 'storePlan'])->name('plans.store');
+                Route::put('plans/{plan}', [MaintenanceController::class, 'updatePlan'])
+                    ->whereNumber('plan')->name('plans.update');
+                Route::post('generate', [MaintenanceController::class, 'generate'])->name('generate');
+                Route::get('orders', [MaintenanceController::class, 'orders'])->name('orders');
+                Route::post('orders/{order}/complete', [MaintenanceController::class, 'complete'])
+                    ->whereNumber('order')->name('orders.complete');
+            });
+
             // 排产（M2-08 / M2-09）：甘特图 + 一键重排
             Route::get('aps', [ApsController::class, 'index'])->name('aps.index');
             Route::post('aps/schedule', [ApsController::class, 'schedule'])->name('aps.schedule');
@@ -103,6 +131,7 @@ Route::middleware(['web', 'module:mes', 'product.only:mes'])
             Route::get('reports/output', [OutputController::class, 'index'])->name('reports.output');
             Route::get('reports/yield', [YieldController::class, 'index'])->name('reports.yield');
             Route::get('reports/labor', [LaborController::class, 'index'])->name('reports.labor');
+            Route::get('reports/oee', [OeeController::class, 'index'])->name('reports.oee');
 
             // 主数据（M1：物料已真实落地，其余逐步替换）
             Route::prefix('master')->name('master.')->group(function () {

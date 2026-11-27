@@ -1,0 +1,9 @@
+MISSING_TABLE	wecom_configs
+MISSING_TABLE	wecom_message_logs
+MISSING_TABLE	wecom_oauth_states
+MISSING_TABLE	wecom_files
+MISSING_TABLE	collab_documents
+MISSING_TABLE	voice_rooms
+MISSING_TABLE	voice_sessions
+MISSING_TABLE	voice_participants
+MISSING_COL	users	wecom_userid,wecom_bound_at,wecom_notify_enabled,wecom_notify_settings

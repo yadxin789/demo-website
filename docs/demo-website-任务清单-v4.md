@@ -432,6 +432,50 @@ S5 与 S6 可并行；S5 必须在 S2 之后（要参照 ERP 的模型与 UI 规
 
 ---
 
+## 第 9.8 部分｜S14 对齐审计与 MES / HR 完备补全（2026-11-27）
+
+> 完成标记：`S14-align-complete`。口径：三套「对齐型」（ERP ↔ `E:\ddwl-erp\erp`、PM ↔ `E:\my-pm\pm-server-openEuler`、Shop ↔ `E:\erp-shop`）以「路由 / 表 / 视图引用」三层无缺失为对齐验收；「协同办公」「电话会议」「企业微信」「AI 外部 API」「注册页」为显式排除项。两套「新增型」（MES、HR）以 Odoo / ERPNext / OrangeHRM 为参照补全功能闭环。
+
+### A. 对齐审计（9 项）
+- [x] S14-A01 脚本 `tools/compare-routes.php`：参考项目原地 `artisan route:list --json --except-vendor` 导出基线，归一口径 = HTTP 方法 + URI（去产品前缀、参数统一 `{*}`）+ `Controller@method`
+- [x] S14-A02 脚本 `tools/compare-schema.php`：解析双方 migrations 的 `Schema::create|table` 与 `$table->col`，比对表集合与列集合
+- [x] S14-A03 脚本 `tools/compare-views.php`：同名视图比对 `route('x.y')` 引用集合，路由名去产品前缀归一化；缺 60% 以上引用判定为空壳
+- [x] S14-A04 ERP 对账：路由 353 / 355（缺 0、多 2 自建，唯一 action 差异是根路由 `HomeController@index` → `LandingController@show`）、表 287 / 287（缺表 0 缺列 0）、视图 171 / 174（缺文件 0、空壳 0）
+- [x] S14-A05 Shop 对账：路由 235 / 224（缺 12，全为 `/api/ai/*` 外部数据 API）、表 82 / 82（缺 0 缺列 0）、视图 117 / 117（缺文件 0、空壳 0）
+- [x] S14-A06 PM 对账：路由 268 / 196（缺 74 = api 38 + 企业微信 17 + 协同办公 11 + 注册 2 + 2 条 PATCH 形式差异）、表 49 / 41（缺 8 全属 wecom/collab/voice，`users` 缺 4 列同为 wecom）、视图 102 / 97（缺 5、空壳 3，全部落在排除项）
+- [x] S14-A07 PM 仅存差异定性：`/admin/departments/{id}`、`/admin/roles/{id}` 参考接 `PATCH|PUT`，演示站只有 `PUT`，功能等价；如需字面一致可改 `Route::match(['put','patch'], …)`
+- [x] S14-A08 结论：三套系统差异全部集中在五类已知排除项，除此之外 ERP / Shop 零差异、PM 仅 2 条 HTTP 方法形式差异
+- [x] S14-A09 明细落盘：`tools/baseline/ref-{erp,pm,shop}.json` + `diff-*` / `schema-*` / `views-*.txt`，可随时重跑复现
+
+### B. MES 完备补全（8 项）
+- [x] S14-M01 缺口定位：对标 Odoo Manufacturing / ERPNext，断点在「报工之后没有闭环」——缺完工入库、批次追溯、计划保养、OEE
+- [x] S14-M02 迁移 `2026_11_27_200001`：`finished_receipts`、`lots`、`maintenance_plans`、`maintenance_orders`（已 migrate）
+- [x] S14-M03 `CompletionService`：分批入库、超计划量拒绝、入库累加成品库存、入满自动 `completed`、关单校验工序全 done、批次号 `LOT-{Ymd}-{seq}` 与父批次推导
+- [x] S14-M04 `MaintenanceService`：到期计划一键生成保养单、同计划已有未完成单则跳过、完成后回写 `last_done_at` / `next_due_at`
+- [x] S14-M05 控制器 4 个：`FinishedReceiptController`、`MaintenanceController`、`TraceController`（`lot_no` 路由绑定）、`Reports\OeeController`（A=运行/(运行+停机)、P=理论/运行封顶 100%、Q=合格/(合格+不良)）
+- [x] S14-M06 视图 6 个 + 路由 12 条 + 菜单 4 项 + 工单详情「完工入库 / 关单」按钮块
+- [x] S14-M07 种子 `CompletionSeeder`：12 个原料批次 + 4 张工单成品入库与父批次链 + 6 条保养计划（2 条已到期）+ 4 张保养单（幂等）
+- [x] S14-M08 实测闭环：6 个新页 200；WO9 入 200 → 再入 600 → 累计 800 = 计划量 → 自动 completed；WO17 关单成功；WO9 因 6 道工序未 done 被拦（符合设计）；到期计划重复生成被跳过
+
+### C. HR 完备补全（8 项）
+- [x] S14-H01 缺口定位：对标 OrangeHRM（Training / Qualifications / Time-Work Shift）与 Odoo HR（Courses / Skills / Planning），缺培训、技能证书、排班表、员工自助
+- [x] S14-H02 迁移 `2026_11_27_210001`：`training_courses`、`training_sessions`、`training_records`、`skills`、`employee_skills`、`certificates`、`shift_assignments`（7 表，已 migrate）
+- [x] S14-H03 模型 7 个 + `Employee` 补 `skills()` / `certificates()` / `trainingRecords()` 三个关系
+- [x] S14-H04 控制器 4 个：`TrainingController`、`SkillController`（技能矩阵 + 证书台账）、`RosterController`（周视图 + 批量排班 + 状态标记）、`MeController`（按 `employee_no` 关联员工档案做自助首页）
+- [x] S14-H05 视图 5 个：`training/index`、`skills/index`、`skills/certificates`（60 天到期高亮、过期红）、`attendance/roster`（周网格 + 点格切状态）、`me/index`（未绑定档案时降级提示）
+- [x] S14-H06 路由 8 组 + 菜单 4 项：培训管理 / 技能矩阵 / 证书台账 / 排班表 / 我的自助，全部挂在 `auth:hr` 内、按 `hr.` 前缀命名
+- [x] S14-H07 种子 `TrainingSkillSeeder`：6 门课程、5 期场次、50 条培训记录、8 项技能、120 条员工技能、20 张证书（含过期与即将到期各若干）、150 条本周排班（幂等）
+- [x] S14-H08 实测：5 个新页全 200；建课程 / 建技能 / 挂等级 / 登记证书 / 批量排班（3 人×5 天=15 条）/ 开培训场次均写库成功，测后已清理脏数据
+
+### D. 回归与交付（5 项）
+- [x] S14-R01 `guard.ps1`：**PASS 17 / 0**（G-13 全量 `php -l` 1583 个文件通过）
+- [x] S14-R02 视觉 **45/0**、独立性 **31/0**、人设 **10/0**、交叉登录 **5/0**、走查 **17/0**
+- [x] S14-R03 `check-http.ps1` 新增 `[3b]` 固定清单 10 项（MES 5 页 + HR 5 页），项数由 60 扩到 70
+- [x] S14-R04 提交推送：见本轮 commit（main 分支），tag 待发版时补
+- [x] S14-R05 文档回填：规划书新增 12.12、任务清单新增本节；并记录 Blade 单行 `@php(...)` + 命名空间 → `T_NS_SEPARATOR` 500 这条坑
+
+---
+
 ## 第 10 部分｜验收清单
 
 ### 里程碑 A（`S4-live3`）

@@ -1,0 +1,2 @@
+EXTRA	GET /home	HomeController@index
+EXTRA	GET /preview	PreviewController@show

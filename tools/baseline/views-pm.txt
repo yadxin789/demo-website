@@ -1,0 +1,8 @@
+NO_VIEW	auth/register
+NO_VIEW	collab/open
+NO_VIEW	project/voice
+NO_VIEW	wecom/partials/send-modal-placeholder
+NO_VIEW	wecom/partials/send-modal
+THIN	collab/index	3/3
+THIN	profile/wecom/index	5/5
+THIN	wecom/files/index	3/3

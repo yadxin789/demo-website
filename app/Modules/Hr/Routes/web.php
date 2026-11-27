@@ -20,6 +20,7 @@ use App\Modules\Hr\Http\Controllers\DashboardController;
 use App\Modules\Hr\Http\Controllers\EmployeeController;
 use App\Modules\Hr\Http\Controllers\ImportController;
 use App\Modules\Hr\Http\Controllers\LeaveController;
+use App\Modules\Hr\Http\Controllers\MeController;
 use App\Modules\Hr\Http\Controllers\MovementController;
 use App\Modules\Hr\Http\Controllers\Org\DepartmentController;
 use App\Modules\Hr\Http\Controllers\Org\HeadcountController;
@@ -28,7 +29,10 @@ use App\Modules\Hr\Http\Controllers\PayrollController;
 use App\Modules\Hr\Http\Controllers\PerformanceController;
 use App\Modules\Hr\Http\Controllers\RecruitmentController;
 use App\Modules\Hr\Http\Controllers\ReportController;
+use App\Modules\Hr\Http\Controllers\RosterController;
+use App\Modules\Hr\Http\Controllers\SkillController;
 use App\Modules\Hr\Http\Controllers\SystemController;
+use App\Modules\Hr\Http\Controllers\TrainingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'module:hr', 'product.only:hr'])
@@ -114,6 +118,43 @@ Route::middleware(['web', 'module:hr', 'product.only:hr'])
             Route::post('leaves/{leave}/reject', [LeaveController::class, 'reject'])
                 ->whereNumber('leave')->name('leaves.reject');
             Route::get('leaves/balances', [LeaveController::class, 'balances'])->name('leaves.balances');
+
+            // 排班表（M7 增补）
+            Route::get('attendance/roster', [RosterController::class, 'index'])->name('attendance.roster');
+            Route::post('attendance/roster', [RosterController::class, 'store'])->name('attendance.roster.store');
+            Route::delete('attendance/roster/{assignment}', [RosterController::class, 'destroy'])
+                ->whereNumber('assignment')->name('attendance.roster.destroy');
+            Route::post('attendance/roster/{assignment}/mark', [RosterController::class, 'mark'])
+                ->whereNumber('assignment')->name('attendance.roster.mark');
+
+            // 培训管理（M7 增补）
+            Route::prefix('training')->name('training.')->group(function () {
+                Route::get('/', [TrainingController::class, 'index'])->name('index');
+                Route::post('courses', [TrainingController::class, 'storeCourse'])->name('courses.store');
+                Route::put('courses/{course}', [TrainingController::class, 'updateCourse'])
+                    ->whereNumber('course')->name('courses.update');
+                Route::post('sessions', [TrainingController::class, 'storeSession'])->name('sessions.store');
+                Route::post('sessions/{session}/records', [TrainingController::class, 'storeRecord'])
+                    ->whereNumber('session')->name('sessions.records.store');
+                Route::put('records/{record}', [TrainingController::class, 'updateRecord'])
+                    ->whereNumber('record')->name('records.update');
+            });
+
+            // 技能矩阵与证书（M7 增补）
+            Route::get('skills', [SkillController::class, 'index'])->name('skills.index');
+            Route::post('skills', [SkillController::class, 'storeSkill'])->name('skills.store');
+            Route::put('skills/{skill}', [SkillController::class, 'updateSkill'])
+                ->whereNumber('skill')->name('skills.update');
+            Route::post('skills/assign', [SkillController::class, 'assign'])->name('skills.assign');
+            Route::delete('skills/assignments/{assignment}', [SkillController::class, 'destroyAssignment'])
+                ->whereNumber('assignment')->name('skills.assignments.destroy');
+            Route::get('skills/certificates', [SkillController::class, 'certificates'])->name('skills.certificates');
+            Route::post('skills/certificates', [SkillController::class, 'storeCertificate'])->name('skills.certificates.store');
+            Route::delete('skills/certificates/{certificate}', [SkillController::class, 'destroyCertificate'])
+                ->whereNumber('certificate')->name('skills.certificates.destroy');
+
+            // 员工自助（M7 增补）
+            Route::get('me', [MeController::class, 'index'])->name('me');
 
             // H4 薪资
             Route::get('payroll/structures', [PayrollController::class, 'structures'])->name('payroll.structures');
