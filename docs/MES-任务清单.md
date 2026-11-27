@@ -177,3 +177,17 @@
 - [x] 九步演示脚本全部走通且数字联动（`tools/mes-demo-walkthrough.php` PASS 9 / FAIL 0）
 - [x] 无定时任务（MC-05，门禁 G-11）
 - [x] 门禁全绿（G-01~G-17：PASS 14 / FAIL 0 / WARN 1〔HR 资产待 S6 补〕/ SKIP 2〔快速模式〕）
+
+---
+
+## 增补｜系统管理后台验收（2026-11-27，全部通过）
+
+- [x] M-A01 迁移 `2026_11_27_100004_create_mes_org_tables`（departments / positions / users 两个外键列）
+- [x] M-A02 种子 `OrgSeeder`：7 部门 / 5 岗位 / 5 账号挂靠（幂等）
+- [x] M-A03 部门管理：列表 + 新增 + 行内编辑 + 删除保护（有子部门/有账号时拒绝）
+- [x] M-A04 岗位管理：列表 + 新增 + 行内编辑 + 删除保护（有账号时拒绝）
+- [x] M-A05 账号管理：列表 + 新增 + 编辑 + 启停 + 改角色 + 删除；密码由操作者填写
+- [x] M-A06 权限：四页 `hasRole('admin')`，非管理员 403
+- [x] M-A07 菜单：侧栏「系统管理」五项，非管理员隐藏
+- [x] M-A08 冒烟 `tools/smoke-mes-system.ps1`：新建账号（挂部门岗位）→ 邮箱登录 dashboard 200 → 编辑页 200 → 删除无残留；部门新增/删除通过
+- [x] M-A09 线上实测：`/mes/system/departments`、`positions`、`users`、`users/create`、`roles` 全 200
