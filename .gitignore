@@ -57,3 +57,4 @@ Thumbs.db
 
 # 部署包不入库
 storage/deploy-*.tar.gz
+storage/mobile-shots/
